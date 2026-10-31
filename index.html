@@ -858,11 +858,11 @@
         <div class="section-title">Afișare Detalii Vizuale:</div>
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
-            <input type="checkbox" id="chk-gaze" checked onchange="redraw()">
+            <input type="checkbox" id="chk-gaze" onchange="redraw()">
             <span style="color:#38bdf8;">👁️ Linie privire / conectare între partenerii față în față</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
-            <input type="checkbox" id="chk-dir-arrows" checked onchange="redraw()">
+            <input type="checkbox" id="chk-dir-arrows" onchange="redraw()">
             <span style="color:#22c55e;">🏹 Săgeți de direcție: arată pasul la dreapta pentru fiecare șir</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
@@ -1206,39 +1206,6 @@
         <button class="tool-btn" title="Zoom Out" onclick="zoom(0.7)">🔍-</button>
         <button class="tool-btn" title="Reset View" onclick="resetZoom()">⟲</button>
       </div>
-
-      <!-- Legend -->
-      <div class="legend-box">
-        <div class="legend-title">
-          <span>LEGENDĂ SALĂ</span>
-          <span style="font-size:10px; color:var(--text-muted);">Exact ca pe Slide</span>
-        </div>
-        <div class="legend-row">
-          <span class="color-swatch" style="background:#38bdf8;"></span>
-          <span>Șirul Stâng (Pășește spre Dreapta Sa: ➔)</span>
-        </div>
-        <div class="legend-row">
-          <span class="color-swatch" style="background:#f43f5e;"></span>
-          <span>Șirul Drept (Pășește spre Dreapta Sa: ➔ în Contrasens)</span>
-        </div>
-        <div class="legend-row">
-          <span class="color-swatch" style="background:#f59e0b; border-radius:50%;"></span>
-          <span>Participanții #1 (Urmărește-i cum se rotesc!)</span>
-        </div>
-        <div class="legend-row">
-          <span class="color-swatch" style="background:#f97316; border-radius:50%;"></span>
-          <span>40 Asistenți pe Buline (A1-A40)</span>
-        </div>
-        <div class="legend-row">
-          <span class="color-swatch" style="background:#22c55e;"></span>
-          <span>START / END</span>
-        </div>
-        <div class="legend-row">
-          <span class="color-swatch" style="background:#ef4444; border:1px solid #fecaca;"></span>
-          <span style="color:#ef4444; font-weight:700;">🚨 ZONĂ ROȘIE: Înghesuială &lt; 46cm umeri</span>
-        </div>
-      </div>
-
     </div>
 
   </div>
@@ -2054,93 +2021,8 @@
             ctx.fillStyle = (currentSolution800 === 'transit') ? 'rgba(2, 132, 199, 0.22)' : 'rgba(34, 197, 94, 0.22)';
             ctx.fill();
 
-            const apexAngle = seg.atBottom ? (Math.PI / 2) : (-Math.PI / 2);
-            const bx = seg.cx + seg.r * Math.cos(apexAngle);
-            const by = seg.cy + seg.r * Math.sin(apexAngle);
-
-            ctx.save();
-            ctx.translate(bx, by);
-
-            let labelText = `🟢 OK: ${(spaceInner * 100).toFixed(1)} cm`;
-            let subLabel = `(> 46cm umeri = Zero Roșu)`;
-            let badgeBg = 'rgba(21, 128, 61, 0.95)';
-            let badgeBorder = '#86efac';
-
-            if (currentSolution800 === 'tapered') {
-              labelText = `🟢 OK: ${(spaceInner * 100).toFixed(1)} cm`;
-              subLabel = `(Culoar viraj ${wTurn.toFixed(2)}m = +${((spaceInner-0.46)*100).toFixed(1)}cm liber)`;
-            } else if (currentSolution800 === 'transit') {
-              labelText = `🔵 TRANZIT FLUID (800 Oameni)`;
-              subLabel = `(Fără oprire pe viraj | 66.1cm pe drept)`;
-              badgeBg = 'rgba(2, 132, 199, 0.95)';
-              badgeBorder = '#7dd3fc';
-            } else if (currentSolution800 === 'staggered') {
-              labelText = `🟡 DISPUNERE ÎN ȘAH`;
-              subLabel = `(Decalaj 20cm | Fără contact umeri)`;
-              badgeBg = 'rgba(180, 83, 9, 0.95)';
-              badgeBorder = '#fde68a';
-            } else if (currentSolution800 === 'max_path') {
-              labelText = `🟣 TRASEU MAXIM 305m`;
-              subLabel = `(${(spaceInner * 100).toFixed(1)}cm viraj | 76.1cm drept)`;
-              badgeBg = 'rgba(109, 40, 217, 0.95)';
-              badgeBorder = '#c4b5fd';
-            }
-
-            const badgeW = 3.8;
-            const badgeH = 0.75;
-            ctx.fillStyle = badgeBg;
-            roundRect(ctx, -badgeW/2, -badgeH/2, badgeW, badgeH, 0.12, true, false);
-            ctx.strokeStyle = badgeBorder;
-            ctx.lineWidth = 0.03;
-            roundRect(ctx, -badgeW/2, -badgeH/2, badgeW, badgeH, 0.12, false, true);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 0.24px sans-serif';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(labelText, 0, -0.12);
-            ctx.font = 'bold 0.16px sans-serif';
-            ctx.fillStyle = '#e2e8f0';
-            ctx.fillText(subLabel, 0, 0.16);
-
-            ctx.restore();
             ctx.restore();
           }
-        }
-      }
-
-      // Direction Arrows in middle of corridors (identical to slide layout)
-      for (let seg of pathSegments) {
-        if (seg.type === 'line') {
-          const midY = (seg.y1 + seg.y2) / 2;
-          const isDown = (seg.y2 > seg.y1);
-          const dir = isDown ? 1 : -1;
-          ctx.save();
-          ctx.translate(seg.x1, midY);
-
-          // Subtle background glow
-          ctx.fillStyle = 'rgba(168, 85, 247, 0.12)';
-          ctx.beginPath();
-          ctx.arc(0, 0, 0.85, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Arrow shaft
-          ctx.strokeStyle = 'rgba(192, 132, 252, 0.55)';
-          ctx.lineWidth = 0.10;
-          ctx.beginPath();
-          ctx.moveTo(0, -dir * 0.7);
-          ctx.lineTo(0, dir * 0.7);
-          ctx.stroke();
-
-          // Arrow head
-          ctx.fillStyle = 'rgba(192, 132, 252, 0.75)';
-          ctx.beginPath();
-          ctx.moveTo(0, dir * 0.95);
-          ctx.lineTo(-0.28, dir * 0.45);
-          ctx.lineTo(0.28, dir * 0.45);
-          ctx.closePath();
-          ctx.fill();
-
-          ctx.restore();
         }
       }
 
