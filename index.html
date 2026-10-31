@@ -1061,26 +1061,40 @@
           </div>
         </div>
 
-        <!-- Distanță spate în spate -->
-        <div class="param-box" style="border-left:3px solid #fb923c;">
+        <!-- Distanță spate în spate: șiruri albastre (fără asistenți) -->
+        <div class="param-box" style="border-left:3px solid #38bdf8;">
           <div class="param-header">
-            <span class="param-name">Distanță spate în spate (între culoare)</span>
+            <span class="param-name">Spate în spate, șirurile albastre (fără asistenți)</span>
             <span class="param-val" id="disp-backgap">1.10 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-backgap" min="0.4" max="2.0" step="0.05" value="1.1" oninput="onBackGapChange(this.value)">
+          <input type="range" class="param-slider" id="rng-backgap" min="0.1" max="2.0" step="0.05" value="1.1" oninput="onBackGapChange(this.value)">
           <div class="param-sub">
-            <span>0.40 m</span>
-            <span id="backgap-note" style="color:#fb923c; font-weight:600;">zonă asistenți</span>
+            <span>0.10 m</span>
+            <span id="backgap-note" style="color:#38bdf8; font-weight:600;"></span>
             <span>2.00 m</span>
           </div>
           <div style="display:flex; gap:6px; margin-top:8px;">
-            <button class="preset-btn btn-bg" onclick="setBackGap(0.8)">0.8 m</button>
+            <button class="preset-btn btn-bg" onclick="setBackGap(0.1)">0.1 m</button>
+            <button class="preset-btn btn-bg" onclick="setBackGap(0.3)">0.3 m</button>
+            <button class="preset-btn btn-bg" onclick="setBackGap(0.6)">0.6 m</button>
             <button class="preset-btn btn-bg" onclick="setBackGap(1.0)">1.0 m</button>
-            <button class="preset-btn btn-bg" onclick="setBackGap(1.2)">1.2 m</button>
-            <button class="preset-btn btn-bg" onclick="setBackGap(1.5)">1.5 m</button>
             <button class="preset-btn" id="btn-bg-auto" onclick="setBackGapAuto()">Automat</button>
           </div>
           <div id="backgap-warn" style="display:none; margin-top:6px; font-size:11px; color:#fca5a5;"></div>
+        </div>
+
+        <!-- Zona asistenților: șiruri roz -->
+        <div class="param-box" style="border-left:3px solid #fb923c;">
+          <div class="param-header">
+            <span class="param-name">Spate în spate, șirurile roz (zona asistenților)</span>
+            <span class="param-val" id="disp-assistgap">1.10 m</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-assistgap" min="0.5" max="2.0" step="0.05" value="1.1" oninput="onAssistGapChange(this.value)">
+          <div class="param-sub">
+            <span>0.50 m</span>
+            <span id="assistgap-note" style="color:#fb923c; font-weight:600;"></span>
+            <span>2.00 m</span>
+          </div>
         </div>
 
         <!-- SECȚIUNE NOUĂ: DISTANȚE FAȚĂ DE PEREȚI -->
@@ -1412,7 +1426,10 @@
     let scale = 20;
     let panX = 0, panY = 0;
     let viewRot = 0; // rotirea vederii (radiani)
-    let backGap = 1.10;       // distanta spate in spate intre participantii culoarelor vecine (m)
+    let backGap = 1.10;       // spate in spate la sirurile ALBASTRE (fara asistenti), min 0.10 m
+    let assistGap = 1.10;     // spate in spate la sirurile ROZ, unde stau asistentii (zona portocalie)
+    let laneXs = [];          // pozitiile X ale axelor culoarelor
+    let assistAisles = [];    // zonele de asistenti (intre doua siruri roz, plus marginea dreapta daca nr. culoare e impar)
     let backGapAuto = true;   // true = culoarele umplu sala (distanta rezulta); false = distanta setata manual
     let backGapClamped = false;
     let laneYTop = 0, laneYBottom = 0;
@@ -1432,29 +1449,43 @@
 
     function recalculateAll() {
       const halfW = corridorW / 2;
-      let marginX;
+      const nA = Math.ceil((nLanes - 1) / 2);     // spatii intre siruri roz (cu asistenti)
+      const nB = Math.floor((nLanes - 1) / 2);    // spatii intre siruri albastre (fara asistenti)
+      const sumCW = (nLanes - 1) * corridorW;
       backGapClamped = false;
-      if (!backGapAuto) {
-        // Distanta spate in spate setata manual: blocul de culoare se centreaza in sala
-        const maxBG = Math.max(0.2, (ROOM_W - 0.6 - corridorW) / (nLanes - 1) - corridorW);
-        if (backGap > maxBG) { backGap = maxBG; backGapClamped = true; }
-        pitch = corridorW + backGap;
-        const blockW = (nLanes - 1) * pitch + corridorW;
-        marginX = (ROOM_W - blockW) / 2 + halfW;
+      let marginX, centered = !backGapAuto;
+      if (backGapAuto) {
+        const S = ROOM_W - 2 * (wallDistSide + halfW);
+        backGap = nB > 0 ? (S - sumCW - nA * assistGap) / nB : assistGap;
+        if (backGap < 0.10) { backGap = 0.10; centered = true; backGapClamped = true; }
+      }
+      if (centered) {
+        const maxB = nB > 0 ? Math.max(0.10, (ROOM_W - 0.6 - corridorW - sumCW - nA * assistGap) / nB) : 0.10;
+        if (backGap > maxB) { backGap = maxB; backGapClamped = true; }
+        if (backGap < 0.10) backGap = 0.10;
+        const S = sumCW + nA * assistGap + nB * backGap;
+        marginX = (ROOM_W - (S + corridorW)) / 2 + halfW;
         wallDistSide = marginX - halfW;
         const elSideSl = document.getElementById('rng-wall-side');
         if (elSideSl) elSideSl.value = Math.min(3.5, Math.max(0.5, wallDistSide));
       } else {
         marginX = wallDistSide + halfW;
-        const usableW = Math.max(2.0, ROOM_W - 2 * marginX);
-        pitch = usableW / (nLanes - 1);
-        backGap = pitch - corridorW;
       }
-      rTurn = pitch / 2;
+      // Pozitiile culoarelor: spatii alternante (roz-roz cu asistenti, albastru-albastru fara)
+      laneXs = [marginX];
+      const pitches = [];
+      for (let k = 0; k < nLanes - 1; k++) {
+        const pk = corridorW + (k % 2 === 0 ? assistGap : backGap);
+        pitches.push(pk);
+        laneXs.push(laneXs[k] + pk);
+      }
+      pitch = pitches.length ? pitches.reduce((u, v) => u + v, 0) / pitches.length : 2.0;
+      rTurn = pitches.length ? Math.min(...pitches) / 2 : 1.0;          // cel mai strans viraj (cazul cel mai defavorabil)
+      const rTurnMax = pitches.length ? Math.max(...pitches) / 2 : 1.0;
 
-      // Apex-ul exterior al virajului U este exact la distanța wallDistEnd de perete:
+      // Apex-ul exterior al virajului U este la distanta wallDistEnd de perete:
       const turnerMode = (currentSolution800 === 'turners');
-      const endPad = wallDistEnd + (turnerMode ? 0 : rTurn) + halfW;   // la intorcatori nu mai e nevoie de raza virajului
+      const endPad = wallDistEnd + (turnerMode ? 0 : rTurnMax) + halfW;   // la intorcatori nu mai e nevoie de raza virajului
       const yTop = endPad;
       const yBottom = ROOM_L - endPad;
       laneYTop = yTop; laneYBottom = yBottom;
@@ -1470,7 +1501,7 @@
       totalPathLength = 0;
 
       for (let i = 0; i < nLanes; i++) {
-        const x = marginX + i * pitch;
+        const x = laneXs[i];
         const goingDown = (i % 2 === 0);
         const yStart = goingDown ? yTop : yBottom;
         const yEnd = goingDown ? yBottom : yTop;
@@ -1489,7 +1520,7 @@
 
         if (i < nLanes - 1 && currentSolution800 === 'turners') {
           // Intoarcere asistata: culoarul merge drept pana aproape de perete, apoi un tronson scurt intre culoare
-          const nextX = marginX + (i + 1) * pitch;
+          const nextX = laneXs[i + 1];
           const yHop = goingDown ? yBottom : yTop;
           const hopLen = Math.abs(nextX - x);
           pathSegments.push({
@@ -1504,16 +1535,17 @@
           });
           totalPathLength += hopLen;
         } else if (i < nLanes - 1) {
-          const nextX = marginX + (i + 1) * pitch;
+          const nextX = laneXs[i + 1];
           const centerX = (x + nextX) / 2;
           const centerY = goingDown ? yBottom : yTop;
-          const arcLen = Math.PI * rTurn;
+          const rK = (nextX - x) / 2;
+          const arcLen = Math.PI * rK;
 
           pathSegments.push({
             type: 'arc',
             cx: centerX,
             cy: centerY,
-            r: rTurn,
+            r: rK,
             startAngle: Math.PI,
             endAngle: 0,
             anticlockwise: goingDown ? true : false,
@@ -1576,94 +1608,34 @@
     // Soluțiile cu viraj U real verifică înghesuiala (cele cu tranzit/șah/întorcători o evită prin altă metodă)
     function checksCongestion() { return ['none', 'tapered', 'max_path'].includes(currentSolution800); }
 
-    // Axa zonei de asistenti din dreapta culoarului `i` (in spatele participantilor, nu intre ei)
-    function aisleCenterX(i) {
-      const x = pathSegments.filter(sg => sg.type === 'line')[i].x1;
+    // Zona asistentilor (portocalie): spatiul din spatele participantilor ROZ, nu intre participanti.
+    // Culoarele merg alternativ (jos/sus), deci spatiile 0, 2, 4... sunt roz-roz; 1, 3, 5... sunt albastru-albastru (fara asistenti).
+    function aisleBoundsK(k) {
       const halfW = corridorW / 2;
-      if (i < nLanes - 1) return x + pitch / 2;
-      return x + halfW + Math.max(0.3, (ROOM_W - (x + halfW)) / 2);
-    }
-    function aisleBounds(i) {
-      const x = pathSegments.filter(sg => sg.type === 'line')[i].x1;
-      const halfW = corridorW / 2;
-      const left = x + halfW + TORSO_DEPTH / 2;
-      const right = (i < nLanes - 1) ? (x + pitch - halfW - TORSO_DEPTH / 2) : (ROOM_W - 0.15);
+      const left = laneXs[k] + halfW + TORSO_DEPTH / 2;
+      const right = (k < nLanes - 1) ? (laneXs[k + 1] - halfW - TORSO_DEPTH / 2) : (ROOM_W - 0.15);
       return { left, right: Math.max(left + 0.1, right) };
     }
 
     function buildDynamicAssistants(yTop, yBottom, marginX) {
       assistants = [];
-      const straightSegs = pathSegments.filter(s => s.type === 'line');
-      const numLines = straightSegs.length;
-      if (numLines === 0) return;
-
+      assistAisles = [];
+      for (let k = 0; k < nLanes - 1; k += 2) assistAisles.push(k);
+      if (nLanes % 2 === 1) assistAisles.push(nLanes - 1);      // marginea dreapta: ultimul culoar are sirul roz spre perete
+      const nAis = assistAisles.length;
+      if (!nAis || !assistCount) return;
+      const base = Math.floor(assistCount / nAis);
+      let rem = assistCount % nAis;
+      let id = 1;
       const segLen = yBottom - yTop;
-
-      // Schema exactă conform pozei originale din proiector: 9 culoare, 40 asistenți (A1 la A40)
-      // Asistenții sunt plasați EXCLUSIV pe tronsoanele drepte (niciun asistent pe virajele U!)
-      // și sunt aliniați în 5 rânduri orizontale regulate pe lățimea sălii.
-      if (nLanes === 9 && assistCount === 40) {
-        const yRows = [
-          yTop + segLen * 0.12,
-          yTop + segLen * 0.31,
-          yTop + segLen * 0.50,
-          yTop + segLen * 0.69,
-          yTop + segLen * 0.88
-        ];
-
-        // Culoarele 1 la 7 (index 0 la 6): exact câte 5 asistenți pe fiecare culoar
-        for (let i = 0; i < 7; i++) {
-          const seg = straightSegs[i];
-          const isDown = (seg.dir === 'down');
-          const base = i * 5;
-          for (let r = 0; r < 5; r++) {
-            // Dacă merge în jos: rând 0 -> A(base+1), ..., rând 4 -> A(base+5)
-            // Dacă merge în sus: rând 4 (baza) -> A(base+1), ..., rând 0 (top) -> A(base+5)
-            const rowIdx = isDown ? r : (4 - r);
-            const num = base + r + 1;
-            assistants.push({
-              x: aisleCenterX(i),
-              y: yRows[rowIdx],
-              angle: isDown ? Math.PI / 2 : -Math.PI / 2,
-              id: `A${num}`
-            });
-          }
-        }
-
-        // Culoarul 8 (index 7, merge în SUS spre virajul 8):
-        // Conform schemei din slide, asistenții A36, A37, A38 sunt pe rândurile superioare (0, 1, 2)
-        const seg7 = straightSegs[7];
-        assistants.push({ x: aisleCenterX(7), y: yRows[0], angle: -Math.PI / 2, id: 'A36' });
-        assistants.push({ x: aisleCenterX(7), y: yRows[1], angle: -Math.PI / 2, id: 'A37' });
-        assistants.push({ x: aisleCenterX(7), y: yRows[2], angle: -Math.PI / 2, id: 'A38' });
-
-        // Culoarul 9 (index 8, merge în JOS spre ieșirea END):
-        // Conform schemei din slide, asistenții A39, A40 sunt pe rândurile 3 și 4, chiar înainte de END!
-        const seg8 = straightSegs[8];
-        assistants.push({ x: aisleCenterX(8), y: yRows[3], angle: Math.PI / 2, id: 'A39' });
-        assistants.push({ x: aisleCenterX(8), y: yRows[4], angle: Math.PI / 2, id: 'A40' });
-      } else {
-        // Mod Dinamic: Asistenții sunt plasați ÎNTOTDEAUNA EXCLUSIV pe tronsoanele drepte (NICIODATĂ pe virajele U!)
-        const basePerLane = Math.floor(assistCount / numLines);
-        let rem = assistCount % numLines;
-        let curId = 1;
-
-        for (let i = 0; i < numLines; i++) {
-          const seg = straightSegs[i];
-          const countInLane = basePerLane + (rem > 0 ? 1 : 0);
-          if (rem > 0) rem--;
-          const isDown = (seg.dir === 'down');
-
-          for (let j = 0; j < countInLane; j++) {
-            const t = (j + 0.5) / countInLane;
-            const y = isDown ? (yTop + t * segLen) : (yBottom - t * segLen);
-            assistants.push({
-              x: aisleCenterX(i),
-              y: y,
-              angle: isDown ? Math.PI / 2 : -Math.PI / 2,
-              id: `A${curId++}`
-            });
-          }
+      for (const k of assistAisles) {
+        const cnt = base + (rem > 0 ? 1 : 0);
+        if (rem > 0) rem--;
+        const bd = aisleBoundsK(k);
+        const cx = (bd.left + bd.right) / 2;
+        for (let j = 0; j < cnt; j++) {
+          const t = (j + 0.5) / cnt;
+          assistants.push({ x: cx, y: yTop + t * segLen, angle: 0, id: `A${id++}`, aisle: k });
         }
       }
     }
@@ -1671,22 +1643,28 @@
     function onBackGapChange(v) { backGap = parseFloat(v); backGapAuto = false; recalculateAll(); }
     function setBackGap(v) { backGap = v; backGapAuto = false; recalculateAll(); }
     function setBackGapAuto() { backGapAuto = true; recalculateAll(); }
+    function onAssistGapChange(v) { assistGap = parseFloat(v); recalculateAll(); }
     function syncBackGapUI() {
-      const sl = document.getElementById('rng-backgap'); if (sl) sl.value = Math.min(2.0, Math.max(0.4, backGap));
+      const sl = document.getElementById('rng-backgap'); if (sl) sl.value = Math.min(2.0, Math.max(0.1, backGap));
       const d = document.getElementById('disp-backgap'); if (d) d.innerText = backGap.toFixed(2) + ' m';
-      const free = backGap - TORSO_DEPTH;
       const n = document.getElementById('backgap-note');
-      if (n) n.innerText = `zonă asistenți: ${(Math.max(0, free) * 100).toFixed(0)} cm liberi`;
+      if (n) n.innerText = `între umeri/spate: ${(backGap * 100).toFixed(0)} cm`;
       const w = document.getElementById('backgap-warn');
       if (w) {
-        let msg = '';
-        if (backGapClamped) msg = `Nu încap mai mult de ${backGap.toFixed(2)} m pentru ${nLanes} culoare în sală; valoarea a fost limitată.`;
-        else if (free < ASSIST_DIA) msg = `Un asistent are nevoie de aproximativ ${(ASSIST_DIA * 100).toFixed(0)} cm; aici sunt doar ${(Math.max(0, free) * 100).toFixed(0)} cm liberi.`;
+        const msg = backGapClamped ? `Cu aceste setări nu încap ${nLanes} culoare; distanța a fost limitată la ${(backGap * 100).toFixed(0)} cm.` : '';
         w.style.display = msg ? 'block' : 'none';
         w.innerText = msg;
       }
       document.querySelectorAll('.btn-bg').forEach(b => b.classList.toggle('active', !backGapAuto && Math.abs(parseFloat(b.innerText) - backGap) < 0.03));
       const ba = document.getElementById('btn-bg-auto'); if (ba) ba.classList.toggle('active', backGapAuto);
+      const sa = document.getElementById('rng-assistgap'); if (sa) sa.value = assistGap;
+      const da = document.getElementById('disp-assistgap'); if (da) da.innerText = assistGap.toFixed(2) + ' m';
+      const na = document.getElementById('assistgap-note');
+      if (na) {
+        const free = Math.max(0, assistGap - TORSO_DEPTH);
+        na.innerText = `liber pentru asistent: ${(free * 100).toFixed(0)} cm` + (free < ASSIST_DIA ? ' (prea puțin)' : '');
+        na.style.color = free < ASSIST_DIA ? '#fca5a5' : '#fb923c';
+      }
     }
 
     function updateMetrics() {
@@ -1697,7 +1675,7 @@
       document.getElementById('disp-assist').innerText = `${assistCount} asistenți`;
       document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) ? 'A1 - A40 (conform slide)' : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`;
       document.getElementById('disp-lanes').innerText = `${nLanes} Culoare (${nLanes-1} Bucle U)`;
-      document.getElementById('disp-pitch').innerText = `Pas între axe: ${pitch.toFixed(2)} m`;
+      document.getElementById('disp-pitch').innerText = `Pas între axe: ${(corridorW + assistGap).toFixed(2)} / ${(corridorW + backGap).toFixed(2)} m`;
       document.getElementById('disp-dist-face').innerText = `${corridorW.toFixed(2)} m`;
 
       document.getElementById('calc-len').innerText = `${totalPathLength.toFixed(1)} m`;
@@ -2484,17 +2462,9 @@
     }
 
     function drawAssistants() {
-      // Zone portocalii (culoarele de asistenti, in spatele participantilor)
-      const used = new Set();
-      const laneSegs = pathSegments.filter(sg => sg.type === 'line');
-      for (const a of assistants) {
-        for (let i = 0; i < laneSegs.length; i++) {
-          const bd = aisleBounds(i);
-          if (a.x >= bd.left - 0.01 && a.x <= bd.right + 0.01) { used.add(i); break; }
-        }
-      }
-      for (const i of used) {
-        const bd = aisleBounds(i);
+      // Zone portocalii: spatiul din spatele participantilor roz
+      for (const k of assistAisles) {
+        const bd = aisleBoundsK(k);
         ctx.save();
         ctx.fillStyle = 'rgba(251, 146, 60, 0.50)';
         ctx.fillRect(bd.left, laneYTop, bd.right - bd.left, laneYBottom - laneYTop);
@@ -2505,9 +2475,9 @@
         ctx.setLineDash([]);
         ctx.restore();
       }
-      const freeW = Math.max(0.3, backGap - TORSO_DEPTH);
-      const rad = Math.min(0.40, Math.max(0.18, freeW / 2 - 0.02));
       for (let a of assistants) {
+        const bd = aisleBoundsK(a.aisle);
+        const rad = Math.min(0.40, Math.max(0.16, (bd.right - bd.left) / 2 - 0.02));
         ctx.save();
         ctx.translate(a.x, a.y);
         ctx.rotate(-viewRot);
@@ -2814,11 +2784,11 @@
       const showWallDims = document.getElementById('chk-wall-dims')?.checked ?? true;
       if (showWallDims) {
         // Distanță perete SUS
-        const topTurnX = (nLanes > 2) ? (wallDistSide + corridorW/2 + pitch * 1.5) : (ROOM_W / 2);
+        const topTurnX = (nLanes > 2) ? (laneXs[1] + laneXs[2]) / 2 : (ROOM_W / 2);
         drawWallClearanceLine(topTurnX, 0, topTurnX, wallDistEnd, ` ${wallDistEnd.toFixed(2)} m (Perete Sus)`, '#38bdf8');
 
         // Distanță perete JOS
-        const btmTurnX = wallDistSide + corridorW/2 + pitch * 0.5;
+        const btmTurnX = (laneXs[0] + laneXs[1]) / 2;
         drawWallClearanceLine(btmTurnX, ROOM_L - wallDistEnd, btmTurnX, ROOM_L, ` ${wallDistEnd.toFixed(2)} m (Perete Jos)`, '#38bdf8');
 
         // Distanță perete STÂNGA
@@ -2968,7 +2938,7 @@
       const stepDist = totalVirtualLength / pairs;
       const rInner = Math.max(0.05, rTurn - wTurn / 2);
       const spaceInner = stepDist * (rInner / rTurn);
-      const freeAisle = Math.max(0, backGap - TORSO_DEPTH);
+      const freeAisle = Math.max(0, assistGap - TORSO_DEPTH);
       const totalSec = pairs * stepIntervalSec;
       const turnerAssist = turnerMode ? 2 * (nLanes - 1) : 0;
       const solNames = { tapered: 'Soluția 1 - culoar îngustat pe viraj', transit: 'Soluția 2 - viraj tranzit fluid', staggered: 'Soluția 3 - dispunere în șah', max_path: 'Soluția 4 - traseu maxim', turners: 'Soluția 5 - întorcători la capete', none: 'Configurația inițială' };
@@ -2982,12 +2952,13 @@
         { title: 'Distanțe setate', rows: [
           ['Față în față (lățime culoar)', `${fm(corridorW)} m`, 'distanța dintre cele două șiruri'],
           ['Lățime culoar pe viraj', turnerMode ? 'fără viraj' : `${fm(wTurn)} m`, turnerMode ? 'întorcători la capete' : 'doar în zona virajului U'],
-          ['Spate în spate (între culoare)', `${fm(backGap)} m`, 'spațiul din spatele participanților'],
-          ['Pas între axele culoarelor', `${fm(pitch)} m`, 'lățime culoar + spate în spate'],
+          ['Spate în spate, șiruri albastre', `${fm(backGap)} m`, 'fără asistenți, minim 0,10 m'],
+          ['Spate în spate, șiruri roz', `${fm(assistGap)} m`, 'zona portocalie a asistenților'],
+          ['Pas între axe (roz / albastru)', `${fm(corridorW + assistGap)} / ${fm(corridorW + backGap)} m`, 'lățime culoar + spate în spate'],
           ['Distanță capete față de perete', `${fm(wallDistEnd)} m`, 'sus și jos'],
           ['Distanță culoare față de pereții laterali', `${fm(wallDistSide)} m`, 'stânga și dreapta'],
           ['Număr culoare', `${nLanes}`, `${nLanes - 1} ${turnerMode ? 'treceri la capete' : 'viraje U'}`],
-          ['Rază viraj (axa culoarului)', turnerMode ? '-' : `${fm(rTurn)} m`, 'pas între axe / 2'],
+          ['Rază viraj (axa culoarului)', turnerMode ? '-' : `${fm(rTurn)} - ${fm((corridorW + Math.max(assistGap, backGap)) / 2)} m`, 'pas între axe / 2 (cel mai strâns - cel mai larg)'],
         ]},
         { title: 'Traseu', rows: [
           ['Lungime culoar drept', `${fm(laneLen, 1)} m`, 'lungime sală - capete'],
@@ -3002,7 +2973,8 @@
           ['Spațiu pe persoană pe culoar', fcm(stepDist), 'lungime traseu / perechi'],
           ['Liber față de umeri (46 cm)', fcm(stepDist - SHOULDER), 'spațiu pe persoană - 46 cm'],
           ['Spațiu pe interior de viraj', turnerMode ? 'nu există' : fcm(spaceInner), 'spațiu pe persoană x R interior / R axă'],
-          ['Lățime liberă între spatele participanților', fcm(freeAisle), 'spate în spate - 2 x 12 cm (adâncime piept)'],
+          ['Lățime liberă în zona asistenților', fcm(freeAisle), 'spate în spate roz - 24 cm (adâncime piept)'],
+          ['Lățime liberă între spatele albastre', fcm(Math.max(0, backGap - TORSO_DEPTH)), 'spate în spate albastru - 24 cm'],
         ]},
         { title: 'Timp', rows: [
           ['Pauză față în față', `${fm(stepIntervalSec, 1)} s`, 'setată în aplicație'],
@@ -3012,11 +2984,11 @@
       ];
 
       const formulas = [
-        'Pas între axe = lățime culoar + distanță spate în spate',
-        'Spațiu pe persoană = lungime traseu / număr de perechi',
+                'Spațiu pe persoană = lungime traseu / număr de perechi',
         'Liber față de umeri = spațiu pe persoană - 0,46 m',
         'Spațiu pe interior de viraj = spațiu pe persoană x (R axă - lățime viraj / 2) / R axă',
-        'Lățime liberă între spate = distanță spate în spate - 0,24 m',
+        'Lățime liberă între spate = distanță spate în spate - 0,24 m (adâncimea pieptului)',
+        'Pas între axe = lățime culoar + spate în spate (alternativ: roz cu asistenți, albastru fără)',
         'Durată tur = număr de perechi x secunde pe pas',
       ];
 
@@ -3041,9 +3013,13 @@
       }
       if (freeAisle < ASSIST_DIA) {
         const need = ASSIST_DIA + TORSO_DEPTH;
-        sug.push(`Zona asistenților are ${fcm(freeAisle)} liberi, iar un asistent are nevoie de aproximativ 76 cm. Măriți distanța spate în spate la cel puțin ${fm(need)} m.`);
+        sug.push(`Zona asistenților are ${fcm(freeAisle)} liberi, iar un asistent are nevoie de aproximativ 76 cm. Măriți distanța spate în spate la șirurile roz la cel puțin ${fm(need)} m.`);
       }
-      const possLanes = Math.floor((ROOM_W - 2 * 1.0 - corridorW) / (corridorW + backGap)) + 1;
+      let possLanes = 1;
+      for (let nn = 2; nn <= 40; nn++) {
+        const aa = Math.ceil((nn - 1) / 2), bb = Math.floor((nn - 1) / 2);
+        if ((nn - 1) * corridorW + aa * assistGap + bb * backGap + corridorW <= ROOM_W - 2.0) possLanes = nn; else break;
+      }
       if (possLanes > nLanes) sug.push(`Cu aceste distanțe ar încăpea ${possLanes} culoare (acum ${nLanes}), cu pereții laterali la 1,0 m. Mai multe culoare înseamnă culoare mai scurte sau mai mult spațiu pe persoană.`);
       const secFor30 = 1800 / pairs;
       if (totalSec > 1800) sug.push(`Pentru un tur sub 30 de minute pauza trebuie să fie de cel mult ${fm(secFor30, 1)} s pe pas (acum ${fm(stepIntervalSec, 1)} s).`);
