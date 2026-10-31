@@ -1298,7 +1298,7 @@
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             Combină tot ce ai cerut într-o singură configurație:<br>
             • <b>Câte un întorcător în centrul fiecărei curbe</b> (om portocaliu): participanții trec în jurul lui, fără oprire, deci nu există înghesuială.<br>
-            • <b>Șirurile albastre fără asistenți în spate</b>, apropiate la <b>30 cm</b> spate în spate (poți coborî oricând până la 10 cm).<br>
+            • <b>Șirurile albastre fără asistenți în spate</b>, apropiate la <b>50 cm</b> spate în spate (minimul la care încape întorcătorul; fără întorcători poți coborî până la 10 cm).<br>
             • <b>Asistenții în zone portocalii</b>, în spatele șirurilor roz: 5 zone cu câte 8 asistenți (A1–A40), cu 86 cm liberi fiecare.<br>
             • Spațiul câștigat de la albastre se folosește pentru <b>un al 10-lea culoar</b> (lățimea sălii rămâne cu 1,45 m până la pereții laterali).<br>
             • <b style="color:#bef264;">79,3 cm între persoane</b> pe culoar (în loc de 71,3 cm la Soluția 5), cu 33 cm liberi față de umeri; pe fiecare culoar stau 80 de oameni în loc de 89.<br>
@@ -1514,16 +1514,17 @@
       const nB = Math.floor((nLanes - 1) / 2);    // spatii intre siruri albastre (fara asistenti)
       const sumCW = (nLanes - 1) * corridorW;
       backGapClamped = false;
+      const minB = isTurnerMode() ? 0.50 : 0.10;     // la intorcatori, omul din centrul curbei trebuie sa incapa intre sirurile albastre
       let marginX, centered = !backGapAuto;
       if (backGapAuto) {
         const S = ROOM_W - 2 * (wallDistSide + halfW);
         backGap = nB > 0 ? (S - sumCW - nA * assistGap) / nB : assistGap;
-        if (backGap < 0.10) { backGap = 0.10; centered = true; backGapClamped = true; }
+        if (backGap < minB) { backGap = minB; centered = true; backGapClamped = true; }
       }
       if (centered) {
-        const maxB = nB > 0 ? Math.max(0.10, (ROOM_W - 0.6 - corridorW - sumCW - nA * assistGap) / nB) : 0.10;
+        const maxB = nB > 0 ? Math.max(minB, (ROOM_W - 0.6 - corridorW - sumCW - nA * assistGap) / nB) : minB;
         if (backGap > maxB) { backGap = maxB; backGapClamped = true; }
-        if (backGap < 0.10) backGap = 0.10;
+        if (backGap < minB) backGap = minB;
         const S = sumCW + nA * assistGap + nB * backGap;
         marginX = (ROOM_W - (S + corridorW)) / 2 + halfW;
         wallDistSide = marginX - halfW;
@@ -1726,7 +1727,8 @@
       if (n) n.innerText = `între umeri/spate: ${(backGap * 100).toFixed(0)} cm`;
       const w = document.getElementById('backgap-warn');
       if (w) {
-        const msg = backGapClamped ? `Cu aceste setări nu încap ${nLanes} culoare; distanța a fost limitată la ${(backGap * 100).toFixed(0)} cm.` : '';
+        let msg = backGapClamped ? `Cu aceste setări nu încap ${nLanes} culoare; distanța a fost limitată la ${(backGap * 100).toFixed(0)} cm.` : '';
+        if (isTurnerMode() && backGap <= 0.5001) msg = (msg ? msg + ' ' : '') + 'Cu întorcători, albaștrii nu pot fi mai aproape de 50 cm: atât încape asistentul din centrul curbei.';
         w.style.display = msg ? 'block' : 'none';
         w.innerText = msg;
       }
@@ -1989,7 +1991,7 @@
       assistCount = 40;
       if (mode === 'recommended') {
         assistGap = 1.10;
-        backGap = 0.30;
+        backGap = 0.50;
         backGapAuto = false;
       } else if (prevMode === 'recommended') {
         assistGap = 1.10;
@@ -2535,7 +2537,8 @@
         ctx.beginPath(); ctx.arc(seg.cx, seg.cy, 0.42, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.setLineDash([]);
         ctx.restore();
-        const gaze = seg.atBottom ? Math.PI / 2 : -Math.PI / 2;      // cu fata spre participantii din curba
+        const aisleGap = 2 * seg.r - corridorW;                          // spate in spate intre sirurile care trec pe langa el
+        const gaze = aisleGap < 0.75 ? 0 : (seg.atBottom ? Math.PI / 2 : -Math.PI / 2);   // pe alee ingusta sta cu umerii pe lungimea culoarului
         drawHumanTopDown(seg.cx, seg.cy, gaze, 0, false, '', '#ea580c', '#fb923c', false, 0, false, 0);
       }
     }
