@@ -752,6 +752,13 @@
 
     .dot-teal { background: #2dd4bf; box-shadow: 0 0 6px rgba(45,212,191,.7); }
     #sol-btn-turners.active, #card-sol-btn-turners.active { background: #0d9488; border-color: #5eead4; box-shadow: 0 0 10px rgba(94, 234, 212, 0.4); color: #fff; }
+
+    /* ===== buton Export PDF vizibil in antet ===== */
+    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .hdr-pdf { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 999px; border: 1px solid #38bdf8; background: #0284c7; color: #fff; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .hdr-pdf:hover { background: #0ea5e9; }
+    .mob-pdf { flex: 0 0 auto !important; background: #0284c7 !important; border-color: #38bdf8 !important; color: #fff !important; display: inline-flex; align-items: center; gap: 6px; }
+    @media (max-width: 900px) { .header-right { display: none; } }
   </style>
 </head>
 <body>
@@ -787,6 +794,7 @@
     </div>
 
     <!-- Circuit Progress Pill -->
+    <div class="header-right">
     <div class="circuit-pill">
       <span>Pasul <b id="hdr-step-num">1 / 400</b></span>
       <span class="sep"></span>
@@ -796,12 +804,15 @@
       <span class="sep pill-extra"></span>
       <span class="pill-extra"><b id="hdr-progress">0%</b></span>
     </div>
+    <button class="hdr-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Export PDF</button>
+    </div>
   </header>
 
   <!-- Mobile Tab Switcher: Plan vs Settings -->
   <div class="mobile-nav-bar">
     <button id="mob-tab-plan" class="mob-nav-btn active" onclick="setMobileView('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg> Plan Sală & Animație</button>
     <button id="mob-tab-ctrl" class="mob-nav-btn" onclick="setMobileView('ctrl')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg> Setări & Calcule (800)</button>
+    <button class="mob-nav-btn mob-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> PDF</button>
   </div>
 
   <!-- Main View -->
