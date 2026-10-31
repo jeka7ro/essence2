@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulare 800 Oameni Față în Față - Pas la Dreapta în Contrasens (35.3m × 21.6m)</title>
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --panel-bg: rgba(15, 23, 42, 0.98);
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-orange: #f97316;
+      --accent-purple: #a855f7;
+      --accent-gold: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    header {
+      background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 8px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-mode {
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid var(--accent-purple);
+      color: #c084fc;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Circuit Progress Pill */
+    .circuit-pill {
+      background: #1e293b;
+      border: 1px solid var(--accent-blue);
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .circuit-pill b {
+      color: var(--accent-blue);
+      font-family: ui-monospace, monospace;
+      font-size: 14px;
+    }
+
+    /* Camera Switcher */
+    .cam-selector {
+      display: flex;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .btn-cam {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-cam:hover { color: #fff; }
+    .btn-cam.active {
+      background: #0284c7;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);
+    }
+
+    /* Main Container */
+    .app-main {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 430px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      overflow-y: auto;
+      box-shadow: 6px 0 30px rgba(0,0,0,0.6);
+    }
+
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--card-border);
+      background: #0f172a;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 11px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 14px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Action Buttons */
+    .big-step-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #fff;
+      border: 1px solid #38bdf8;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
+      transition: all 0.15s ease;
+      margin-bottom: 10px;
+    }
+
+    .big-step-btn:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);
+      transform: translateY(-1px);
+    }
+
+    .progress-box {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #0f172a;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 8px 0;
+      border: 1px solid #334155;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      border-radius: 5px;
+      transition: width 0.15s linear;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    button.ctrl-btn {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      background: #334155;
+      color: var(--text-main);
+      border: 1px solid #475569;
+    }
+
+    button.ctrl-btn:hover { background: #475569; }
+    button.ctrl-btn.btn-primary { background: var(--accent-blue); color: #0f172a; border-color: transparent; }
+    button.ctrl-btn.btn-active { background: #0284c7 !important; color: #fff !important; }
+
+    .preset-btn {
+      flex: 1;
+      padding: 7px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 6px;
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .preset-btn:hover {
+      color: #fff;
+      background: #334155;
+    }
+    .preset-btn.active {
+      background: var(--accent-blue);
+      color: #0f172a;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Parameters */
+    .param-box {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .param-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .param-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-blue);
+      font-family: ui-monospace, monospace;
+    }
+
+    .param-slider {
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      margin: 4px 0;
+    }
+
+    .param-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+    }
+
+    .param-sub {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Explanation Banner */
+    .exercise-banner {
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #e9d5ff;
+    }
+
+    /* Canvas Viewport */
+    .viewport {
+      flex: 1;
+      position: relative;
+      background: #050811;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      display: block;
+      cursor: grab;
+    }
+    canvas:active { cursor: grabbing; }
+
+    /* Overlay Badge on Canvas */
+    .canvas-overlay-info {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--accent-blue);
+      padding: 8px 14px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: #fff;
+      max-width: 820px;
+    }
+
+    .sol-pill {
+      background: rgba(30, 41, 59, 0.85);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 4px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sol-pill:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .sol-pill.active {
+      color: #fff;
+      font-weight: 700;
+    }
+    #sol-btn-tapered.active, #card-sol-btn-tapered.active { background: #059669; border-color: #34d399; box-shadow: 0 0 10px rgba(52, 211, 153, 0.4); color: #fff; }
+    #sol-btn-transit.active, #card-sol-btn-transit.active { background: #0284c7; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); color: #fff; }
+    #sol-btn-staggered.active, #card-sol-btn-staggered.active { background: #d97706; border-color: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); color: #fff; }
+    #sol-btn-max.active, #card-sol-btn-max.active { background: #7c3aed; border-color: #a78bfa; box-shadow: 0 0 10px rgba(167, 139, 250, 0.4); color: #fff; }
+    #sol-btn-none.active, #card-sol-btn-none.active { background: #dc2626; border-color: #f87171; box-shadow: 0 0 10px rgba(248, 113, 113, 0.4); color: #fff; }
+
+    /* Toolbar */
+    .viewport-toolbar {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: flex;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--card-border);
+      padding: 5px;
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    .tool-btn {
+      width: 32px;
+      height: 32px;
+      background: #1e293b;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .tool-btn:hover { background: #334155; }
+
+    /* Legend */
+    .legend-box {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--card-border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+      font-size: 11px;
+      z-index: 10;
+      max-width: 330px;
+    }
+
+    .legend-title {
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      color: #cbd5e1;
+    }
+
+    .color-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="header-left">
+      <div class="brand-title">
+        <span>👥 FAȚĂ ÎN FAȚĂ & PAS LA DREAPTA ÎN CONTRASENS</span>
+      </div>
+
+      <!-- Quick Camera Switcher -->
+      <div class="cam-selector">
+        <button id="cam-macro" class="btn-cam active" onclick="setCamMode('macro')">
+          <span>🔎</span> Super Macro (Ochi)
+        </button>
+        <button id="cam-close" class="btn-cam" onclick="setCamMode('close')">
+          <span>🔍</span> Culoar Drept
+        </button>
+        <button id="cam-congestion" class="btn-cam" onclick="setCamMode('congestion')" style="color:#f87171; border-color:#ef4444;">
+          <span>🚨</span> Viraj Roșu (Înghesuială)
+        </button>
+        <button id="cam-follow" class="btn-cam" onclick="setCamMode('follow')">
+          <span>🎥</span> Urmărire Lider
+        </button>
+        <button id="cam-full" class="btn-cam" onclick="setCamMode('full')">
+          <span>🗺️</span> Toată Sala (800)
+        </button>
+      </div>
+    </div>
+
+    <!-- Circuit Progress Pill -->
+    <div class="circuit-pill">
+      <span>PASUL:</span>
+      <b id="hdr-step-num"># 1 / 400</b>
+      <span style="color:#64748b;">|</span>
+      <span>⏳ Pas în: <b id="hdr-countdown" style="color:var(--accent-green); font-family:ui-monospace, monospace; font-size:14px;">10.0s</b></span>
+      <span style="color:#64748b;">|</span>
+      <span>Progres: <b id="hdr-progress">0%</b></span>
+    </div>
+  </header>
+
+  <!-- Main View -->
+  <div class="app-main">
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+      
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('tab-circuit')">🦶 Pas Dreapta</button>
+        <button class="tab-btn" onclick="switchTab('tab-params')">🎛️ Parametri</button>
+        <button class="tab-btn" onclick="switchTab('tab-congestion')" style="color:#f87171; font-weight:800;">🚨 Unde se Înghesuie?</button>
+        <button class="tab-btn" onclick="switchTab('tab-calc')">📐 Calcul</button>
+      </div>
+
+      <!-- TAB 1: CIRCUIT CONTRASENS -->
+      <div id="tab-circuit" class="tab-content active">
+        
+        <div class="exercise-banner">
+          <b>🎯 REGULA EXACTĂ DE MIȘCARE:</b><br>
+          • Oamenii stau <b>față în față</b> peste culoar și <b>umăr la umăr</b> pe fiecare linie.<br>
+          • <b>Când omul din stânga face un pas spre dreapta lui</b>, omul din fața lui face și el <b>un pas spre dreapta lui</b>.<br>
+          • Fiind față în față, <b>„dreapta fiecăruia” înseamnă direcții opuse (contrasens)</b>!<br>
+          • Astfel, cele două șiruri alunecă în sensuri contrare, întâlnind la fiecare pas un nou partener, până fac turul complet și revin la punctul de pornire.
+        </div>
+
+        <!-- Big Step Button -->
+        <button class="big-step-btn" onclick="triggerContrasensStep()">
+          <span>🦶</span> FĂ UN PAS LA DREAPTA (Partener Nou)
+        </button>
+
+        <div class="btn-group">
+          <button id="btn-flow-play" class="ctrl-btn btn-primary" onclick="toggleFlowPlay()">
+            <span id="play-icon">⏸</span> Pauză Mișcare
+          </button>
+          <button class="ctrl-btn" onclick="resetCircuit()">
+            <span>🔄</span> Reset la Pasul 1
+          </button>
+        </div>
+
+        <!-- Progress Box -->
+        <div class="progress-box">
+          <div class="section-title">
+            <span>Tur Complet În Contrasens</span>
+            <span id="circuit-status" style="color:var(--accent-green);">ACTIV (60 FPS)</span>
+          </div>
+
+          <div class="progress-bar-bg">
+            <div id="circuit-progress-fill" class="progress-bar-fill"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#cbd5e1; margin-top:4px;">
+            <span>Șirul Stâng: ➔ Spre Dreapta Sa</span>
+            <span id="lbl-lap-count">Circuitul #1</span>
+            <span>Șirul Drept: ➔ Spre Dreapta Sa</span>
+          </div>
+
+          <div class="param-header" style="margin-top:14px;">
+            <span class="param-name">⏱️ Timp Față în Față (înainte de pas):</span>
+            <span class="param-val" id="disp-interval">10.0 sec / pas</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-interval" min="2" max="60" step="1" value="10" oninput="updateInterval(this.value)">
+          <div class="param-sub">
+            <span>2s</span>
+            <span style="color:var(--accent-green); font-weight:700;">10s (recomandat atelier)</span>
+            <span>60s</span>
+          </div>
+
+          <!-- Quick Preset Buttons -->
+          <div style="display:flex; gap:5px; margin-top:8px;">
+            <button class="preset-btn" onclick="setIntervalPreset(5)">5 sec</button>
+            <button class="preset-btn active" id="btn-preset-10" onclick="setIntervalPreset(10)">10 sec</button>
+            <button class="preset-btn" onclick="setIntervalPreset(15)">15 sec</button>
+            <button class="preset-btn" onclick="setIntervalPreset(30)">30 sec</button>
+            <button class="preset-btn" onclick="setIntervalPreset(60)">60 sec</button>
+          </div>
+
+          <!-- Live Countdown Box -->
+          <div style="margin-top:12px; background:#0f172a; border-radius:8px; padding:10px; border:1px solid #334155;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11.5px; font-weight:700; color:#38bdf8;">⏳ Numărătoare Pas:</span>
+              <span id="disp-countdown" style="font-size:14px; font-weight:800; color:var(--accent-green); font-family:ui-monospace, monospace;">10.0s</span>
+            </div>
+            <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden; margin-top:6px; border:1px solid #334155;">
+              <div id="countdown-bar-fill" style="height:100%; width:100%; background:linear-gradient(90deg, #38bdf8, #22c55e); transition:width 0.1s linear;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:4px; text-align:center;">
+              Participanții stau nemișcați față în față, apoi pășesc lateral la dreapta
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Toggles -->
+        <div class="section-title">Afișare Detalii Vizuale:</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+            <input type="checkbox" id="chk-gaze" checked onchange="redraw()">
+            <span style="color:#38bdf8;">👁️ Linie privire / conectare între partenerii față în față</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+            <input type="checkbox" id="chk-dir-arrows" checked onchange="redraw()">
+            <span style="color:#22c55e;">🏹 Săgeți de direcție: arată pasul la dreapta pentru fiecare șir</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+            <input type="checkbox" id="chk-lead-marker" checked onchange="redraw()">
+            <span style="color:#f59e0b;">⭐ Urmărește Participantul #1 (Linia Stângă) și #1 (Linia Dreaptă)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+            <input type="checkbox" id="chk-assistants" checked onchange="redraw()">
+            <span style="color:#f97316;">🟠 50 Asistenți pe Buline (A1-A50)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+            <input type="checkbox" id="chk-wall-dims" checked onchange="redraw()">
+            <span style="color:#38bdf8;">📏 Cote & Distanțe față de Pereți (Sus, Jos, Laterale)</span>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: PARAMETRI SALĂ -->
+      <div id="tab-params" class="tab-content">
+        <div class="section-title">Ajustează Oameni și Bucle</div>
+
+        <!-- Slider Participanți -->
+        <div class="param-box">
+          <div class="param-header">
+            <span class="param-name">👥 Total Participanți:</span>
+            <span class="param-val" id="disp-part">800 pers</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-part" min="100" max="1200" step="20" value="800" oninput="onParamChange()">
+          <div class="param-sub">
+            <span>100</span>
+            <span id="disp-part-split" style="color:var(--accent-blue); font-weight:700;">400 Stg vs 400 Dr (Față în Față)</span>
+            <span>1200</span>
+          </div>
+        </div>
+
+        <!-- Slider Asistenți -->
+        <div class="param-box">
+          <div class="param-header">
+            <span class="param-name">🟠 Asistenți pe Culoare (Buline):</span>
+            <span class="param-val" id="disp-assist">40 asistenți</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-assist" min="10" max="80" step="2" value="40" oninput="onParamChange()">
+          <div class="param-sub">
+            <span>10</span>
+            <span id="disp-assist-dist" style="color:var(--accent-orange); font-weight:700;">A1 - A40 (conform slide)</span>
+            <span>80</span>
+          </div>
+        </div>
+
+        <!-- Slider Bucle / Culoare -->
+        <div class="param-box">
+          <div class="param-header">
+            <span class="param-name">🔄 Număr Culoare (Lanes / Bucle):</span>
+            <span class="param-val" id="disp-lanes">9 Culoare (8 Bucle U)</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-lanes" min="4" max="12" step="1" value="9" oninput="onParamChange()">
+          <div class="param-sub">
+            <span>4 Culoare</span>
+            <span id="disp-pitch" style="color:var(--accent-purple); font-weight:700;">Pas între axe: 2.30 m</span>
+            <span>12 Culoare</span>
+          </div>
+        </div>
+
+        <!-- Slider Distanță Față în Față -->
+        <div class="param-box">
+          <div class="param-header">
+            <span class="param-name">📏 Distanță Față în Față (Culoar):</span>
+            <span class="param-val" id="disp-dist-face">1.20 m</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-corridor-w" min="0.8" max="2.2" step="0.1" value="1.2" oninput="onParamChange()">
+          <div class="param-sub">
+            <span>0.80 m (aproape)</span>
+            <span>1.20 m (recomandat)</span>
+            <span>2.20 m (depărtat)</span>
+          </div>
+        </div>
+
+        <!-- SECȚIUNE NOUĂ: DISTANȚE FAȚĂ DE PEREȚI -->
+        <div class="section-title" style="color:#38bdf8; margin-top:14px;">🏛️ Distanțe față de Pereții Sălii</div>
+
+        <!-- Slider Distanță Pereți Capăt (Sus / Jos) -->
+        <div class="param-box" style="border-left:3px solid #38bdf8;">
+          <div class="param-header">
+            <span class="param-name">↕️ Distanță Pereți Capăt (Sus / Jos):</span>
+            <span class="param-val" id="disp-wall-end" style="color:#38bdf8; font-weight:800;">1.20 m</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-wall-end" min="0.5" max="4.5" step="0.1" value="1.2" oninput="onParamChange()">
+          <div class="param-sub">
+            <span>0.5 m (minim)</span>
+            <span id="disp-wall-end-sub" style="color:#38bdf8; font-weight:700;">Spațiu liber între viraj și perete</span>
+            <span>4.5 m (foarte larg)</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="preset-btn btn-wend" onclick="setWallEndPreset(0.8)">0.8 m</button>
+            <button class="preset-btn btn-wend active" onclick="setWallEndPreset(1.2)">1.2 m</button>
+            <button class="preset-btn btn-wend" onclick="setWallEndPreset(2.0)">2.0 m</button>
+            <button class="preset-btn btn-wend" onclick="setWallEndPreset(3.0)">3.0 m</button>
+          </div>
+        </div>
+
+        <!-- Slider Distanță Pereți Laterali (Stânga / Dreapta) -->
+        <div class="param-box" style="border-left:3px solid #a855f7;">
+          <div class="param-header">
+            <span class="param-name">↔️ Distanță Pereți Laterali (Stânga / Dreapta):</span>
+            <span class="param-val" id="disp-wall-side" style="color:#a855f7; font-weight:800;">1.00 m</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-wall-side" min="0.5" max="3.5" step="0.1" value="1.0" oninput="onParamChange()">
+          <div class="param-sub">
+            <span>0.5 m (minim)</span>
+            <span id="disp-wall-side-sub" style="color:#a855f7; font-weight:700;">Spațiu liber la pereții laterali</span>
+            <span>3.5 m (larg)</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="preset-btn btn-wside" onclick="setWallSidePreset(0.8)">0.8 m</button>
+            <button class="preset-btn btn-wside active" onclick="setWallSidePreset(1.0)">1.0 m</button>
+            <button class="preset-btn btn-wside" onclick="setWallSidePreset(1.5)">1.5 m</button>
+            <button class="preset-btn btn-wside" onclick="setWallSidePreset(2.5)">2.5 m</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 3: CALCUL MATEMATIC -->
+      <div id="tab-calc" class="tab-content">
+        <div class="section-title">Calcul Matematic Exact</div>
+        <div style="background:#1e293b; border-radius:8px; padding:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
+          <p><b>Suprafață Sală:</b> 35,3 m × 21,6 m = <b>762,48 m²</b>.</p>
+          <p style="margin-top:6px;"><b>Lungime Totală Traseu:</b> <span id="calc-len">264,1 m</span>.</p>
+          <p style="margin-top:6px;"><b>Număr Perechi Față în Față:</b> <span id="calc-pairs">400 perechi</span>.</p>
+          <p style="margin-top:6px;"><b>Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> per pas la dreapta.</p>
+          <p style="margin-top:6px;"><b>Distanță Viraje U față de Pereți (Sus/Jos):</b> <b style="color:#38bdf8;" id="calc-wall-end">1.20 m</b>.</p>
+          <p style="margin-top:6px;"><b>Distanță Culoare față de Pereți (Laterale):</b> <b style="color:#a855f7;" id="calc-wall-side">1.00 m</b>.</p>
+          <p style="margin-top:6px;"><b>Viteză Relativă:</b> Deoarece ambele șiruri fac un pas la dreapta în sensuri opuse, avansul relativ este de <b>2 poziții per pas</b>!</p>
+          <p style="margin-top:6px;"><b>Timp pentru un Circuit Complet:</b> <span id="calc-lap-time">400 pași la 1.8s = 12 minute</span>.</p>
+        </div>
+      </div>
+
+      <!-- TAB 4: 4 SOLUȚII PENTRU PĂSTRAREA A EXACT 800 PERSOANE -->
+      <div id="tab-congestion" class="tab-content">
+        <div class="section-title" style="color:#38bdf8; font-size:12px;">🎯 4 Soluții Concrete pentru 800 Persoane (Fără Reducere)</div>
+        
+        <!-- Diagnostic Box -->
+        <div style="background:rgba(15, 23, 42, 0.85); border:1px solid #334155; border-radius:8px; padding:12px; margin-bottom:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
+          <b style="color:#f87171; font-size:13px;">DE CE APARE PROBLEMA LA 800 OAMENI PE SCHEMA STANDARD:</b><br>
+          • <b>Pe linia dreaptă</b>: Există <b>73.4 cm</b> per persoană ➔ foarte lejer (> 46 cm umeri).<br>
+          • <b>Pe interiorul celor 8 viraje U (la 1.20m lățime)</b>: Curbura strânsă comprimă rândul interior la <b style="color:#f87171; font-family:monospace;">35.1 cm</b> (< 46 cm umeri = suprapunere -10.9 cm).<br>
+          • <b style="color:#38bdf8;">Pentru a păstra toți cei 800 de oameni</b>, apasă pe oricare din cele 4 soluții de mai jos pentru a o vedea live în animație:
+        </div>
+
+        <!-- Soluția 1 -->
+        <div class="param-box" style="border-left:3px solid #22c55e;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 1 (RECOMANDATĂ): Culoar Conic / 0.70m pe Viraj
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            • Pe liniile drepte păstrezi <b>1.20 m</b> lățime pentru contactul vizual față în față.<br>
+            • Pe virajele U culoarul se îngustează la <b>0.70 m</b> (la pas de rotație nu e nevoie de 1.2m).<br>
+            • Raza interioară crește de la 0.55m la <b>0.80 m</b>.<br>
+            • Spațiul pe interior crește la <b style="color:#22c55e; font-weight:800;">51.0 cm</b> (> 46 cm umeri).<br>
+            <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni încap perfect.</b>
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-tapered" style="background:#059669; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('tapered')">
+            🟢 Afișează Soluția 1 pe Plan (Culoar 0.70m Viraj)
+          </button>
+        </div>
+
+        <!-- Soluția 2 -->
+        <div class="param-box" style="border-left:3px solid #38bdf8;">
+          <div style="font-weight:700; color:#38bdf8; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 2: Viraje de Tranzit Fluid (Staționare doar pe Drept)
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            • În exercițiul de 10s privire față în față, oamenii nu se opresc pe o curbă la 180°.<br>
+            • Toate cele <b>400 de perechi (800 oameni)</b> stau față în față <b>exclusiv pe cele 9 culoare drepte</b>, unde au <b style="color:#38bdf8; font-weight:800;">66.1 cm</b> per om (+20 cm liber între umeri).<br>
+            • Virajele U sunt <b>Zone de Rotație Continuă</b> (tranzit fluid fără oprire umăr la umăr).<br>
+            <b style="color:#38bdf8;">Rezultat: Nimeni nu stă blocat pe viraj; totul decurge natural și fluid.</b>
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-transit" style="background:#0284c7; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('transit')">
+            🔵 Afișează Soluția 2 pe Plan (Viraje Tranzit Fluid)
+          </button>
+        </div>
+
+        <!-- Soluția 3 -->
+        <div class="param-box" style="border-left:3px solid #f59e0b;">
+          <div style="font-weight:700; color:#f59e0b; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 3: Dispunere în Șah (Decalaj 20 cm pe Viraj)
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            • Participanții de pe rândul interior sunt decalați cu o jumătate de pas (20 cm).<br>
+            • Grosimea corpului din profil este de doar <b>24 cm</b> (față de 46 cm lățimea umerilor).<br>
+            • Umerii nu se mai ciocnesc lateral, ci se suprapun liber în spațiul toracic decalat.<br>
+            <b style="color:#f59e0b;">Rezultat: Se păstrează lățimea de 1.20m peste tot, fără frecare de umeri.</b>
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-staggered" style="background:#d97706; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('staggered')">
+            🟡 Afișează Soluția 3 pe Plan (Dispunere în Șah)
+          </button>
+        </div>
+
+        <!-- Soluția 4 -->
+        <div class="param-box" style="border-left:3px solid #a855f7;">
+          <div style="font-weight:700; color:#a855f7; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 4: Maximizare Traseu la Pereți (0.60m) + Viraj 0.75m
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            • Traseul se apropie la <b>0.60 m</b> de pereții de capăt și 0.80 m lateral.<br>
+            • Lungimea totală a circuitului crește la <b style="color:#a855f7; font-weight:800;">304.5 metri</b>.<br>
+            • Spațiu foarte generos: <b>76.1 cm</b> pe liniile drepte și <b>51.8 cm</b> pe viraje.<br>
+            <b style="color:#a855f7;">Rezultat: Circuit extins la maximum în sala de 35.3m × 21.6m.</b>
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-max" style="background:#7c3aed; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('max_path')">
+            🟣 Afișează Soluția 4 pe Plan (Traseu Maxim 305m)
+          </button>
+        </div>
+
+        <!-- Comparație cu Problema Inițială -->
+        <div class="param-box" style="border-left:3px solid #ef4444;">
+          <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;">
+            COMPARAȚIE: Configurația Inițială cu Problema Roșie
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje.
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-none" style="background:#dc2626; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('none')">
+            🔴 Arată Problema Inițială (Zone Roșii)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Canvas Viewport -->
+    <div class="viewport" id="viewport">
+      <canvas id="simCanvas"></canvas>
+
+      <!-- Viewport Overlay with Direct Solution Selector -->
+      <div class="canvas-overlay-info">
+        <div style="display:flex; align-items:center; gap:10px; width:100%;">
+          <span style="font-size:18px;">⏱️</span>
+          <div>
+            <b>Timp Față în Față: <span id="overlay-timer" style="color:var(--accent-green); font-family:ui-monospace, monospace; font-size:14px;">10.0s</span></b>
+            <div style="font-size:10.5px; color:#cbd5e1;">Stau față în față nemișcați, apoi fac 1 pas la dreapta în contrasens</div>
+          </div>
+          <div id="overlay-congestion-badge" style="margin-left:auto; padding:4px 10px; border-radius:6px; background:rgba(34, 197, 94, 0.20); border:1px solid #22c55e; color:#86efac; font-size:11px; font-weight:700; display:flex; align-items:center; gap:6px;">
+            <span>🟢</span> <span id="overlay-congestion-text">Soluția 1 Activă: 8 Bucle Verzi (51.0 cm &gt; 46 cm umeri)</span>
+          </div>
+        </div>
+
+        <!-- Direct Solution Selector for 800 people -->
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.1); padding-top:6px; width:100%;">
+          <span style="font-size:10.5px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px;">Soluții 800 Persoane:</span>
+          <button class="sol-pill active" id="sol-btn-tapered" onclick="setSolution800('tapered')">🟢 1. Culoar 0.70m Viraj</button>
+          <button class="sol-pill" id="sol-btn-transit" onclick="setSolution800('transit')">🔵 2. Viraj Tranzit Fluid</button>
+          <button class="sol-pill" id="sol-btn-staggered" onclick="setSolution800('staggered')">🟡 3. Dispunere în Șah</button>
+          <button class="sol-pill" id="sol-btn-max" onclick="setSolution800('max_path')">🟣 4. Traseu Maxim 305m</button>
+          <button class="sol-pill" id="sol-btn-none" onclick="setSolution800('none')">🔴 Arată Problema (1.20m)</button>
+        </div>
+      </div>
+
+      <!-- Top Tools -->
+      <div class="viewport-toolbar">
+        <button class="tool-btn" title="Zoom In" onclick="zoom(1.3)">🔍+</button>
+        <button class="tool-btn" title="Zoom Out" onclick="zoom(0.7)">🔍-</button>
+        <button class="tool-btn" title="Reset View" onclick="resetZoom()">⟲</button>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-box">
+        <div class="legend-title">
+          <span>LEGENDĂ SALĂ</span>
+          <span style="font-size:10px; color:var(--text-muted);">Exact ca pe Slide</span>
+        </div>
+        <div class="legend-row">
+          <span class="color-swatch" style="background:#38bdf8;"></span>
+          <span>Șirul Stâng (Pășește spre Dreapta Sa: ➔)</span>
+        </div>
+        <div class="legend-row">
+          <span class="color-swatch" style="background:#f43f5e;"></span>
+          <span>Șirul Drept (Pășește spre Dreapta Sa: ➔ în Contrasens)</span>
+        </div>
+        <div class="legend-row">
+          <span class="color-swatch" style="background:#f59e0b; border-radius:50%;"></span>
+          <span>Participanții #1 (Urmărește-i cum se rotesc!)</span>
+        </div>
+        <div class="legend-row">
+          <span class="color-swatch" style="background:#f97316; border-radius:50%;"></span>
+          <span>50 Asistenți pe Buline (A1-A50)</span>
+        </div>
+        <div class="legend-row">
+          <span class="color-swatch" style="background:#22c55e;"></span>
+          <span>START / END</span>
+        </div>
+        <div class="legend-row">
+          <span class="color-swatch" style="background:#ef4444; border:1px solid #fecaca;"></span>
+          <span style="color:#ef4444; font-weight:700;">🚨 ZONĂ ROȘIE: Înghesuială &lt; 46cm umeri</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // --- Scale Constants (Meters) ---
+    const ROOM_L = 35.3;
+    const ROOM_W = 21.6;
+    const SECTION_C3 = 6.6;
+    const WALL_POCKET_1 = 0.9;
+    const SECTION_C2 = 6.7;
+    const WALL_POCKET_2 = 1.0;
+    const SECTION_C1 = 6.6;
+
+    // --- Dynamic Parameters ---
+    let partCount = 800; // 400 left, 400 right
+    let assistCount = 40; // Exact 40 asistenți (A1 - A40) conform schemei originale
+    let nLanes = 9;       // Exact 9 culoare (3 în C3, 3 în C2, 3 în C1) conform schemei originale
+    let corridorW = 1.20;
+    let corridorWTurn = 0.70; // Soluția 1 activă implicit: lățime viraj 0.70m -> 51.0 cm spațiu liber (> 46cm umeri)
+    let currentSolution800 = 'tapered'; // 'tapered', 'transit', 'staggered', 'max_path', 'none'
+
+    // Contrasens Step Motion State
+    let isFlowPlaying = true;
+    let stepIntervalSec = 10.0;
+    let currentStepNumber = 1;
+    let targetShift = 0; // in meters along track
+    let animShift = 0;   // interpolated smoothly
+    let stepTimer = 0;
+
+    let camMode = 'macro'; // 'macro', 'close', 'follow', 'full'
+
+    // Canvas
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    let scale = 20;
+    let panX = 0, panY = 0;
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+
+    let pitch = 2.70;
+    let rTurn = 1.35;
+    let wallDistEnd = 1.20;  // Distanță liberă de la perete capăt (sus/jos) până la viraj
+    let wallDistSide = 1.00; // Distanță liberă de la perete lateral (stânga/dreapta) până la culoar
+    let pathSegments = [];
+    let totalPathLength = 0;
+    let assistants = [];
+
+    function recalculateAll() {
+      const halfW = corridorW / 2;
+      const marginX = wallDistSide + halfW;
+      const usableW = Math.max(2.0, ROOM_W - 2 * marginX);
+      pitch = usableW / (nLanes - 1);
+      rTurn = pitch / 2;
+
+      // Apex-ul exterior al virajului U este exact la distanța wallDistEnd de perete:
+      const yTop = wallDistEnd + rTurn + halfW;
+      const yBottom = ROOM_L - (wallDistEnd + rTurn + halfW);
+
+      buildDynamicPath(yTop, yBottom, marginX);
+      buildDynamicAssistants(yTop, yBottom, marginX);
+      updateMetrics();
+      redraw();
+    }
+
+    function buildDynamicPath(yTop, yBottom, marginX) {
+      pathSegments = [];
+      totalPathLength = 0;
+
+      for (let i = 0; i < nLanes; i++) {
+        const x = marginX + i * pitch;
+        const goingDown = (i % 2 === 0);
+        const yStart = goingDown ? yTop : yBottom;
+        const yEnd = goingDown ? yBottom : yTop;
+        const segLen = Math.abs(yEnd - yStart);
+
+        pathSegments.push({
+          type: 'line',
+          x1: x, y1: yStart,
+          x2: x, y2: yEnd,
+          startDist: totalPathLength,
+          length: segLen,
+          laneIdx: i,
+          dir: goingDown ? 'down' : 'up'
+        });
+        totalPathLength += segLen;
+
+        if (i < nLanes - 1) {
+          const nextX = marginX + (i + 1) * pitch;
+          const centerX = (x + nextX) / 2;
+          const centerY = goingDown ? yBottom : yTop;
+          const arcLen = Math.PI * rTurn;
+
+          pathSegments.push({
+            type: 'arc',
+            cx: centerX,
+            cy: centerY,
+            r: rTurn,
+            startAngle: Math.PI,
+            endAngle: 0,
+            anticlockwise: goingDown ? true : false,
+            startDist: totalPathLength,
+            length: arcLen,
+            atBottom: goingDown,
+            turnIdx: i
+          });
+          totalPathLength += arcLen;
+        }
+      }
+    }
+
+    function getPointAtDist(dist) {
+      dist = ((dist % totalPathLength) + totalPathLength) % totalPathLength;
+      for (let seg of pathSegments) {
+        if (dist >= seg.startDist && dist <= seg.startDist + seg.length) {
+          const localD = dist - seg.startDist;
+          if (seg.type === 'line') {
+            const t = localD / seg.length;
+            const x = seg.x1 + t * (seg.x2 - seg.x1);
+            const y = seg.y1 + t * (seg.y2 - seg.y1);
+            const angle = Math.atan2(seg.y2 - seg.y1, seg.x2 - seg.x1);
+            return { x, y, angle, type: 'line', seg };
+          } else if (seg.type === 'arc') {
+            const t = localD / seg.length;
+            // For bottom turn: ang goes from PI to 0 (through +PI/2)
+            // For top turn: ang goes from -PI to 0 (through -PI/2)
+            const ang = seg.atBottom ? (Math.PI - t * Math.PI) : (-Math.PI + t * Math.PI);
+            const x = seg.cx + seg.r * Math.cos(ang);
+            const y = seg.cy + seg.r * Math.sin(ang);
+            const tangent = seg.atBottom ? (ang - Math.PI / 2) : (ang + Math.PI / 2);
+            return { x, y, angle: tangent, type: 'arc', seg };
+          }
+        }
+      }
+      return { x: 0, y: 0, angle: 0, type: 'line', seg: null };
+    }
+
+    function buildDynamicAssistants(yTop, yBottom, marginX) {
+      assistants = [];
+      const straightSegs = pathSegments.filter(s => s.type === 'line');
+      const numLines = straightSegs.length;
+      if (numLines === 0) return;
+
+      const segLen = yBottom - yTop;
+
+      // Schema exactă conform pozei originale din proiector: 9 culoare, 40 asistenți (A1 la A40)
+      // Asistenții sunt plasați EXCLUSIV pe tronsoanele drepte (niciun asistent pe virajele U!)
+      // și sunt aliniați în 5 rânduri orizontale regulate pe lățimea sălii.
+      if (nLanes === 9 && assistCount === 40) {
+        const yRows = [
+          yTop + segLen * 0.12,
+          yTop + segLen * 0.31,
+          yTop + segLen * 0.50,
+          yTop + segLen * 0.69,
+          yTop + segLen * 0.88
+        ];
+
+        // Culoarele 1 la 7 (index 0 la 6): exact câte 5 asistenți pe fiecare culoar
+        for (let i = 0; i < 7; i++) {
+          const seg = straightSegs[i];
+          const isDown = (seg.dir === 'down');
+          const base = i * 5;
+          for (let r = 0; r < 5; r++) {
+            // Dacă merge în jos: rând 0 -> A(base+1), ..., rând 4 -> A(base+5)
+            // Dacă merge în sus: rând 4 (baza) -> A(base+1), ..., rând 0 (top) -> A(base+5)
+            const rowIdx = isDown ? r : (4 - r);
+            const num = base + r + 1;
+            assistants.push({
+              x: seg.x1,
+              y: yRows[rowIdx],
+              angle: isDown ? Math.PI / 2 : -Math.PI / 2,
+              id: `A${num}`
+            });
+          }
+        }
+
+        // Culoarul 8 (index 7, merge în SUS spre virajul 8):
+        // Conform schemei din slide, asistenții A36, A37, A38 sunt pe rândurile superioare (0, 1, 2)
+        const seg7 = straightSegs[7];
+        assistants.push({ x: seg7.x1, y: yRows[0], angle: -Math.PI / 2, id: 'A36' });
+        assistants.push({ x: seg7.x1, y: yRows[1], angle: -Math.PI / 2, id: 'A37' });
+        assistants.push({ x: seg7.x1, y: yRows[2], angle: -Math.PI / 2, id: 'A38' });
+
+        // Culoarul 9 (index 8, merge în JOS spre ieșirea END):
+        // Conform schemei din slide, asistenții A39, A40 sunt pe rândurile 3 și 4, chiar înainte de END!
+        const seg8 = straightSegs[8];
+        assistants.push({ x: seg8.x1, y: yRows[3], angle: Math.PI / 2, id: 'A39' });
+        assistants.push({ x: seg8.x1, y: yRows[4], angle: Math.PI / 2, id: 'A40' });
+      } else {
+        // Mod Dinamic: Asistenții sunt plasați ÎNTOTDEAUNA EXCLUSIV pe tronsoanele drepte (NICIODATĂ pe virajele U!)
+        const basePerLane = Math.floor(assistCount / numLines);
+        let rem = assistCount % numLines;
+        let curId = 1;
+
+        for (let i = 0; i < numLines; i++) {
+          const seg = straightSegs[i];
+          const countInLane = basePerLane + (rem > 0 ? 1 : 0);
+          if (rem > 0) rem--;
+          const isDown = (seg.dir === 'down');
+
+          for (let j = 0; j < countInLane; j++) {
+            const t = (j + 0.5) / countInLane;
+            const y = isDown ? (yTop + t * segLen) : (yBottom - t * segLen);
+            assistants.push({
+              x: seg.x1,
+              y: y,
+              angle: isDown ? Math.PI / 2 : -Math.PI / 2,
+              id: `A${curId++}`
+            });
+          }
+        }
+      }
+    }
+
+    function updateMetrics() {
+      document.getElementById('disp-part').innerText = `${partCount} pers`;
+      document.getElementById('disp-part-split').innerText = `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
+      document.getElementById('disp-assist').innerText = `${assistCount} asistenți`;
+      document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) ? 'A1 - A40 (conform slide)' : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`;
+      document.getElementById('disp-lanes').innerText = `${nLanes} Culoare (${nLanes-1} Bucle U)`;
+      document.getElementById('disp-pitch').innerText = `Pas între axe: ${pitch.toFixed(2)} m`;
+      document.getElementById('disp-dist-face').innerText = `${corridorW.toFixed(2)} m`;
+
+      document.getElementById('calc-len').innerText = `${totalPathLength.toFixed(1)} m`;
+      const pairs = Math.round(partCount / 2);
+      document.getElementById('calc-pairs').innerText = `${pairs} perechi`;
+      const stepSize = ((totalPathLength / pairs) * 100).toFixed(1);
+      document.getElementById('calc-step-size').innerText = `${stepSize} cm`;
+      updateLapTimeMetric();
+
+      // Update Live Congestion Status
+      const stepDist = totalPathLength / pairs;
+      const wTurn = (corridorWTurn ? corridorWTurn : corridorW);
+      const rInner = Math.max(0.05, rTurn - wTurn / 2);
+      const spaceInner = stepDist * (rInner / rTurn);
+      const nTurns = nLanes - 1;
+      const isRed = (currentSolution800 === 'none') && (spaceInner < 0.46);
+
+      const cBadge = document.getElementById('overlay-congestion-badge');
+      const cText = document.getElementById('overlay-congestion-text');
+      if (cBadge && cText) {
+        if (isRed) {
+          cBadge.style.background = 'rgba(239, 68, 68, 0.22)';
+          cBadge.style.borderColor = '#ef4444';
+          cBadge.style.color = '#fca5a5';
+          cText.innerHTML = `🚨 Problemă: ${nTurns} Bucle Roșii (${(spaceInner*100).toFixed(1)} cm &lt; 46 cm umeri)`;
+        } else {
+          cBadge.style.background = 'rgba(34, 197, 94, 0.20)';
+          cBadge.style.borderColor = '#22c55e';
+          cBadge.style.color = '#86efac';
+          let solMsg = `🟢 Soluție 800 Activă: ${nTurns} Bucle Verzi (Zero Roșu)`;
+          if (currentSolution800 === 'tapered') {
+            solMsg = `🟢 Soluția 1 (Culoar 0.70m): ${(spaceInner*100).toFixed(1)} cm pe viraj &gt; 46cm umeri (Zero Roșu)`;
+          } else if (currentSolution800 === 'transit') {
+            solMsg = `🔵 Soluția 2: Viraj Tranzit Fluid (66.1 cm pe linii drepte | Zero Roșu)`;
+          } else if (currentSolution800 === 'staggered') {
+            solMsg = `🟡 Soluția 3: Dispunere în Șah (Decalaj 20cm | Fără contact umeri)`;
+          } else if (currentSolution800 === 'max_path') {
+            solMsg = `🟣 Soluția 4: Traseu Maxim 305m (${(spaceInner*100).toFixed(1)}cm viraj, 76cm drept)`;
+          }
+          cText.innerHTML = solMsg;
+        }
+      }
+
+      // Distanțe pereți
+      const elDispWallEnd = document.getElementById('disp-wall-end');
+      if (elDispWallEnd) elDispWallEnd.innerText = `${wallDistEnd.toFixed(2)} m`;
+      const elDispWallSide = document.getElementById('disp-wall-side');
+      if (elDispWallSide) elDispWallSide.innerText = `${wallDistSide.toFixed(2)} m`;
+      const elCalcWallEnd = document.getElementById('calc-wall-end');
+      if (elCalcWallEnd) elCalcWallEnd.innerText = `${wallDistEnd.toFixed(2)} m`;
+      const elCalcWallSide = document.getElementById('calc-wall-side');
+      if (elCalcWallSide) elCalcWallSide.innerText = `${wallDistSide.toFixed(2)} m`;
+
+      document.querySelectorAll('.btn-wend').forEach(b => {
+        b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - wallDistEnd) < 0.05);
+      });
+      document.querySelectorAll('.btn-wside').forEach(b => {
+        b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - wallDistSide) < 0.05);
+      });
+    }
+
+    // --- CONTRASENS STEP LOGIC ---
+    // Când omul din stânga pășește spre dreapta sa (+d), omul din dreapta pășește spre dreapta sa (-d, contrasens)
+    // Deplasarea relativă este de 1 pas complet, întâlnind exact partenerul următor FAȚĂ ÎN FAȚĂ!
+    function triggerContrasensStep() {
+      const pairs = Math.round(partCount / 2);
+      const stepDist = totalPathLength / pairs;
+
+      targetShift += stepDist / 2;
+      currentStepNumber++;
+
+      updateStepProgressUI();
+    }
+
+    function toggleFlowPlay() {
+      isFlowPlaying = !isFlowPlaying;
+      document.getElementById('play-icon').innerText = isFlowPlaying ? '⏸' : '▶️';
+      document.getElementById('btn-flow-play').innerHTML = `<span id="play-icon">${isFlowPlaying ? '⏸' : '▶️'}</span> ${isFlowPlaying ? 'Pauză Mișcare' : 'Pornește Mișcare'}`;
+      document.getElementById('circuit-status').innerText = isFlowPlaying ? 'ACTIV (60 FPS)' : 'ÎN PAUZĂ';
+      document.getElementById('circuit-status').style.color = isFlowPlaying ? 'var(--accent-green)' : 'var(--accent-orange)';
+    }
+
+    function resetCircuit() {
+      targetShift = 0;
+      animShift = 0;
+      currentStepNumber = 1;
+      stepTimer = 0;
+      updateStepProgressUI();
+      redraw();
+    }
+
+    function updateInterval(v) {
+      stepIntervalSec = parseFloat(v);
+      stepTimer = 0;
+      document.getElementById('disp-interval').innerText = `${stepIntervalSec.toFixed(1)} sec / pas`;
+      updateLapTimeMetric();
+      document.querySelectorAll('.preset-btn').forEach(b => {
+        b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - stepIntervalSec) < 0.1);
+      });
+    }
+
+    function setIntervalPreset(sec) {
+      document.getElementById('rng-interval').value = sec;
+      updateInterval(sec);
+    }
+
+    function updateLapTimeMetric() {
+      const pairs = Math.round(partCount / 2);
+      const totalSec = pairs * stepIntervalSec;
+      const mins = Math.floor(totalSec / 60);
+      const remSec = Math.round(totalSec % 60);
+      let str = `${mins} min ${remSec > 0 ? remSec + 's' : ''}`;
+      if (mins >= 60) {
+        const hrs = Math.floor(mins / 60);
+        str = `${hrs}h ${mins % 60}m`;
+      }
+      const el = document.getElementById('calc-lap-time');
+      if (el) el.innerText = `${pairs} pași la ${stepIntervalSec.toFixed(0)}s = ${str}`;
+    }
+
+    function updateStepProgressUI() {
+      const pairs = Math.round(partCount / 2);
+      const normalizedStep = ((currentStepNumber - 1) % pairs) + 1;
+      const pct = (((normalizedStep - 1) / pairs) * 100).toFixed(1);
+      const laps = Math.floor((currentStepNumber - 1) / pairs) + 1;
+
+      document.getElementById('hdr-step-num').innerText = `# ${normalizedStep} / ${pairs}`;
+      document.getElementById('hdr-progress').innerText = `${pct}%`;
+      document.getElementById('circuit-progress-fill').style.width = `${pct}%`;
+      document.getElementById('lbl-lap-count').innerText = `Circuitul #${laps}`;
+    }
+
+    function onParamChange() {
+      partCount = parseInt(document.getElementById('rng-part').value);
+      assistCount = parseInt(document.getElementById('rng-assist').value);
+      nLanes = parseInt(document.getElementById('rng-lanes').value);
+      corridorW = parseFloat(document.getElementById('rng-corridor-w').value);
+
+      const elEnd = document.getElementById('rng-wall-end');
+      if (elEnd) wallDistEnd = parseFloat(elEnd.value);
+      const elSide = document.getElementById('rng-wall-side');
+      if (elSide) wallDistSide = parseFloat(elSide.value);
+
+      recalculateAll();
+    }
+
+    function setWallEndPreset(dist) {
+      wallDistEnd = dist;
+      const el = document.getElementById('rng-wall-end');
+      if (el) el.value = dist;
+      onParamChange();
+    }
+
+    function setWallSidePreset(dist) {
+      wallDistSide = dist;
+      const el = document.getElementById('rng-wall-side');
+      if (el) el.value = dist;
+      onParamChange();
+    }
+
+    function applyPresetSolution(parts, lanes, corridorWidth) {
+      partCount = parts;
+      nLanes = lanes;
+      corridorW = corridorWidth;
+
+      const inpPart = document.getElementById('rng-part');
+      if (inpPart) inpPart.value = parts;
+      const inpLanes = document.getElementById('rng-lanes');
+      if (inpLanes) inpLanes.value = lanes;
+      const inpW = document.getElementById('rng-corridor-w');
+      if (inpW) inpW.value = corridorWidth;
+
+      recalculateAll();
+      setCamMode('congestion');
+    }
+
+    function setSolution800(mode) {
+      currentSolution800 = mode;
+      partCount = 800;
+      nLanes = 9;
+      assistCount = 40;
+
+      const inpPart = document.getElementById('rng-part');
+      if (inpPart) inpPart.value = 800;
+      const inpLanes = document.getElementById('rng-lanes');
+      if (inpLanes) inpLanes.value = 9;
+      const inpAssist = document.getElementById('rng-assist');
+      if (inpAssist) inpAssist.value = 40;
+
+      if (mode === 'tapered') {
+        corridorW = 1.20;
+        corridorWTurn = 0.70;
+        wallDistEnd = 1.20;
+        wallDistSide = 1.00;
+      } else if (mode === 'transit') {
+        corridorW = 1.20;
+        corridorWTurn = 1.00;
+        wallDistEnd = 1.20;
+        wallDistSide = 1.00;
+      } else if (mode === 'staggered') {
+        corridorW = 1.20;
+        corridorWTurn = 1.20;
+        wallDistEnd = 1.20;
+        wallDistSide = 1.00;
+      } else if (mode === 'max_path') {
+        corridorW = 1.20;
+        corridorWTurn = 0.75;
+        wallDistEnd = 0.60;
+        wallDistSide = 0.80;
+      } else { // 'none'
+        corridorW = 1.20;
+        corridorWTurn = 1.20;
+        wallDistEnd = 1.20;
+        wallDistSide = 1.00;
+      }
+
+      const inpW = document.getElementById('rng-corridor-w');
+      if (inpW) inpW.value = corridorW;
+      const elEnd = document.getElementById('rng-wall-end');
+      if (elEnd) elEnd.value = wallDistEnd;
+      const elSide = document.getElementById('rng-wall-side');
+      if (elSide) elSide.value = wallDistSide;
+
+      updateSolutionPills();
+      recalculateAll();
+      setCamMode('congestion');
+    }
+
+    function updateSolutionPills() {
+      const pillMap = [
+        { id: 'sol-btn-tapered', mode: 'tapered' },
+        { id: 'sol-btn-transit', mode: 'transit' },
+        { id: 'sol-btn-staggered', mode: 'staggered' },
+        { id: 'sol-btn-max', mode: 'max_path' },
+        { id: 'sol-btn-none', mode: 'none' }
+      ];
+      pillMap.forEach(item => {
+        const btn = document.getElementById(item.id);
+        if (btn) btn.classList.toggle('active', currentSolution800 === item.mode);
+        const cardBtn = document.getElementById(`card-${item.id}`);
+        if (cardBtn) cardBtn.classList.toggle('active', currentSolution800 === item.mode);
+      });
+    }
+
+    function setCamMode(mode) {
+      camMode = mode;
+      document.getElementById('cam-macro')?.classList.toggle('active', mode === 'macro');
+      document.getElementById('cam-close')?.classList.toggle('active', mode === 'close');
+      document.getElementById('cam-congestion')?.classList.toggle('active', mode === 'congestion');
+      document.getElementById('cam-follow')?.classList.toggle('active', mode === 'follow');
+      document.getElementById('cam-full')?.classList.toggle('active', mode === 'full');
+
+      if (mode === 'macro') fitMacro();
+      else if (mode === 'close') fitCloseUp();
+      else if (mode === 'congestion') fitCongestion();
+      else if (mode === 'full') fitFullRoom();
+      redraw();
+    }
+
+    function fitMacro() {
+      const vp = document.getElementById('viewport');
+      scale = 90;
+      panX = vp.clientWidth / 2 - 1.35 * scale;
+      panY = vp.clientHeight / 2 - 8.5 * scale;
+    }
+
+    function fitCloseUp() {
+      const vp = document.getElementById('viewport');
+      scale = 48;
+      panX = vp.clientWidth / 2 - 2.7 * scale;
+      panY = vp.clientHeight / 2 - 11.0 * scale;
+    }
+
+    function fitCongestion() {
+      const vp = document.getElementById('viewport');
+      scale = 55;
+      const turnX = 1.35 + pitch / 2;
+      const turnY = ROOM_L - 3.0;
+      panX = vp.clientWidth / 2 - turnX * scale;
+      panY = vp.clientHeight / 2 - turnY * scale;
+    }
+
+    function fitFullRoom() {
+      const vp = document.getElementById('viewport');
+      const pad = 30;
+      const scaleX = (vp.clientWidth - pad * 2) / ROOM_W;
+      const scaleY = (vp.clientHeight - pad * 2) / ROOM_L;
+      scale = Math.min(scaleX, scaleY) * 0.95;
+      panX = (vp.clientWidth - ROOM_W * scale) / 2;
+      panY = (vp.clientHeight - ROOM_L * scale) / 2;
+    }
+
+    function zoom(f) { scale *= f; redraw(); }
+    function resetZoom() { setCamMode(camMode); }
+
+    // --- Animation Loop ---
+    let lastTime = performance.now();
+
+    function animate(currentTime) {
+      const dt = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
+      if (dt > 0 && dt < 0.1) {
+        // Smoothly glide to the target shift
+        animShift += (targetShift - animShift) * 0.08;
+
+        if (isFlowPlaying) {
+          stepTimer += dt;
+          if (stepTimer >= stepIntervalSec) {
+            stepTimer = 0;
+            triggerContrasensStep();
+          }
+        }
+
+        // Live countdown updates
+        const remainingSec = Math.max(0, stepIntervalSec - stepTimer);
+        const countdownPct = (remainingSec / stepIntervalSec) * 100;
+
+        const elHdrCd = document.getElementById('hdr-countdown');
+        if (elHdrCd) elHdrCd.innerText = `${remainingSec.toFixed(1)}s`;
+        const elDispCd = document.getElementById('disp-countdown');
+        if (elDispCd) elDispCd.innerText = `${remainingSec.toFixed(1)}s`;
+        const elCdBar = document.getElementById('countdown-bar-fill');
+        if (elCdBar) elCdBar.style.width = `${countdownPct}%`;
+        const elOvlTimer = document.getElementById('overlay-timer');
+        if (elOvlTimer) elOvlTimer.innerText = `${remainingSec.toFixed(1)}s`;
+
+        // Camera follow
+        if (camMode === 'follow') {
+          const pt = getPointAtDist(animShift);
+          const vp = document.getElementById('viewport');
+          const targetPanX = vp.clientWidth / 2 - pt.x * scale;
+          const targetPanY = vp.clientHeight / 2 - pt.y * scale;
+          panX += (targetPanX - panX) * 0.08;
+          panY += (targetPanY - panY) * 0.08;
+        }
+      }
+
+      redraw();
+      requestAnimationFrame(animate);
+    }
+
+    // --- Drawing Functions ---
+    function redraw() {
+      const vp = document.getElementById('viewport');
+      ctx.save();
+      ctx.clearRect(0, 0, vp.clientWidth, vp.clientHeight);
+
+      ctx.translate(panX, panY);
+      ctx.scale(scale, scale);
+
+      drawRoomArchitecture();
+      drawSlideTrack();
+
+      if (document.getElementById('chk-assistants').checked) {
+        drawAssistants();
+      }
+
+      // DRAW THE CONTRASENS FACE-TO-FACE PARTICIPANTS
+      drawContrasensParticipants();
+
+      drawDimensions();
+
+      ctx.restore();
+    }
+
+    function drawRoomArchitecture() {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, ROOM_W, ROOM_L);
+
+      // Floor grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 0.04;
+      for (let x = 0; x <= ROOM_W; x += 1) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ROOM_L); ctx.stroke();
+      }
+      for (let y = 0; y <= ROOM_L; y += 1) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(ROOM_W, y); ctx.stroke();
+      }
+
+      // Perimeter walls
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 0.35;
+      ctx.strokeRect(0, 0, ROOM_W, ROOM_L);
+
+      // Partition columns
+      const xPart1 = SECTION_C3;
+      const xPart2 = SECTION_C3 + WALL_POCKET_1 + SECTION_C2;
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(xPart1, 0, WALL_POCKET_1, 1.2);
+      ctx.fillRect(xPart1, ROOM_L - 1.2, WALL_POCKET_1, 1.2);
+      ctx.fillRect(xPart2, 0, WALL_POCKET_2, 1.2);
+      ctx.fillRect(xPart2, ROOM_L - 1.2, WALL_POCKET_2, 1.2);
+
+      // Dividing lines
+      ctx.setLineDash([0.3, 0.3]);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 0.08;
+      ctx.beginPath();
+      ctx.moveTo(xPart1 + WALL_POCKET_1/2, 0); ctx.lineTo(xPart1 + WALL_POCKET_1/2, ROOM_L);
+      ctx.moveTo(xPart2 + WALL_POCKET_2/2, 0); ctx.lineTo(xPart2 + WALL_POCKET_2/2, ROOM_L);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.font = 'bold 2.0px sans-serif';
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.10)';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('C3', SECTION_C3 / 2, ROOM_L / 2);
+      ctx.fillText('C2', xPart1 + WALL_POCKET_1 + SECTION_C2 / 2, ROOM_L / 2);
+      ctx.fillText('C1', xPart2 + WALL_POCKET_2 + SECTION_C1 / 2, ROOM_L / 2);
+    }
+
+    function drawSlideTrack() {
+      const wTurn = (corridorWTurn ? corridorWTurn : corridorW);
+      const halfW = corridorW / 2;
+      const halfWTurn = wTurn / 2;
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.18)';
+
+      for (let i = 0; i < pathSegments.length; i++) {
+        const seg = pathSegments[i];
+        ctx.beginPath();
+        if (seg.type === 'line') {
+          ctx.lineWidth = corridorW;
+          ctx.moveTo(seg.x1, seg.y1);
+          ctx.lineTo(seg.x2, seg.y2);
+        } else if (seg.type === 'arc') {
+          ctx.lineWidth = wTurn;
+          ctx.arc(seg.cx, seg.cy, seg.r, seg.startAngle, seg.endAngle, seg.anticlockwise);
+        }
+        ctx.stroke();
+      }
+
+      // Outer violet boundary lines
+      ctx.lineWidth = 0.06;
+      ctx.strokeStyle = '#a855f7';
+      ctx.beginPath();
+      for (let seg of pathSegments) {
+        if (seg.type === 'line') {
+          for (let offset of [-halfW, halfW]) {
+            const normalX = (seg.dir === 'down' ? -offset : offset);
+            ctx.moveTo(seg.x1 + normalX, seg.y1);
+            ctx.lineTo(seg.x2 + normalX, seg.y2);
+          }
+        } else if (seg.type === 'arc') {
+          for (let offset of [-halfWTurn, halfWTurn]) {
+            const rOffset = seg.r + (seg.atBottom ? offset : -offset);
+            if (rOffset > 0) {
+              ctx.moveTo(seg.cx + rOffset * Math.cos(seg.startAngle), seg.cy + rOffset * Math.sin(seg.startAngle));
+              ctx.arc(seg.cx, seg.cy, rOffset, seg.startAngle, seg.endAngle, seg.anticlockwise);
+            }
+          }
+        }
+      }
+      ctx.stroke();
+
+      // Highlight Congestion Zones or Resolved Solutions on U-Turns
+      const pairs = Math.round(partCount / 2);
+      const stepDist = totalPathLength / pairs;
+
+      for (let i = 0; i < pathSegments.length; i++) {
+        const seg = pathSegments[i];
+        if (seg.type === 'arc') {
+          const rInner = Math.max(0.05, seg.r - halfWTurn);
+          const spaceInner = stepDist * (rInner / seg.r);
+          const isCongestedTurn = (currentSolution800 === 'none') && (spaceInner < 0.46);
+
+          if (isCongestedTurn) {
+            // Fill inner half of U-turn with striking RED
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(seg.cx, seg.cy, seg.r, seg.startAngle, seg.endAngle, seg.anticlockwise);
+            ctx.arc(seg.cx, seg.cy, rInner, seg.endAngle, seg.startAngle, !seg.anticlockwise);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.40)';
+            ctx.fill();
+
+            // Inner dashed red warning border
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 0.08;
+            ctx.setLineDash([0.3, 0.15]);
+            ctx.beginPath();
+            ctx.arc(seg.cx, seg.cy, rInner, seg.startAngle, seg.endAngle, seg.anticlockwise);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Danger badge placed at the apex of the U-turn
+            const apexAngle = seg.atBottom ? (Math.PI / 2) : (-Math.PI / 2);
+            const badgeR = rInner + (seg.r - rInner) * 0.5;
+            const bx = seg.cx + badgeR * Math.cos(apexAngle);
+            const by = seg.cy + badgeR * Math.sin(apexAngle);
+
+            ctx.save();
+            ctx.translate(bx, by);
+            const badgeW = 3.6;
+            const badgeH = 0.75;
+            ctx.fillStyle = 'rgba(185, 28, 28, 0.95)';
+            roundRect(ctx, -badgeW/2, -badgeH/2, badgeW, badgeH, 0.12, true, false);
+            ctx.strokeStyle = '#fca5a5';
+            ctx.lineWidth = 0.04;
+            roundRect(ctx, -badgeW/2, -badgeH/2, badgeW, badgeH, 0.12, false, true);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 0.26px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`🚨 ZONĂ ROȘIE: ${(spaceInner * 100).toFixed(1)} cm`, 0, -0.12);
+            ctx.font = 'bold 0.18px sans-serif';
+            ctx.fillStyle = '#fecaca';
+            ctx.fillText(`(< 46cm umeri = suprapunere -${((0.46 - spaceInner)*100).toFixed(1)}cm)`, 0, 0.16);
+            ctx.restore();
+
+            ctx.restore();
+          } else {
+            // GREEN TURN (Resolved through selected solution for 800 people)
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(seg.cx, seg.cy, seg.r, seg.startAngle, seg.endAngle, seg.anticlockwise);
+            ctx.arc(seg.cx, seg.cy, rInner, seg.endAngle, seg.startAngle, !seg.anticlockwise);
+            ctx.closePath();
+            ctx.fillStyle = (currentSolution800 === 'transit') ? 'rgba(2, 132, 199, 0.22)' : 'rgba(34, 197, 94, 0.22)';
+            ctx.fill();
+
+            const apexAngle = seg.atBottom ? (Math.PI / 2) : (-Math.PI / 2);
+            const bx = seg.cx + seg.r * Math.cos(apexAngle);
+            const by = seg.cy + seg.r * Math.sin(apexAngle);
+
+            ctx.save();
+            ctx.translate(bx, by);
+
+            let labelText = `🟢 OK: ${(spaceInner * 100).toFixed(1)} cm`;
+            let subLabel = `(> 46cm umeri = Zero Roșu)`;
+            let badgeBg = 'rgba(21, 128, 61, 0.95)';
+            let badgeBorder = '#86efac';
+
+            if (currentSolution800 === 'tapered') {
+              labelText = `🟢 OK: ${(spaceInner * 100).toFixed(1)} cm`;
+              subLabel = `(Culoar viraj ${wTurn.toFixed(2)}m = +${((spaceInner-0.46)*100).toFixed(1)}cm liber)`;
+            } else if (currentSolution800 === 'transit') {
+              labelText = `🔵 TRANZIT FLUID (800 Oameni)`;
+              subLabel = `(Fără oprire pe viraj | 66.1cm pe drept)`;
+              badgeBg = 'rgba(2, 132, 199, 0.95)';
+              badgeBorder = '#7dd3fc';
+            } else if (currentSolution800 === 'staggered') {
+              labelText = `🟡 DISPUNERE ÎN ȘAH`;
+              subLabel = `(Decalaj 20cm | Fără contact umeri)`;
+              badgeBg = 'rgba(180, 83, 9, 0.95)';
+              badgeBorder = '#fde68a';
+            } else if (currentSolution800 === 'max_path') {
+              labelText = `🟣 TRASEU MAXIM 305m`;
+              subLabel = `(${(spaceInner * 100).toFixed(1)}cm viraj | 76.1cm drept)`;
+              badgeBg = 'rgba(109, 40, 217, 0.95)';
+              badgeBorder = '#c4b5fd';
+            }
+
+            const badgeW = 3.8;
+            const badgeH = 0.75;
+            ctx.fillStyle = badgeBg;
+            roundRect(ctx, -badgeW/2, -badgeH/2, badgeW, badgeH, 0.12, true, false);
+            ctx.strokeStyle = badgeBorder;
+            ctx.lineWidth = 0.03;
+            roundRect(ctx, -badgeW/2, -badgeH/2, badgeW, badgeH, 0.12, false, true);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 0.24px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(labelText, 0, -0.12);
+            ctx.font = 'bold 0.16px sans-serif';
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillText(subLabel, 0, 0.16);
+
+            ctx.restore();
+            ctx.restore();
+          }
+        }
+      }
+
+      // Direction Arrows in middle of corridors (identical to slide layout)
+      for (let seg of pathSegments) {
+        if (seg.type === 'line') {
+          const midY = (seg.y1 + seg.y2) / 2;
+          const isDown = (seg.y2 > seg.y1);
+          const dir = isDown ? 1 : -1;
+          ctx.save();
+          ctx.translate(seg.x1, midY);
+
+          // Subtle background glow
+          ctx.fillStyle = 'rgba(168, 85, 247, 0.12)';
+          ctx.beginPath();
+          ctx.arc(0, 0, 0.85, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Arrow shaft
+          ctx.strokeStyle = 'rgba(192, 132, 252, 0.55)';
+          ctx.lineWidth = 0.10;
+          ctx.beginPath();
+          ctx.moveTo(0, -dir * 0.7);
+          ctx.lineTo(0, dir * 0.7);
+          ctx.stroke();
+
+          // Arrow head
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.75)';
+          ctx.beginPath();
+          ctx.moveTo(0, dir * 0.95);
+          ctx.lineTo(-0.28, dir * 0.45);
+          ctx.lineTo(0.28, dir * 0.45);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.restore();
+        }
+      }
+
+      // START Button
+      const pStart = getPointAtDist(0.4);
+      ctx.fillStyle = '#22c55e';
+      const startBtnY = Math.max(0.15, pStart.y - 1.6);
+      roundRect(ctx, pStart.x - 1.2, startBtnY, 2.4, 0.85, 0.18, true, false);
+      ctx.fillStyle = '#052e16';
+      ctx.font = 'bold 0.40px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('START', pStart.x, startBtnY + 0.42);
+
+      // Curved entry arrow
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 0.12;
+      ctx.beginPath();
+      ctx.arc(pStart.x - 0.7, pStart.y - 0.4, 0.6, Math.PI, Math.PI * 0.5, true);
+      ctx.stroke();
+
+      // END Button & Exit Arrow (adapts to whether track ends at top or bottom)
+      const pEnd = getPointAtDist(totalPathLength - 0.4);
+      const isEndAtBottom = (pEnd.y > ROOM_L / 2);
+      ctx.fillStyle = '#ef4444';
+      const endBtnY = isEndAtBottom ? (pEnd.y + 0.6) : Math.max(0.15, pEnd.y - 1.6);
+      roundRect(ctx, pEnd.x - 1.2, endBtnY, 2.4, 0.85, 0.18, true, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 0.40px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('END', pEnd.x, endBtnY + 0.42);
+
+      // Exit arrow
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 0.12;
+      ctx.beginPath();
+      if (isEndAtBottom) {
+        ctx.moveTo(pEnd.x, pEnd.y + 0.15);
+        ctx.lineTo(pEnd.x, pEnd.y + 0.55);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(pEnd.x, pEnd.y + 0.58);
+        ctx.lineTo(pEnd.x - 0.22, pEnd.y + 0.38);
+        ctx.lineTo(pEnd.x + 0.22, pEnd.y + 0.38);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        ctx.moveTo(pEnd.x, pEnd.y - 0.5);
+        ctx.lineTo(pEnd.x, pEnd.y - 0.9);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(pEnd.x, pEnd.y - 0.95);
+        ctx.lineTo(pEnd.x - 0.22, pEnd.y - 0.75);
+        ctx.lineTo(pEnd.x + 0.22, pEnd.y - 0.75);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function drawAssistants() {
+      for (let a of assistants) {
+        ctx.save();
+        ctx.translate(a.x, a.y);
+
+        ctx.fillStyle = '#ea580c';
+        ctx.beginPath(); ctx.arc(0, 0, 0.48, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.05; ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 0.26px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(a.id, 0, 0);
+
+        ctx.restore();
+      }
+    }
+
+    // DRAW THE PARTICIPANTS: MOVING IN CONTRASENS (ONE TO HIS RIGHT, THE OTHER TO HIS RIGHT)
+    function drawContrasensParticipants() {
+      const pairs = Math.round(partCount / 2); // 400 pairs
+      const stepDist = totalPathLength / pairs; // ~66 cm
+      const halfW = corridorW / 2;
+      const showGaze = document.getElementById('chk-gaze').checked;
+      const showLead = document.getElementById('chk-lead-marker').checked;
+      const showArrows = document.getElementById('chk-dir-arrows').checked;
+
+      // Lateral step stride: when moving between steps
+      const isStepping = Math.abs(targetShift - animShift) > 0.005;
+      const stepCyclePhase = (animShift / (stepDist / 2)) * Math.PI;
+      const lateralFootStride = Math.abs(Math.sin(stepCyclePhase)) * 0.15;
+
+      for (let i = 0; i < pairs; i++) {
+        // Line 1: Blue / Cyan Suits (Moves forward by animShift)
+        const d1 = ((i + 0.5) * stepDist + animShift + totalPathLength * 100) % totalPathLength;
+        const pt1 = getPointAtDist(d1);
+        const theta1 = pt1.angle;
+        // Vector across corridor: U1 = (-sin(theta1), cos(theta1))
+        const u1x = -Math.sin(theta1);
+        const u1y = Math.cos(theta1);
+        // Position of Person 1 (Blue) on +U1 side
+        const currentTurnHalfW1 = (pt1.type === 'arc' && corridorWTurn) ? (corridorWTurn / 2) : halfW;
+        const p1x = pt1.x + u1x * currentTurnHalfW1;
+        const p1y = pt1.y + u1y * currentTurnHalfW1;
+        // Gaze of Person 1: points DIRECTLY across corridor towards partner (-U1)
+        const gaze1 = Math.atan2(-u1y, -u1x);
+
+        // Line 2: Rose / Magenta Suits (Moves in CONTRASENS / backward by animShift)
+        const staggerOffset = (currentSolution800 === 'staggered' && pt1.type === 'arc') ? 0.20 : 0;
+        const d2 = ((i + 0.5) * stepDist - animShift + staggerOffset + totalPathLength * 100) % totalPathLength;
+        const pt2 = getPointAtDist(d2);
+        const theta2 = pt2.angle;
+        const u2x = -Math.sin(theta2);
+        const u2y = Math.cos(theta2);
+        // Position of Person 2 (Rose) on -U2 side
+        const currentTurnHalfW2 = (pt2.type === 'arc' && corridorWTurn) ? (corridorWTurn / 2) : halfW;
+        const p2x = pt2.x - u2x * currentTurnHalfW2;
+        const p2y = pt2.y - u2y * currentTurnHalfW2;
+        // Gaze of Person 2: points DIRECTLY across corridor towards partner (+U2)
+        const gaze2 = Math.atan2(u2y, u2x);
+
+        // Congestion Detection on Curves (< 46cm umeri):
+        let isCongested1 = false;
+        let space1 = stepDist;
+        if (currentSolution800 === 'none' && pt1.type === 'arc' && pt1.seg) {
+          const dCenter1 = Math.hypot(p1x - pt1.seg.cx, p1y - pt1.seg.cy);
+          if (dCenter1 < pt1.seg.r) {
+            space1 = stepDist * (dCenter1 / pt1.seg.r);
+            if (space1 < 0.46) isCongested1 = true;
+          }
+        }
+
+        let isCongested2 = false;
+        let space2 = stepDist;
+        if (currentSolution800 === 'none' && pt2.type === 'arc' && pt2.seg) {
+          const dCenter2 = Math.hypot(p2x - pt2.seg.cx, p2y - pt2.seg.cy);
+          if (dCenter2 < pt2.seg.r) {
+            space2 = stepDist * (dCenter2 / pt2.seg.r);
+            if (space2 < 0.46) isCongested2 = true;
+          }
+        }
+
+        // Draw Person 1 (Blue or RED if congested)
+        const isLead1 = (i === 0 && showLead);
+        const p1Col = isCongested1 ? '#dc2626' : (isLead1 ? '#f59e0b' : '#0284c7');
+        const p1High = isCongested1 ? '#ef4444' : (isLead1 ? '#fbbf24' : '#38bdf8');
+        drawHumanTopDown(
+          p1x, p1y, gaze1,
+          isStepping ? lateralFootStride : 0,
+          isLead1, '⭐ Lider #1 (Stânga)',
+          p1Col, p1High,
+          showArrows, i + 1,
+          isCongested1, space1
+        );
+
+        // Draw Person 2 (Rose or RED if congested)
+        const isLead2 = (i === 0 && showLead);
+        const p2Col = isCongested2 ? '#dc2626' : (isLead2 ? '#f59e0b' : '#db2777');
+        const p2High = isCongested2 ? '#ef4444' : (isLead2 ? '#fbbf24' : '#f472b6');
+        drawHumanTopDown(
+          p2x, p2y, gaze2,
+          isStepping ? lateralFootStride : 0,
+          isLead2, '⭐ Lider #1 (Dreapta)',
+          p2Col, p2High,
+          showArrows, i + 1,
+          isCongested2, space2
+        );
+      }
+
+      // SIGHTLINES (Linii de privire discrete FAȚĂ ÎN FAȚĂ):
+      // FĂRĂ etichete mari parazite pe culoar!
+      if (showGaze) {
+        const stepSkip = (scale < 30 ? 4 : (scale < 50 ? 2 : 1));
+        for (let k = 0; k < pairs; k += stepSkip) {
+          const spotD = (k + 0.5) * stepDist;
+          const pt = getPointAtDist(spotD);
+          const theta = pt.angle;
+          const ux = -Math.sin(theta);
+          const uy = Math.cos(theta);
+
+          const s1x = pt.x + ux * halfW;
+          const s1y = pt.y + uy * halfW;
+          const s2x = pt.x - ux * halfW;
+          const s2y = pt.y - uy * halfW;
+
+          ctx.strokeStyle = (k === 0 && showLead) ? 'rgba(245, 158, 11, 0.95)' : 'rgba(56, 189, 248, 0.35)';
+          ctx.lineWidth = (k === 0 && showLead) ? 0.04 : 0.02;
+          ctx.setLineDash([0.15, 0.10]);
+          ctx.beginPath();
+          ctx.moveTo(s1x, s1y);
+          ctx.lineTo(s2x, s2y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+    }
+
+    // Anatomical Top-Down Human Figure:
+    // Local +X = FRONT (Face, Eyes, Nose, Hands reaching across towards partner)
+    // Local -X = BACK (Spine, Hair)
+    // Local +Y = RIGHT (Right Shoulder, Right Arm, Stepping Right Foot)
+    // Local -Y = LEFT (Left Shoulder, Left Arm, Left Foot)
+    function drawHumanTopDown(x, y, gazeAngle, footStride, isLead, leadText, primaryCol, highlightCol, showDir, dirSign, isCongested, congestionSpace) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(gazeAngle); // Local +X is now oriented EXACTLY towards partner!
+
+      // 1. Soft Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.42)';
+      ctx.beginPath();
+      ctx.ellipse(0.02, 0.02, 0.20, 0.28, Math.PI / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Footwear / Shoes: taking lateral step to their right along +Y
+      // Left foot (-Y)
+      ctx.fillStyle = '#0f172a';
+      roundRect(ctx, -0.10, -0.16 + footStride * 0.2, 0.22, 0.09, 0.03, true, false);
+
+      // Right foot (+Y) - STEPS OUT TO THE RIGHT
+      ctx.fillStyle = '#0f172a';
+      roundRect(ctx, -0.10, 0.07 + footStride, 0.24, 0.10, 0.03, true, false);
+      // Green outline on stepping right foot
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 0.025;
+      roundRect(ctx, -0.10, 0.07 + footStride, 0.24, 0.10, 0.03, false, true);
+
+      // 3. Torso & Shoulders:
+      // Width across shoulders in Y: 0.46m (-0.23 to +0.23) -> PARALLEL to corridor (UMĂR LA UMĂR)
+      // Depth in X: 0.24m (-0.12 to +0.12) -> PERPENDICULAR to corridor (FAȚĂ ÎN FAȚĂ)
+      ctx.fillStyle = primaryCol;
+      ctx.strokeStyle = isLead ? '#f59e0b' : '#ffffff';
+      ctx.lineWidth = isLead ? 0.04 : 0.025;
+      roundRect(ctx, -0.12, -0.23, 0.24, 0.46, 0.08, true, true);
+
+      // 4. Arms reaching forward towards partner (+X)
+      ctx.fillStyle = highlightCol;
+      // Left arm
+      roundRect(ctx, -0.06, -0.25, 0.24, 0.07, 0.03, true, false);
+      // Right arm
+      roundRect(ctx, -0.06, 0.18, 0.24, 0.07, 0.03, true, false);
+
+      // Hands reaching out towards partner (+X) (skin tone)
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(0.20, -0.21, 0.04, 0, Math.PI * 2);
+      ctx.arc(0.20, 0.21, 0.04, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 5. Head (radius 0.12m)
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(0, 0, 0.12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair on back of head (-X)
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(0, 0, 0.12, Math.PI * 0.5, Math.PI * 1.5, false);
+      ctx.fill();
+
+      // 6. TWO EYES looking straight forward at partner (+X)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0.08, -0.05, 0.028, 0, Math.PI * 2);
+      ctx.arc(0.08, 0.05, 0.028, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Black Pupils looking at partner (+X)
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(0.09, -0.05, 0.016, 0, Math.PI * 2);
+      ctx.arc(0.09, 0.05, 0.016, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Nose pointing forward (+X)
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(0.08, -0.02);
+      ctx.lineTo(0.14, 0);
+      ctx.lineTo(0.08, 0.02);
+      ctx.closePath();
+      ctx.fill();
+
+      // 7. Green Step Arrow on Right Shoulder (+Y)
+      if (showDir) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.fillStyle = '#22c55e';
+        ctx.lineWidth = 0.025;
+        ctx.beginPath();
+        ctx.moveTo(0, 0.26);
+        ctx.lineTo(0, 0.42);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0.47);
+        ctx.lineTo(-0.06, 0.39);
+        ctx.lineTo(0.06, 0.39);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // 8. Lead marker
+      if (isLead) {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 0.05;
+        ctx.setLineDash([0.1, 0.1]);
+        ctx.beginPath();
+        ctx.arc(0, 0, 0.38, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        roundRect(ctx, -1.05, -0.16, 0.70, 0.32, 0.06, true, false);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 0.02;
+        roundRect(ctx, -1.05, -0.16, 0.70, 0.32, 0.06, false, true);
+        ctx.font = 'bold 0.13px sans-serif';
+        ctx.fillStyle = '#f59e0b';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(leadText, -0.70, 0);
+        ctx.restore();
+      }
+
+      // 9. Congestion Alert on Participant (Red Glowing Aura & Badge)
+      if (isCongested) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 0.04;
+        ctx.setLineDash([0.08, 0.06]);
+        ctx.beginPath();
+        ctx.arc(0, 0, 0.35, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        if (scale >= 45) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(220, 38, 38, 0.95)';
+          roundRect(ctx, -0.65, -0.15, 0.45, 0.30, 0.05, true, false);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 0.12px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(`🚨 ${(congestionSpace * 100).toFixed(0)}cm`, -0.42, 0);
+          ctx.restore();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function drawDimensions() {
+      ctx.strokeStyle = '#38bdf8';
+      ctx.fillStyle = '#38bdf8';
+      ctx.lineWidth = 0.04;
+      ctx.font = 'bold 0.45px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+      const dimX = -1.1;
+      drawDimensionLine(dimX, 0, dimX, ROOM_L, '≈ 35,3 m (LUNGIME)');
+
+      const dimY = ROOM_L + 1.1;
+      drawDimensionLine(0, dimY, ROOM_W, dimY, '≈ 21,6 m (LĂȚIME)');
+
+      // COTE & DISTANȚE PÂNĂ LA PEREȚI
+      const showWallDims = document.getElementById('chk-wall-dims')?.checked ?? true;
+      if (showWallDims) {
+        // Distanță perete SUS
+        const topTurnX = (nLanes > 2) ? (wallDistSide + corridorW/2 + pitch * 1.5) : (ROOM_W / 2);
+        drawWallClearanceLine(topTurnX, 0, topTurnX, wallDistEnd, `↕️ ${wallDistEnd.toFixed(2)} m (Perete Sus)`, '#38bdf8');
+
+        // Distanță perete JOS
+        const btmTurnX = wallDistSide + corridorW/2 + pitch * 0.5;
+        drawWallClearanceLine(btmTurnX, ROOM_L - wallDistEnd, btmTurnX, ROOM_L, `↕️ ${wallDistEnd.toFixed(2)} m (Perete Jos)`, '#38bdf8');
+
+        // Distanță perete STÂNGA
+        drawWallClearanceLine(0, ROOM_L / 2, wallDistSide, ROOM_L / 2, `↔️ ${wallDistSide.toFixed(2)} m (Perete Stânga)`, '#a855f7');
+
+        // Distanță perete DREAPTA
+        drawWallClearanceLine(ROOM_W - wallDistSide, ROOM_L / 2, ROOM_W, ROOM_L / 2, `↔️ ${wallDistSide.toFixed(2)} m (Perete Dreapta)`, '#a855f7');
+      }
+    }
+
+    function drawWallClearanceLine(x1, y1, x2, y2, label, col = '#38bdf8') {
+      ctx.save();
+      ctx.strokeStyle = col;
+      ctx.fillStyle = col;
+      ctx.lineWidth = 0.04;
+      ctx.setLineDash([0.15, 0.1]);
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      if (x1 === x2) {
+        ctx.beginPath();
+        ctx.moveTo(x1 - 0.35, y1); ctx.lineTo(x1 + 0.35, y1);
+        ctx.moveTo(x2 - 0.35, y2); ctx.lineTo(x2 + 0.35, y2);
+        ctx.stroke();
+
+        const midY = (y1 + y2) / 2;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+        const bw = 4.2, bh = 0.52;
+        roundRect(ctx, x1 - bw/2, midY - bh/2, bw, bh, 0.1, true, false);
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 0.025;
+        roundRect(ctx, x1 - bw/2, midY - bh/2, bw, bh, 0.1, false, true);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 0.23px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(label, x1, midY);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1 - 0.35); ctx.lineTo(x1, y1 + 0.35);
+        ctx.moveTo(x2, y2 - 0.35); ctx.lineTo(x2, y2 + 0.35);
+        ctx.stroke();
+
+        const midX = (x1 + x2) / 2;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+        const bw = 3.8, bh = 0.52;
+        roundRect(ctx, midX - bw/2, y1 - bh/2, bw, bh, 0.1, true, false);
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 0.025;
+        roundRect(ctx, midX - bw/2, y1 - bh/2, bw, bh, 0.1, false, true);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 0.23px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(label, midX, y1);
+      }
+      ctx.restore();
+    }
+
+    function drawDimensionLine(x1, y1, x2, y2, text) {
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      if (x1 === x2) {
+        ctx.beginPath();
+        ctx.moveTo(x1 - 0.25, y1); ctx.lineTo(x1 + 0.25, y1);
+        ctx.moveTo(x2 - 0.25, y2); ctx.lineTo(x2 + 0.25, y2);
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(x1 - 0.35, (y1 + y2) / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1 - 0.25); ctx.lineTo(x1, y1 + 0.25);
+        ctx.moveTo(x2, y2 - 0.25); ctx.lineTo(x2, y2 + 0.25);
+        ctx.stroke();
+        ctx.fillText(text, (x1 + x2) / 2, y1 + 0.45);
+      }
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function switchTab(id) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (id === 'tab-circuit') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('tab-circuit').classList.add('active');
+      } else if (id === 'tab-params') {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('tab-params').classList.add('active');
+      } else if (id === 'tab-congestion') {
+        document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+        document.getElementById('tab-congestion').classList.add('active');
+      } else {
+        document.querySelector('.tab-btn:nth-child(4)').classList.add('active');
+        document.getElementById('tab-calc').classList.add('active');
+      }
+    }
+
+    // --- Mouse Drag & Zoom ---
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStart.x = e.clientX - panX;
+      dragStart.y = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        panX = e.clientX - dragStart.x;
+        panY = e.clientY - dragStart.y;
+        redraw();
+      }
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+      const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+      const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+      panX = mouseX - (mouseX - panX) * zoomFactor;
+      panY = mouseY - (mouseY - panY) * zoomFactor;
+      scale *= zoomFactor;
+      redraw();
+    }, { passive: false });
+
+    window.addEventListener('resize', () => {
+      const vp = document.getElementById('viewport');
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = vp.clientWidth * dpr;
+      canvas.height = vp.clientHeight * dpr;
+      canvas.style.width = vp.clientWidth + 'px';
+      canvas.style.height = vp.clientHeight + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      if (camMode === 'macro') fitMacro();
+      else if (camMode === 'close') fitCloseUp();
+      else if (camMode === 'congestion') fitCongestion();
+      else fitFullRoom();
+      redraw();
+    });
+
+    // Start
+    const vpInit = document.getElementById('viewport');
+    const dprInit = window.devicePixelRatio || 1;
+    canvas.width = vpInit.clientWidth * dprInit;
+    canvas.height = vpInit.clientHeight * dprInit;
+    canvas.style.width = vpInit.clientWidth + 'px';
+    canvas.style.height = vpInit.clientHeight + 'px';
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dprInit, dprInit);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const pParts = urlParams.get('parts');
+    if (pParts) {
+      partCount = parseInt(pParts);
+      const inp = document.getElementById('rng-part');
+      if (inp) inp.value = partCount;
+    }
+    const pLanes = urlParams.get('lanes');
+    if (pLanes) {
+      nLanes = parseInt(pLanes);
+      const inp = document.getElementById('rng-lanes');
+      if (inp) inp.value = nLanes;
+    }
+    const pWallEnd = urlParams.get('wall_end');
+    if (pWallEnd) {
+      wallDistEnd = parseFloat(pWallEnd);
+      const inp = document.getElementById('rng-wall-end');
+      if (inp) inp.value = wallDistEnd;
+    }
+    const pWallSide = urlParams.get('wall_side');
+    if (pWallSide) {
+      wallDistSide = parseFloat(pWallSide);
+      const inp = document.getElementById('rng-wall-side');
+      if (inp) inp.value = wallDistSide;
+    }
+    const pSol = urlParams.get('sol');
+    if (pSol) {
+      setSolution800(pSol);
+    } else {
+      updateSolutionPills();
+    }
+    recalculateAll();
+    const initCam = urlParams.get('cam') || 'macro';
+    setCamMode(initCam);
+    const initTab = urlParams.get('tab');
+    if (initTab) switchTab('tab-' + initTab);
+    requestAnimationFrame(animate);
+
+  </script>
+</body>
+</html>

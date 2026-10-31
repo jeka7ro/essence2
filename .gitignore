@@ -1,0 +1,15 @@
+# Temporary images and debug crops
+*.png
+*_slice.jpg
+crop_*.jpg
+slide_*.jpg
+start_*.jpg
+thumb.jpg
+top_slice.jpg
+bot_slice.jpg
+left_slice.jpg
+right_slice.jpg
+highres_rotated.jpg
+.DS_Store
+.system_generated/
+scratch/
