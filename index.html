@@ -759,6 +759,18 @@
     .hdr-pdf:hover { background: #0ea5e9; }
     .mob-pdf { flex: 0 0 auto !important; background: #0284c7 !important; border-color: #38bdf8 !important; color: #fff !important; display: inline-flex; align-items: center; gap: 6px; }
     @media (max-width: 900px) { .header-right { display: none; } }
+
+    /* ===== comenzi pas: grila curata, aceeasi inaltime ===== */
+    .ctl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .ctl { height: 44px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 14px; font-weight: 600; color: #e2e8f0; background: #243247; border: 1px solid rgba(255,255,255,0.14); cursor: pointer; transition: background .15s ease, border-color .15s ease; padding: 0 14px; }
+    .ctl:hover { background: #2f3f58; border-color: rgba(255,255,255,0.28); }
+    .ctl:active { transform: translateY(1px); }
+    .ctl .ic { width: 18px; height: 18px; }
+    .ctl-primary { background: #0284c7; border-color: #38bdf8; color: #fff; }
+    .ctl-primary:hover { background: #0ea5e9; border-color: #7dd3fc; }
+    .prog-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: #cbd5e1; white-space: nowrap; margin-top: 2px; }
+    .prog-meta .chip { display: inline-flex; align-items: center; }
+    .dot-pink { background: #f43f5e; box-shadow: 0 0 6px rgba(244,63,94,.7); }
   </style>
 </head>
 <body>
@@ -840,23 +852,12 @@
           • Astfel, cele două șiruri alunecă în sensuri contrare, întâlnind la fiecare pas un nou partener, până fac turul complet și revin la punctul de pornire.
         </div>
 
-        <!-- Step Controls: Next / Previous / Play / Reset -->
-        <div style="display:flex; gap:8px;">
-          <button class="big-step-btn" style="flex:1; margin-bottom:0;" onclick="triggerContrasensStep()">
-            <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span> Pas la Dreapta (+1)
-          </button>
-          <button class="ctrl-btn" style="width:auto; padding:12px 16px; font-weight: 700; border-radius:10px; background:#1e293b; border:1px solid #475569;" onclick="triggerContrasensStepBack()" title="Revino la partenerul precedent">
-            <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Înapoi (-1)</span>
-          </button>
-        </div>
-
-        <div class="btn-group">
-          <button id="btn-flow-play" class="ctrl-btn btn-primary" onclick="toggleFlowPlay()">
-            <span id="play-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></span> Pauză Mișcare
-          </button>
-          <button class="ctrl-btn" onclick="resetCircuit()">
-            <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span> Reset la Pasul 1
-          </button>
+        <!-- Comenzi pas -->
+        <div class="ctl-grid">
+          <button class="ctl" onclick="triggerContrasensStepBack()" title="Revino la partenerul precedent"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Înapoi</button>
+          <button class="ctl ctl-primary" onclick="triggerContrasensStep()">Pas la dreapta <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button id="btn-flow-play" class="ctl" onclick="toggleFlowPlay()"><span id="play-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></span> Pauză</button>
+          <button class="ctl" onclick="resetCircuit()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reset</button>
         </div>
 
         <!-- Progress Box -->
@@ -870,11 +871,7 @@
             <div id="circuit-progress-fill" class="progress-bar-fill"></div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; font-size:11px; color:#cbd5e1; margin-top:4px;">
-            <span>Șirul Stâng: → Spre Dreapta Sa</span>
-            <span id="lbl-lap-count">Circuitul #1</span>
-            <span>Șirul Drept: → Spre Dreapta Sa</span>
-          </div>
+          <div class="prog-meta"><span class="chip"><span class="dot dot-blue"></span>Șir stâng</span><span id="lbl-lap-count">Circuitul #1</span><span class="chip"><span class="dot dot-pink"></span>Șir drept</span></div>
 
           <div class="param-header" style="margin-top:14px;">
             <span class="param-name"> Timp față în față (înainte de pas):</span>
@@ -1693,7 +1690,7 @@
 
     function toggleFlowPlay() {
       isFlowPlaying = !isFlowPlaying;
-      document.getElementById('btn-flow-play').innerHTML = `<span id="play-icon">${isFlowPlaying ? IC.pause : IC.play}</span> ${isFlowPlaying ? 'Pauză Mișcare' : 'Pornește Mișcare'}`;
+      document.getElementById('btn-flow-play').innerHTML = `<span id="play-icon">${isFlowPlaying ? IC.pause : IC.play}</span> ${isFlowPlaying ? 'Pauză' : 'Pornește'}`;
       const tp = document.getElementById('tool-play'); if (tp) tp.innerHTML = isFlowPlaying ? IC.pause : IC.play;
       document.getElementById('circuit-status').innerText = isFlowPlaying ? 'Rulează' : 'În pauză';
       document.getElementById('circuit-status').style.color = isFlowPlaying ? 'var(--accent-green)' : 'var(--accent-orange)';
