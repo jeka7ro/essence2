@@ -784,6 +784,12 @@
 
     .dot-lime { background: #a3e635; box-shadow: 0 0 6px rgba(163,230,53,.7); }
     #sol-btn-recommended.active, #card-sol-btn-recommended.active { background: #65a30d; border-color: #bef264; box-shadow: 0 0 10px rgba(190, 242, 100, 0.4); color: #fff; }
+
+    /* ===== dimensiuni sala editabile ===== */
+    .room-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .room-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #cbd5e1; font-weight: 600; }
+    .num-in { width: 100%; height: 40px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: #0f172a; color: #fff; padding: 0 16px; font-family: inherit; font-size: 15px; font-weight: 600; outline: none; font-variant-numeric: tabular-nums; }
+    .num-in:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.2); }
   </style>
 </head>
 <body>
@@ -993,6 +999,18 @@
 
       <!-- TAB 2: PARAMETRI SALĂ -->
       <div id="tab-params" class="tab-content">
+        <div class="section-title">Dimensiunile sălii</div>
+        <div class="param-box">
+          <div class="room-grid">
+            <label>Lățime (m)<input type="number" class="num-in" id="inp-room-w" min="6" max="80" step="0.1" value="21.6" oninput="onRoomChange()"></label>
+            <label>Lungime (m)<input type="number" class="num-in" id="inp-room-l" min="6" max="80" step="0.1" value="35.3" oninput="onRoomChange()"></label>
+          </div>
+          <div class="param-sub" style="margin-top:8px;">
+            <span id="room-area-note">Suprafață 762,5 m²</span>
+            <button class="preset-btn" style="flex:0 0 auto; padding:6px 12px;" onclick="resetRoomDims()">Dimensiuni originale</button>
+          </div>
+        </div>
+
         <div class="section-title">Vedere</div>
         <div class="param-box">
           <div class="param-header">
@@ -1161,7 +1179,7 @@
       <div id="tab-calc" class="tab-content">
         <div class="section-title">Calcul Matematic Exact</div>
         <div style="background:#1e293b; border-radius:8px; padding:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
-          <p><b>Suprafață Sală:</b> 35,3 m × 21,6 m = <b>762,48 m²</b>.</p>
+          <p><b>Suprafață Sală:</b> <span id="calc-room">35,3 m × 21,6 m = <b>762,48 m²</b></span>.</p>
           <p style="margin-top:6px;"><b>Lungime Totală Traseu:</b> <span id="calc-len">264,1 m</span>.</p>
           <p style="margin-top:6px;"><b>Număr Perechi Față în Față:</b> <span id="calc-pairs">400 perechi</span>.</p>
           <p style="margin-top:6px;"><b>Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> per pas la dreapta.</p>
@@ -1431,13 +1449,19 @@
     };
 
     // --- Scale Constants (Meters) ---
-    const ROOM_L = 35.3;
-    const ROOM_W = 21.6;
-    const SECTION_C3 = 6.6;
+    const ROOM_W0 = 21.6, ROOM_L0 = 35.3;       // dimensiunile originale ale sălii
+    let ROOM_L = ROOM_L0;
+    let ROOM_W = ROOM_W0;
+    let SECTION_C3 = 6.6;
     const WALL_POCKET_1 = 0.9;
-    const SECTION_C2 = 6.7;
+    let SECTION_C2 = 6.7;
     const WALL_POCKET_2 = 1.0;
-    const SECTION_C1 = 6.6;
+    let SECTION_C1 = 6.6;
+    // Compartimentele (C3/C2/C1) se scalează proporțional cu lățimea sălii; pereții despărțitori rămân 0,9 m și 1,0 m
+    function applyRoomDims() {
+      const f = Math.max(0.1, (ROOM_W - WALL_POCKET_1 - WALL_POCKET_2) / (6.6 + 6.7 + 6.6));
+      SECTION_C3 = 6.6 * f; SECTION_C2 = 6.7 * f; SECTION_C1 = 6.6 * f;
+    }
 
     // --- Dynamic Parameters ---
     let partCount = 800; // 400 left, 400 right
@@ -1680,6 +1704,31 @@
       }
     }
 
+    function syncRoomUI() {
+      const w = document.getElementById('inp-room-w'), l = document.getElementById('inp-room-l');
+      if (w && document.activeElement !== w) w.value = ROOM_W;
+      if (l && document.activeElement !== l) l.value = ROOM_L;
+      const a = document.getElementById('room-area-note'); if (a) a.innerText = `Suprafață ${fm(ROOM_W * ROOM_L, 1)} m²`;
+      const c = document.getElementById('calc-room');
+      if (c) c.innerHTML = `${fm(ROOM_L, 1)} m × ${fm(ROOM_W, 1)} m = <b>${fm(ROOM_W * ROOM_L)} m²</b>`;
+      document.title = `Față în față - Pas la dreapta în contrasens (${fm(ROOM_L, 1)}m × ${fm(ROOM_W, 1)}m)`;
+    }
+    function onRoomChange() {
+      const w = parseFloat(document.getElementById('inp-room-w').value);
+      const l = parseFloat(document.getElementById('inp-room-l').value);
+      if (!(w >= 6 && w <= 80 && l >= 6 && l <= 80)) return;     // valori incomplete în timpul tastării: ignorate
+      ROOM_W = w; ROOM_L = l;
+      applyRoomDims();
+      recalculateAll();
+      if (camMode === 'full') fitFullRoom();
+      redraw();
+    }
+    function resetRoomDims() {
+      ROOM_W = ROOM_W0; ROOM_L = ROOM_L0;
+      document.getElementById('inp-room-w').value = ROOM_W; document.getElementById('inp-room-l').value = ROOM_L;
+      onRoomChange();
+    }
+
     function onBackGapChange(v) { backGap = parseFloat(v); backGapAuto = false; recalculateAll(); }
     function setBackGap(v) { backGap = v; backGapAuto = false; recalculateAll(); }
     function setBackGapAuto() { backGapAuto = true; recalculateAll(); }
@@ -1708,6 +1757,7 @@
     }
 
     function updateMetrics() {
+      syncRoomUI();
       syncBackGapUI();
       renderReportHTML();
       document.getElementById('disp-part').innerText = `${partCount} pers`;
@@ -2817,10 +2867,10 @@
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 
       const dimX = -1.1;
-      drawDimensionLine(dimX, 0, dimX, ROOM_L, '≈ 35,3 m (LUNGIME)');
+      drawDimensionLine(dimX, 0, dimX, ROOM_L, `≈ ${ROOM_L.toFixed(1).replace('.', ',')} m (LUNGIME)`);
 
       const dimY = ROOM_L + 1.1;
-      drawDimensionLine(0, dimY, ROOM_W, dimY, '≈ 21,6 m (LĂȚIME)');
+      drawDimensionLine(0, dimY, ROOM_W, dimY, `≈ ${ROOM_W.toFixed(1).replace('.', ',')} m (LĂȚIME)`);
 
       // COTE & DISTANȚE PÂNĂ LA PEREȚI
       const showWallDims = document.getElementById('chk-wall-dims')?.checked ?? true;
@@ -3423,7 +3473,7 @@
       const chk = {};
       CHK_IDS.forEach(id => { const el = document.getElementById(id); if (el) chk[id] = el.checked; });
       return {
-        v: 1, partCount, assistCount, nLanes, corridorW, corridorWTurn, wallDistEnd, wallDistSide,
+        v: 1, roomW: ROOM_W, roomL: ROOM_L, partCount, assistCount, nLanes, corridorW, corridorWTurn, wallDistEnd, wallDistSide,
         backGap, backGapAuto, assistGap, sol: currentSolution800, stepIntervalSec, stepGlideSec,
         viewRot, cam: camMode, tab: TAB_IDS[Math.max(0, activeTabIdx)], chk,
         sidebarCollapsed: !!(sb && sb.classList.contains('collapsed')), hudMin: !!(hud && hud.classList.contains('hud-min'))
@@ -3443,6 +3493,9 @@
       try { st = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return; }
       if (!st || st.v !== 1) return;
       const num = (v, d) => (typeof v === 'number' && isFinite(v)) ? v : d;
+      ROOM_W = Math.min(80, Math.max(6, num(st.roomW, ROOM_W)));
+      ROOM_L = Math.min(80, Math.max(6, num(st.roomL, ROOM_L)));
+      applyRoomDims();
       partCount = num(st.partCount, partCount);
       assistCount = num(st.assistCount, assistCount);
       nLanes = Math.min(12, Math.max(4, Math.round(num(st.nLanes, nLanes))));
