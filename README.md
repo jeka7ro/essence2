@@ -36,6 +36,24 @@ Pe liniile drepte ($9 \times 29.4\text{ m} = 264.6\text{ m}$), cei 800 de oameni
 
 ---
 
+## 🌐 Acces Online (GitHub Pages)
+
+Aplicația este configurată pentru deploy automat pe GitHub Pages:
+👉 **[https://jeka7ro.github.io/essence2/](https://jeka7ro.github.io/essence2/)**
+
+---
+
+## 📱 Utilizare pe Mobil și Desktop
+
+- **Mobil:** 
+  - Butoane rapide de navigare: `👁️ Plan Sală & Animație` (ecran complet) vs `⚙️ Setări & Calcule (800)`.
+  - Suport tactil nativ: tragere cu un deget pentru pan / deplasare și pinch cu 2 degete pentru zoom in/out.
+- **Desktop:**
+  - Panou lateral complet cu parametri, distanțe reglabile față de pereți, cronometru 2s - 60s, pas înainte (+1) și pas înapoi (-1).
+  - Comutator instant între cele 4 soluții geometrice deasupra planului.
+
+---
+
 ## 🚀 Rulare Locală
 
 Deschide direct `index.html` în orice browser modern sau pornește un server HTTP local:
@@ -46,3 +64,4 @@ python3 -m http.server 8000
 
 Accesează în browser:
 `http://localhost:8000`
+
