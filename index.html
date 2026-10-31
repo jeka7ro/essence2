@@ -1255,9 +1255,9 @@
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • La capătul fiecărui culoar nu mai există viraj în U: participanții merg drept până aproape de perete, apoi un asistent îi întoarce și îi trece pe culoarul următor.<br>
             • Nu mai există nicio zonă unde se înghesuie: lângă asistent trec pe rând, nu stau față în față.<br>
-            • Culoarele se lungesc de la <b>29.4 m</b> (Soluția 1) la <b style="color:#2dd4bf;">33.1 m</b>, pentru că nu mai e nevoie de raza virajului (capetele ajung la 0.50 m de perete).<br>
-            • Distanța între persoane pe culoar: <b style="color:#2dd4bf;">76.5 cm</b> (umeri 46 cm, deci rămân 30 cm liberi).<br>
-            • Necesar: <b>16 asistenți întorcători</b> (2 la fiecare dintre cele 8 capete), în plus față de A1–A40.<br>
+            • Culoarele se lungesc de la <b>29.4 m</b> (Soluția 1) la <b style="color:#2dd4bf;">32.3 m</b>, pentru că nu mai e nevoie de raza virajului. Întorcătorul (om portocaliu) stă în capătul traseului, între ultimul șir și perete (0.90 m).<br>
+            • Distanța între persoane pe culoar: <b style="color:#2dd4bf;">74.7 cm</b> (umeri 46 cm, deci rămân 28 cm liberi).<br>
+            • Necesar: <b>16 asistenți întorcători</b> (2 la fiecare dintre cele 8 capete), în plus față de A1–A40; apar ca oameni portocalii în zona portocalie din capăt.<br>
             <b style="color:#2dd4bf;">Rezultat: 800 de oameni, zero înghesuială; durata turului rămâne aceeași.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-turners" style="background:#0f766e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('turners')">
@@ -1947,7 +1947,7 @@
       } else if (mode === 'turners') {
         corridorW = 1.20;
         corridorWTurn = 1.20;
-        wallDistEnd = 0.50;
+        wallDistEnd = 0.90;
         wallDistSide = 1.00;
       } else { // 'none'
         corridorW = 1.20;
@@ -2440,38 +2440,39 @@
       }
     }
 
-    // Asistenti "intorcatori": stau la capetele culoarelor si rotesc participantii spre culoarul urmator
+    // Asistenti "intorcatori": oameni portocalii care stau in capatul traseului (intre ultimul sir si perete)
+    // si rotesc participantii spre culoarul urmator
     function drawTurners() {
       if (currentSolution800 !== 'turners') return;
+      const halfW = corridorW / 2;
       for (const seg of pathSegments) {
         if (seg.type !== 'hop') continue;
-        const y = seg.y1, xm = (seg.x1 + seg.x2) / 2;
+        const y = seg.y1;
+        const xl = Math.min(seg.x1, seg.x2), xr = Math.max(seg.x1, seg.x2);
+        const outward = seg.atBottom ? 1 : -1;               // spre perete
         ctx.save();
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = 'rgba(20, 184, 166, 0.20)';
-        ctx.lineWidth = corridorW;
-        ctx.beginPath(); ctx.moveTo(seg.x1, y); ctx.lineTo(seg.x2, y); ctx.stroke();
-        ctx.strokeStyle = 'rgba(94, 234, 212, 0.55)';
+        // tranzitia dintre culoare (aceeasi culoare ca restul traseului)
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.18)';
+        ctx.fillRect(xl - halfW, y - halfW, (xr - xl) + 2 * halfW, corridorW);
+        // zona portocalie a intorcatorilor, intre traseu si perete
+        const zy0 = y + outward * (halfW + 0.25);       // dupa ultimul sir de participanti
+        const zy1 = outward > 0 ? (ROOM_L - 0.05) : 0.05;
+        const zTop = Math.min(zy0, zy1), zH = Math.abs(zy1 - zy0);
+        ctx.fillStyle = 'rgba(251, 146, 60, 0.50)';
+        ctx.fillRect(xl - halfW, zTop, (xr - xl) + 2 * halfW, zH);
+        ctx.strokeStyle = 'rgba(253, 186, 116, 0.95)';
         ctx.lineWidth = 0.05;
-        ctx.setLineDash([0.25, 0.18]);
-        ctx.beginPath(); ctx.moveTo(seg.x1, y); ctx.lineTo(seg.x2, y); ctx.stroke();
+        ctx.setLineDash([0.3, 0.2]);
+        ctx.strokeRect(xl - halfW, zTop, (xr - xl) + 2 * halfW, zH);
         ctx.setLineDash([]);
-        const hopW = Math.abs(seg.x2 - seg.x1);
-        const tr = Math.min(0.32, Math.max(0.14, hopW / 4 - 0.03));
-        for (const dx of [-hopW / 4, hopW / 4]) {
-          ctx.save();
-          ctx.translate(xm + dx, y);
-          ctx.rotate(-viewRot);
-          ctx.fillStyle = '#0d9488';
-          ctx.beginPath(); ctx.arc(0, 0, tr, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.05; ctx.stroke();
-          ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${(tr * 0.95).toFixed(3)}px Inter, system-ui, sans-serif`;
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('Î', 0, 0.01);
-          ctx.restore();
-        }
         ctx.restore();
+        // doi intorcatori (oameni portocalii), cu fata spre participanti
+        const ty = zy0 + outward * Math.min(0.26, zH / 2);
+        const gaze = outward > 0 ? -Math.PI / 2 : Math.PI / 2;
+        const xm = (seg.x1 + seg.x2) / 2, hopW = xr - xl;
+        for (const dx of [-hopW / 4, hopW / 4]) {
+          drawHumanTopDown(xm + dx, ty, gaze, 0, false, '', '#ea580c', '#fb923c', false, 0, false, 0);
+        }
       }
     }
 
