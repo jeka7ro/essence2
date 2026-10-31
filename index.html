@@ -697,6 +697,29 @@
     #overlay-congestion-badge { border-radius: 999px !important; }
     .time-presets-table { border-radius: 12px; }
     input[type=range].param-slider { border-radius: 999px; }
+
+    /* ===== HUD compact deasupra planului ===== */
+    .canvas-overlay-info { width: fit-content; max-width: calc(100% - 28px); padding: 10px 14px !important; gap: 9px !important; border-radius: 18px !important; }
+    .hud-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .hud-stat { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .hud-stat .ic { color: #38bdf8; }
+    .hud-label { font-size: 11px; color: #94a3b8; font-weight: 600; }
+    .hud-val { font-family: ui-monospace, monospace; font-size: 13px; color: #fff; }
+    .hud-green { color: var(--accent-green); }
+    .hud-sub { font-size: 11px; color: #64748b; }
+    .hud-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.14); }
+    .hud-seg { display: flex; gap: 3px; padding: 3px; background: rgba(2,6,23,0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+    .hud-seg::-webkit-scrollbar { display: none; }
+    .hud-seg .sol-pill { background: transparent; border: 1px solid transparent; padding: 5px 12px; white-space: nowrap; flex-shrink: 0; box-shadow: none; }
+    .hud-seg .sol-pill:hover { background: rgba(255,255,255,0.08); }
+    .hud-status { background: none !important; border: none !important; padding: 0 !important; font-size: 11px; font-weight: 600; display: flex; align-items: center; }
+    .hud-status .dot { margin-right: 6px; }
+
+    @media (max-width: 900px) {
+      .hud-sep { display: none; }
+      .hud-row { gap: 4px 14px; }
+      .hud-seg { flex-wrap: wrap; overflow: visible; border-radius: 18px; }
+    }
   </style>
 </head>
 <body>
@@ -1187,44 +1210,30 @@
 
       <!-- Viewport Overlay with Direct Solution Selector -->
       <div class="canvas-overlay-info">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; flex-wrap:wrap;">
-          
-          <!-- Countdown to Next Step -->
-          <div style="display:flex; align-items:center; gap:8px;">
-            <svg class="ic" style="width:20px;height:20px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            <div>
-              <div style="font-size:11.5px; font-weight:800; color:#fff;">Timp Pas Față în Față: <span id="overlay-timer" style="color:var(--accent-green); font-family:ui-monospace, monospace; font-size:14px;">10.0s</span></div>
-              <div style="font-size:10px; color:#cbd5e1;">Stau față în față nemișcați, apoi 1 pas la dreapta</div>
-            </div>
+        <div class="hud-row">
+          <div class="hud-stat">
+            <svg class="ic" style="width:16px;height:16px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span class="hud-label">Următorul pas în</span>
+            <b id="overlay-timer" class="hud-val hud-green">10.0s</b>
           </div>
-
-          <!-- PROMINENT TOTAL DURATION BOX (400 PAȘI) -->
-          <div style="background:rgba(15, 23, 42, 0.88); border:1.5px solid #38bdf8; border-radius:8px; padding:4px 12px; display:flex; align-items:center; gap:8px; box-shadow:0 0 14px rgba(56, 189, 248, 0.3);">
-            <svg class="ic" style="width:20px;height:20px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></svg>
-            <div>
-              <div style="font-size:9.5px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px;">TIMP TOTAL CA SĂ TREACĂ TOȚI (400 Pași):</div>
-              <div style="font-size:13.5px; font-weight:900; color:#fff; font-family:ui-monospace, monospace;">
-                <span id="ovl-total-time" style="color:#38bdf8;">66 min 40s (1h 06m)</span>
-                <span id="ovl-total-sub" style="font-size:10.5px; font-weight:700; color:#86efac; margin-left:4px;">(la 10.0s / pas)</span>
-              </div>
-            </div>
+          <span class="hud-sep"></span>
+          <div class="hud-stat">
+            <svg class="ic" style="width:16px;height:16px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></svg>
+            <span class="hud-label">Tur complet</span>
+            <b id="ovl-total-time" class="hud-val">66 min 40s</b>
+            <span id="ovl-total-sub" class="hud-sub">(400 pași la 10s)</span>
           </div>
-
-          <!-- Active Solution Status -->
-          <div id="overlay-congestion-badge" style="padding:4px 10px; border-radius:6px; background:rgba(34, 197, 94, 0.20); border:1px solid #22c55e; color:#86efac; font-size:11px; font-weight:700; display:flex; align-items:center; gap:6px;"><span id="overlay-congestion-text">Soluția 1 Activă: 8 Bucle Verzi (51.0 cm &gt; 46 cm umeri)</span>
-          </div>
-
         </div>
 
-        <!-- Direct Solution Selector for 800 people -->
-        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.1); padding-top:6px; width:100%;">
-          <span style="font-size:10.5px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px;">Soluții 800 Persoane:</span>
-          <button class="sol-pill active" id="sol-btn-tapered" onclick="setSolution800('tapered')"><span class="dot dot-green"></span>1. Culoar 0.70m Viraj</button>
-          <button class="sol-pill" id="sol-btn-transit" onclick="setSolution800('transit')"><span class="dot dot-blue"></span>2. Viraj Tranzit Fluid</button>
-          <button class="sol-pill" id="sol-btn-staggered" onclick="setSolution800('staggered')"><span class="dot dot-yellow"></span>3. Dispunere în Șah</button>
-          <button class="sol-pill" id="sol-btn-max" onclick="setSolution800('max_path')"><span class="dot dot-purple"></span>4. Traseu Maxim 305m</button>
-          <button class="sol-pill" id="sol-btn-none" onclick="setSolution800('none')"><span class="dot dot-red"></span>Arată Problema (1.20m)</button>
+        <div class="hud-seg" role="group" aria-label="Soluții 800 persoane">
+          <button class="sol-pill active" id="sol-btn-tapered" onclick="setSolution800('tapered')"><span class="dot dot-green"></span>1 &middot; Culoar 0.70 m</button>
+          <button class="sol-pill" id="sol-btn-transit" onclick="setSolution800('transit')"><span class="dot dot-blue"></span>2 &middot; Tranzit</button>
+          <button class="sol-pill" id="sol-btn-staggered" onclick="setSolution800('staggered')"><span class="dot dot-yellow"></span>3 &middot; Șah</button>
+          <button class="sol-pill" id="sol-btn-max" onclick="setSolution800('max_path')"><span class="dot dot-purple"></span>4 &middot; Traseu 305 m</button>
+          <button class="sol-pill" id="sol-btn-none" onclick="setSolution800('none')"><span class="dot dot-red"></span>Problema</button>
         </div>
+
+        <div id="overlay-congestion-badge" class="hud-status"><span id="overlay-congestion-text">Soluția 1 activă</span></div>
       </div>
 
       <!-- Top Tools -->
