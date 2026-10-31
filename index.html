@@ -771,6 +771,16 @@
     .prog-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: #cbd5e1; white-space: nowrap; margin-top: 2px; }
     .prog-meta .chip { display: inline-flex; align-items: center; }
     .dot-pink { background: #f43f5e; box-shadow: 0 0 6px rgba(244,63,94,.7); }
+
+    /* ===== raport dimensiuni ===== */
+    #calc-report { font-size: 12px; color: #cbd5e1; }
+    .rep-title { font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
+    .rep-sec { margin-top: 12px; font-weight: 700; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 3px; margin-bottom: 4px; }
+    .rep-table { width: 100%; border-collapse: collapse; }
+    .rep-table td { padding: 4px 0; vertical-align: top; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .rep-table td.rep-val { text-align: right; font-weight: 700; color: #fff; padding-left: 10px; white-space: nowrap; }
+    .rep-list { margin: 4px 0 0 16px; padding: 0; line-height: 1.5; }
+    .rep-list li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -1051,6 +1061,28 @@
           </div>
         </div>
 
+        <!-- Distanță spate în spate -->
+        <div class="param-box" style="border-left:3px solid #fb923c;">
+          <div class="param-header">
+            <span class="param-name">Distanță spate în spate (între culoare)</span>
+            <span class="param-val" id="disp-backgap">1.10 m</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-backgap" min="0.4" max="2.0" step="0.05" value="1.1" oninput="onBackGapChange(this.value)">
+          <div class="param-sub">
+            <span>0.40 m</span>
+            <span id="backgap-note" style="color:#fb923c; font-weight:600;">zonă asistenți</span>
+            <span>2.00 m</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="preset-btn btn-bg" onclick="setBackGap(0.8)">0.8 m</button>
+            <button class="preset-btn btn-bg" onclick="setBackGap(1.0)">1.0 m</button>
+            <button class="preset-btn btn-bg" onclick="setBackGap(1.2)">1.2 m</button>
+            <button class="preset-btn btn-bg" onclick="setBackGap(1.5)">1.5 m</button>
+            <button class="preset-btn" id="btn-bg-auto" onclick="setBackGapAuto()">Automat</button>
+          </div>
+          <div id="backgap-warn" style="display:none; margin-top:6px; font-size:11px; color:#fca5a5;"></div>
+        </div>
+
         <!-- SECȚIUNE NOUĂ: DISTANȚE FAȚĂ DE PEREȚI -->
         <div class="section-title" style="color:#38bdf8; margin-top:14px;"> Distanțe față de Pereții Sălii</div>
 
@@ -1080,7 +1112,7 @@
             <span class="param-name"> Distanță Pereți Laterali (Stânga / Dreapta):</span>
             <span class="param-val" id="disp-wall-side" style="color:#a855f7; font-weight: 700;">1.00 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-wall-side" min="0.5" max="3.5" step="0.1" value="1.0" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-wall-side" min="0.5" max="3.5" step="0.1" value="1.0" oninput="backGapAuto = true; onParamChange()">
           <div class="param-sub">
             <span>0.5 m (minim)</span>
             <span id="disp-wall-side-sub" style="color:#a855f7; font-weight:700;">Spațiu liber la pereții laterali</span>
@@ -1109,6 +1141,8 @@
           <p style="margin-top:6px;"><b>Viteză Relativă:</b> Deoarece ambele șiruri fac un pas la dreapta în sensuri opuse, avansul relativ este de <b>2 poziții per pas</b>!</p>
           <p style="margin-top:6px;"><b>Timp pentru un Circuit Complet:</b> <span id="calc-lap-time">400 pași la 1.8s = 12 minute</span>.</p>
         </div>
+        <div class="section-title" style="margin-top:14px;">Dimensiuni, calcule și sugestii (ca în PDF, pagina 2)</div>
+        <div id="calc-report"></div>
       </div>
 
       <!-- TAB 4: 4 SOLUȚII PENTRU PĂSTRAREA A EXACT 800 PERSOANE -->
@@ -1378,6 +1412,11 @@
     let scale = 20;
     let panX = 0, panY = 0;
     let viewRot = 0; // rotirea vederii (radiani)
+    let backGap = 1.10;       // distanta spate in spate intre participantii culoarelor vecine (m)
+    let backGapAuto = true;   // true = culoarele umplu sala (distanta rezulta); false = distanta setata manual
+    let backGapClamped = false;
+    let laneYTop = 0, laneYBottom = 0;
+    const SHOULDER = 0.46, TORSO_DEPTH = 0.24, ASSIST_DIA = 0.76;
     let isDragging = false;
     let dragStart = { x: 0, y: 0 };
 
@@ -1393,9 +1432,24 @@
 
     function recalculateAll() {
       const halfW = corridorW / 2;
-      const marginX = wallDistSide + halfW;
-      const usableW = Math.max(2.0, ROOM_W - 2 * marginX);
-      pitch = usableW / (nLanes - 1);
+      let marginX;
+      backGapClamped = false;
+      if (!backGapAuto) {
+        // Distanta spate in spate setata manual: blocul de culoare se centreaza in sala
+        const maxBG = Math.max(0.2, (ROOM_W - 0.6 - corridorW) / (nLanes - 1) - corridorW);
+        if (backGap > maxBG) { backGap = maxBG; backGapClamped = true; }
+        pitch = corridorW + backGap;
+        const blockW = (nLanes - 1) * pitch + corridorW;
+        marginX = (ROOM_W - blockW) / 2 + halfW;
+        wallDistSide = marginX - halfW;
+        const elSideSl = document.getElementById('rng-wall-side');
+        if (elSideSl) elSideSl.value = Math.min(3.5, Math.max(0.5, wallDistSide));
+      } else {
+        marginX = wallDistSide + halfW;
+        const usableW = Math.max(2.0, ROOM_W - 2 * marginX);
+        pitch = usableW / (nLanes - 1);
+        backGap = pitch - corridorW;
+      }
       rTurn = pitch / 2;
 
       // Apex-ul exterior al virajului U este exact la distanța wallDistEnd de perete:
@@ -1403,6 +1457,7 @@
       const endPad = wallDistEnd + (turnerMode ? 0 : rTurn) + halfW;   // la intorcatori nu mai e nevoie de raza virajului
       const yTop = endPad;
       const yBottom = ROOM_L - endPad;
+      laneYTop = yTop; laneYBottom = yBottom;
 
       buildDynamicPath(yTop, yBottom, marginX);
       buildDynamicAssistants(yTop, yBottom, marginX);
@@ -1518,6 +1573,24 @@
       return { x: 0, y: 0, angle: 0, type: 'line', seg: null };
     }
 
+    // Soluțiile cu viraj U real verifică înghesuiala (cele cu tranzit/șah/întorcători o evită prin altă metodă)
+    function checksCongestion() { return ['none', 'tapered', 'max_path'].includes(currentSolution800); }
+
+    // Axa zonei de asistenti din dreapta culoarului `i` (in spatele participantilor, nu intre ei)
+    function aisleCenterX(i) {
+      const x = pathSegments.filter(sg => sg.type === 'line')[i].x1;
+      const halfW = corridorW / 2;
+      if (i < nLanes - 1) return x + pitch / 2;
+      return x + halfW + Math.max(0.3, (ROOM_W - (x + halfW)) / 2);
+    }
+    function aisleBounds(i) {
+      const x = pathSegments.filter(sg => sg.type === 'line')[i].x1;
+      const halfW = corridorW / 2;
+      const left = x + halfW + TORSO_DEPTH / 2;
+      const right = (i < nLanes - 1) ? (x + pitch - halfW - TORSO_DEPTH / 2) : (ROOM_W - 0.15);
+      return { left, right: Math.max(left + 0.1, right) };
+    }
+
     function buildDynamicAssistants(yTop, yBottom, marginX) {
       assistants = [];
       const straightSegs = pathSegments.filter(s => s.type === 'line');
@@ -1549,7 +1622,7 @@
             const rowIdx = isDown ? r : (4 - r);
             const num = base + r + 1;
             assistants.push({
-              x: seg.x1,
+              x: aisleCenterX(i),
               y: yRows[rowIdx],
               angle: isDown ? Math.PI / 2 : -Math.PI / 2,
               id: `A${num}`
@@ -1560,15 +1633,15 @@
         // Culoarul 8 (index 7, merge în SUS spre virajul 8):
         // Conform schemei din slide, asistenții A36, A37, A38 sunt pe rândurile superioare (0, 1, 2)
         const seg7 = straightSegs[7];
-        assistants.push({ x: seg7.x1, y: yRows[0], angle: -Math.PI / 2, id: 'A36' });
-        assistants.push({ x: seg7.x1, y: yRows[1], angle: -Math.PI / 2, id: 'A37' });
-        assistants.push({ x: seg7.x1, y: yRows[2], angle: -Math.PI / 2, id: 'A38' });
+        assistants.push({ x: aisleCenterX(7), y: yRows[0], angle: -Math.PI / 2, id: 'A36' });
+        assistants.push({ x: aisleCenterX(7), y: yRows[1], angle: -Math.PI / 2, id: 'A37' });
+        assistants.push({ x: aisleCenterX(7), y: yRows[2], angle: -Math.PI / 2, id: 'A38' });
 
         // Culoarul 9 (index 8, merge în JOS spre ieșirea END):
         // Conform schemei din slide, asistenții A39, A40 sunt pe rândurile 3 și 4, chiar înainte de END!
         const seg8 = straightSegs[8];
-        assistants.push({ x: seg8.x1, y: yRows[3], angle: Math.PI / 2, id: 'A39' });
-        assistants.push({ x: seg8.x1, y: yRows[4], angle: Math.PI / 2, id: 'A40' });
+        assistants.push({ x: aisleCenterX(8), y: yRows[3], angle: Math.PI / 2, id: 'A39' });
+        assistants.push({ x: aisleCenterX(8), y: yRows[4], angle: Math.PI / 2, id: 'A40' });
       } else {
         // Mod Dinamic: Asistenții sunt plasați ÎNTOTDEAUNA EXCLUSIV pe tronsoanele drepte (NICIODATĂ pe virajele U!)
         const basePerLane = Math.floor(assistCount / numLines);
@@ -1585,7 +1658,7 @@
             const t = (j + 0.5) / countInLane;
             const y = isDown ? (yTop + t * segLen) : (yBottom - t * segLen);
             assistants.push({
-              x: seg.x1,
+              x: aisleCenterX(i),
               y: y,
               angle: isDown ? Math.PI / 2 : -Math.PI / 2,
               id: `A${curId++}`
@@ -1595,7 +1668,30 @@
       }
     }
 
+    function onBackGapChange(v) { backGap = parseFloat(v); backGapAuto = false; recalculateAll(); }
+    function setBackGap(v) { backGap = v; backGapAuto = false; recalculateAll(); }
+    function setBackGapAuto() { backGapAuto = true; recalculateAll(); }
+    function syncBackGapUI() {
+      const sl = document.getElementById('rng-backgap'); if (sl) sl.value = Math.min(2.0, Math.max(0.4, backGap));
+      const d = document.getElementById('disp-backgap'); if (d) d.innerText = backGap.toFixed(2) + ' m';
+      const free = backGap - TORSO_DEPTH;
+      const n = document.getElementById('backgap-note');
+      if (n) n.innerText = `zonă asistenți: ${(Math.max(0, free) * 100).toFixed(0)} cm liberi`;
+      const w = document.getElementById('backgap-warn');
+      if (w) {
+        let msg = '';
+        if (backGapClamped) msg = `Nu încap mai mult de ${backGap.toFixed(2)} m pentru ${nLanes} culoare în sală; valoarea a fost limitată.`;
+        else if (free < ASSIST_DIA) msg = `Un asistent are nevoie de aproximativ ${(ASSIST_DIA * 100).toFixed(0)} cm; aici sunt doar ${(Math.max(0, free) * 100).toFixed(0)} cm liberi.`;
+        w.style.display = msg ? 'block' : 'none';
+        w.innerText = msg;
+      }
+      document.querySelectorAll('.btn-bg').forEach(b => b.classList.toggle('active', !backGapAuto && Math.abs(parseFloat(b.innerText) - backGap) < 0.03));
+      const ba = document.getElementById('btn-bg-auto'); if (ba) ba.classList.toggle('active', backGapAuto);
+    }
+
     function updateMetrics() {
+      syncBackGapUI();
+      renderReportHTML();
       document.getElementById('disp-part').innerText = `${partCount} pers`;
       document.getElementById('disp-part-split').innerText = `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
       document.getElementById('disp-assist').innerText = `${assistCount} asistenți`;
@@ -1617,7 +1713,7 @@
       const rInner = Math.max(0.05, rTurn - wTurn / 2);
       const spaceInner = stepDist * (rInner / rTurn);
       const nTurns = nLanes - 1;
-      const isRed = (currentSolution800 === 'none') && (spaceInner < 0.46);
+      const isRed = checksCongestion() && (spaceInner < 0.46);
 
       const cBadge = document.getElementById('overlay-congestion-badge');
       const cText = document.getElementById('overlay-congestion-text');
@@ -1801,6 +1897,7 @@
     }
 
     function setWallSidePreset(dist) {
+      backGapAuto = true;
       wallDistSide = dist;
       const el = document.getElementById('rng-wall-side');
       if (el) el.value = dist;
@@ -1824,6 +1921,7 @@
     }
 
     function setSolution800(mode) {
+      backGapAuto = true;
       currentSolution800 = mode;
       partCount = 800;
       nLanes = 9;
@@ -2224,7 +2322,7 @@
         if (seg.type === 'arc') {
           const rInner = Math.max(0.05, seg.r - halfWTurn);
           const spaceInner = stepDist * (rInner / seg.r);
-          const isCongestedTurn = (currentSolution800 === 'none') && (spaceInner < 0.46);
+          const isCongestedTurn = checksCongestion() && (spaceInner < 0.46);
 
           if (isCongestedTurn) {
             // Fill inner half of U-turn with striking RED
@@ -2386,17 +2484,40 @@
     }
 
     function drawAssistants() {
+      // Zone portocalii (culoarele de asistenti, in spatele participantilor)
+      const used = new Set();
+      const laneSegs = pathSegments.filter(sg => sg.type === 'line');
+      for (const a of assistants) {
+        for (let i = 0; i < laneSegs.length; i++) {
+          const bd = aisleBounds(i);
+          if (a.x >= bd.left - 0.01 && a.x <= bd.right + 0.01) { used.add(i); break; }
+        }
+      }
+      for (const i of used) {
+        const bd = aisleBounds(i);
+        ctx.save();
+        ctx.fillStyle = 'rgba(251, 146, 60, 0.50)';
+        ctx.fillRect(bd.left, laneYTop, bd.right - bd.left, laneYBottom - laneYTop);
+        ctx.strokeStyle = 'rgba(253, 186, 116, 0.95)';
+        ctx.lineWidth = 0.05;
+        ctx.setLineDash([0.3, 0.2]);
+        ctx.strokeRect(bd.left, laneYTop, bd.right - bd.left, laneYBottom - laneYTop);
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+      const freeW = Math.max(0.3, backGap - TORSO_DEPTH);
+      const rad = Math.min(0.40, Math.max(0.18, freeW / 2 - 0.02));
       for (let a of assistants) {
         ctx.save();
         ctx.translate(a.x, a.y);
         ctx.rotate(-viewRot);
 
         ctx.fillStyle = '#ea580c';
-        ctx.beginPath(); ctx.arc(0, 0, 0.48, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.05; ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.04; ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 0.26px Inter, system-ui, sans-serif';
+        ctx.font = `bold ${(rad * 0.62).toFixed(3)}px Inter, system-ui, sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(a.id, 0, 0);
 
@@ -2450,7 +2571,7 @@
         // Congestion Detection on Curves (< 46cm umeri):
         let isCongested1 = false;
         let space1 = stepDist;
-        if (currentSolution800 === 'none' && pt1.type === 'arc' && pt1.seg) {
+        if (checksCongestion() && pt1.type === 'arc' && pt1.seg) {
           const dCenter1 = Math.hypot(p1x - pt1.seg.cx, p1y - pt1.seg.cy);
           if (dCenter1 < pt1.seg.r) {
             space1 = stepDist * (dCenter1 / pt1.seg.r);
@@ -2460,7 +2581,7 @@
 
         let isCongested2 = false;
         let space2 = stepDist;
-        if (currentSolution800 === 'none' && pt2.type === 'arc' && pt2.seg) {
+        if (checksCongestion() && pt2.type === 'arc' && pt2.seg) {
           const dCenter2 = Math.hypot(p2x - pt2.seg.cx, p2y - pt2.seg.cy);
           if (dCenter2 < pt2.seg.r) {
             space2 = stepDist * (dCenter2 / pt2.seg.r);
@@ -2826,12 +2947,187 @@
     }
 
 
+
+    // ===================== RAPORT: dimensiuni, calcule, sugestii =====================
+    const fm = (v, d = 2) => v.toFixed(d).replace('.', ',');
+    const fcm = (v) => (v * 100).toFixed(1).replace('.', ',') + ' cm';
+    function fmtDur(sec) {
+      const m = Math.floor(sec / 60), r = Math.round(sec % 60);
+      if (m >= 60) return `${Math.floor(m / 60)} h ${m % 60} min ${r} s`;
+      return `${m} min ${r} s`;
+    }
+
+    function computeReport() {
+      const pairs = Math.round(partCount / 2);
+      const halfW = corridorW / 2;
+      const wTurn = corridorWTurn ? corridorWTurn : corridorW;
+      const turnerMode = currentSolution800 === 'turners';
+      const laneSegs = pathSegments.filter(sg => sg.type === 'line');
+      const laneLen = laneSegs.length ? laneSegs[0].length : 0;
+      const sumLane = laneSegs.reduce((a, sg) => a + sg.length, 0);
+      const stepDist = totalVirtualLength / pairs;
+      const rInner = Math.max(0.05, rTurn - wTurn / 2);
+      const spaceInner = stepDist * (rInner / rTurn);
+      const freeAisle = Math.max(0, backGap - TORSO_DEPTH);
+      const totalSec = pairs * stepIntervalSec;
+      const turnerAssist = turnerMode ? 2 * (nLanes - 1) : 0;
+      const solNames = { tapered: 'Soluția 1 - culoar îngustat pe viraj', transit: 'Soluția 2 - viraj tranzit fluid', staggered: 'Soluția 3 - dispunere în șah', max_path: 'Soluția 4 - traseu maxim', turners: 'Soluția 5 - întorcători la capete', none: 'Configurația inițială' };
+
+      const sections = [
+        { title: 'Sala', rows: [
+          ['Dimensiuni sală', `${fm(ROOM_W, 1)} m x ${fm(ROOM_L, 1)} m`, 'din plan'],
+          ['Suprafață', `${fm(ROOM_W * ROOM_L, 1)} m²`, 'lățime x lungime'],
+          ['Compartimente C3 / C2 / C1', `${fm(SECTION_C3, 1)} / ${fm(SECTION_C2, 1)} / ${fm(SECTION_C1, 1)} m`, 'separate de pereții de 0,9 m și 1,0 m'],
+        ]},
+        { title: 'Distanțe setate', rows: [
+          ['Față în față (lățime culoar)', `${fm(corridorW)} m`, 'distanța dintre cele două șiruri'],
+          ['Lățime culoar pe viraj', turnerMode ? 'fără viraj' : `${fm(wTurn)} m`, turnerMode ? 'întorcători la capete' : 'doar în zona virajului U'],
+          ['Spate în spate (între culoare)', `${fm(backGap)} m`, 'spațiul din spatele participanților'],
+          ['Pas între axele culoarelor', `${fm(pitch)} m`, 'lățime culoar + spate în spate'],
+          ['Distanță capete față de perete', `${fm(wallDistEnd)} m`, 'sus și jos'],
+          ['Distanță culoare față de pereții laterali', `${fm(wallDistSide)} m`, 'stânga și dreapta'],
+          ['Număr culoare', `${nLanes}`, `${nLanes - 1} ${turnerMode ? 'treceri la capete' : 'viraje U'}`],
+          ['Rază viraj (axa culoarului)', turnerMode ? '-' : `${fm(rTurn)} m`, 'pas între axe / 2'],
+        ]},
+        { title: 'Traseu', rows: [
+          ['Lungime culoar drept', `${fm(laneLen, 1)} m`, 'lungime sală - capete'],
+          ['Total tronsoane drepte', `${fm(sumLane, 1)} m`, `${nLanes} culoare`],
+          ['Lungime traseu', `${fm(totalPathLength, 1)} m`, 'drept + viraje'],
+          ['Lungime pe care stau oamenii', `${fm(totalVirtualLength, 1)} m`, turnerMode ? 'la întorcători trecerea e asistată' : 'egală cu lungimea traseului'],
+        ]},
+        { title: 'Persoane', rows: [
+          ['Participanți', `${partCount} (${pairs} perechi)`, `${pairs} în fiecare șir`],
+          ['Asistenți pe culoare', `${assistCount}`, 'în zonele portocalii, în spatele participanților'],
+          ['Asistenți întorcători', turnerMode ? `${turnerAssist}` : '0', turnerMode ? '2 la fiecare capăt' : 'doar la Soluția 5'],
+          ['Spațiu pe persoană pe culoar', fcm(stepDist), 'lungime traseu / perechi'],
+          ['Liber față de umeri (46 cm)', fcm(stepDist - SHOULDER), 'spațiu pe persoană - 46 cm'],
+          ['Spațiu pe interior de viraj', turnerMode ? 'nu există' : fcm(spaceInner), 'spațiu pe persoană x R interior / R axă'],
+          ['Lățime liberă între spatele participanților', fcm(freeAisle), 'spate în spate - 2 x 12 cm (adâncime piept)'],
+        ]},
+        { title: 'Timp', rows: [
+          ['Pauză față în față', `${fm(stepIntervalSec, 1)} s`, 'setată în aplicație'],
+          ['Număr de pași pentru un tur', `${pairs}`, 'fiecare se întâlnește cu toți partenerii'],
+          ['Durata unui tur complet', fmtDur(totalSec), 'pași x secunde pe pas'],
+        ]},
+      ];
+
+      const formulas = [
+        'Pas între axe = lățime culoar + distanță spate în spate',
+        'Spațiu pe persoană = lungime traseu / număr de perechi',
+        'Liber față de umeri = spațiu pe persoană - 0,46 m',
+        'Spațiu pe interior de viraj = spațiu pe persoană x (R axă - lățime viraj / 2) / R axă',
+        'Lățime liberă între spate = distanță spate în spate - 0,24 m',
+        'Durată tur = număr de perechi x secunde pe pas',
+      ];
+
+      const sug = [];
+      const minSpace = SHOULDER;
+      if (stepDist < minSpace) {
+        const maxPairs = Math.floor(totalVirtualLength / minSpace);
+        sug.push(`Pe culoar rămân doar ${fcm(stepDist)} pe persoană (sub 46 cm). Cu această lungime de traseu încap cel mult ${2 * maxPairs} persoane; scădeți numărul de participanți sau lungiți traseul.`);
+      }
+      if (!turnerMode && spaceInner < minSpace) {
+        let t = `Pe interiorul virajului sunt ${fcm(spaceInner)} (sub 46 cm).`;
+        const rReq = SHOULDER * rTurn / stepDist;
+        const wReq = 2 * (rTurn - rReq);
+        if (stepDist > SHOULDER && wReq > 0.3) t += ` Îngustați culoarul pe viraj la cel mult ${fm(wReq)} m (acum ${fm(wTurn)} m).`;
+        if (stepDist > SHOULDER) {
+          const rtReq = wTurn / (2 * (1 - SHOULDER / stepDist));
+          const bgReq = 2 * rtReq - corridorW;
+          if (isFinite(bgReq) && bgReq > backGap) t += ` Sau măriți distanța spate în spate la cel puțin ${fm(bgReq)} m.`;
+        }
+        t += ' Alternativ, folosiți Soluția 5 (întorcători la capete).';
+        sug.push(t);
+      }
+      if (freeAisle < ASSIST_DIA) {
+        const need = ASSIST_DIA + TORSO_DEPTH;
+        sug.push(`Zona asistenților are ${fcm(freeAisle)} liberi, iar un asistent are nevoie de aproximativ 76 cm. Măriți distanța spate în spate la cel puțin ${fm(need)} m.`);
+      }
+      const possLanes = Math.floor((ROOM_W - 2 * 1.0 - corridorW) / (corridorW + backGap)) + 1;
+      if (possLanes > nLanes) sug.push(`Cu aceste distanțe ar încăpea ${possLanes} culoare (acum ${nLanes}), cu pereții laterali la 1,0 m. Mai multe culoare înseamnă culoare mai scurte sau mai mult spațiu pe persoană.`);
+      const secFor30 = 1800 / pairs;
+      if (totalSec > 1800) sug.push(`Pentru un tur sub 30 de minute pauza trebuie să fie de cel mult ${fm(secFor30, 1)} s pe pas (acum ${fm(stepIntervalSec, 1)} s).`);
+      const zoneSec = Math.round(pairs / 3) * stepIntervalSec;
+      sug.push(`Dacă sala se împarte în cele 3 compartimente (C1, C2, C3) cu câte un circuit separat, turul se reduce la aproximativ ${fmtDur(zoneSec)} la aceeași pauză, dar fiecare participant întâlnește doar o treime din parteneri.`);
+      if (!sug.some(t => t.startsWith('Pe culoar') || t.startsWith('Pe interior'))) sug.unshift('Configurația curentă respectă 46 cm pe persoană, atât pe culoar cât și la capete.');
+
+      return { sections, formulas, sug, title: solNames[currentSolution800] || '' };
+    }
+
+    function renderReportHTML() {
+      const el = document.getElementById('calc-report');
+      if (!el) return;
+      const r = computeReport();
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      let h = `<div class="rep-title">${esc(r.title)}</div>`;
+      for (const sec of r.sections) {
+        h += `<div class="rep-sec">${esc(sec.title)}</div><table class="rep-table">`;
+        for (const [a, b, c] of sec.rows) h += `<tr><td>${esc(a)}</td><td class="rep-val">${esc(b)}</td></tr>`;
+        h += '</table>';
+      }
+      h += `<div class="rep-sec">Formule</div><ul class="rep-list">${r.formulas.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
+      h += `<div class="rep-sec">Sugestii</div><ul class="rep-list">${r.sug.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
+      el.innerHTML = h;
+    }
+
     // --- EXPORT PLAN ÎN PDF (fără biblioteci externe, A4; portret sau peisaj după rotire) ---
     function exportPlanPDF() {
+      const planPage = renderPlanPage();
+      const calcPage = renderCalcPage();
+      const pages = [planPage, calcPage].map(pg => {
+        const b64 = pg.canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
+        const bin = atob(b64);
+        const jpg = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) jpg[i] = bin.charCodeAt(i);
+        return { jpg, w: pg.canvas.width, h: pg.canvas.height, pw: pg.landscape ? 841.89 : 595.28, ph: pg.landscape ? 595.28 : 841.89 };
+      });
+
+      // PDF minimal: N pagini, fiecare o imagine JPEG pe toata pagina
+      const enc = new TextEncoder();
+      const chunks = [];
+      let len = 0;
+      const offsets = [];
+      const push = (d) => { const u = typeof d === 'string' ? enc.encode(d) : d; chunks.push(u); len += u.length; };
+      const obj = (n, body) => { offsets[n] = len; push(`${n} 0 obj\n`); push(body); push('\nendobj\n'); };
+
+      push('%PDF-1.4\n');
+      obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+      const kids = pages.map((_, i) => `${3 + 3 * i} 0 R`).join(' ');
+      obj(2, `<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>`);
+      pages.forEach((pg, i) => {
+        const pN = 3 + 3 * i, iN = 4 + 3 * i, cN = 5 + 3 * i;
+        obj(pN, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pg.pw} ${pg.ph}] /Resources << /XObject << /Im0 ${iN} 0 R >> >> /Contents ${cN} 0 R >>`);
+        offsets[iN] = len;
+        push(`${iN} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${pg.w} /Height ${pg.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${pg.jpg.length} >>\nstream\n`);
+        push(pg.jpg);
+        push('\nendstream\nendobj\n');
+        const content = `q ${pg.pw} 0 0 ${pg.ph} 0 0 cm /Im0 Do Q`;
+        obj(cN, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+      });
+      const total = 3 + 3 * pages.length;
+      const xrefPos = len;
+      let xref = `xref\n0 ${total}\n0000000000 65535 f \n`;
+      for (let i = 1; i < total; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+      push(xref);
+      push(`trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`);
+
+      const blob = new Blob(chunks, { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `plan_sala_${partCount}_pers_${currentSolution800}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    // Pagina 1: planul sălii (portret sau peisaj după rotire)
+    function renderPlanPage() {
       const rc = Math.abs(Math.cos(viewRot)), rs = Math.abs(Math.sin(viewRot));
       const bw0 = ROOM_W * rc + ROOM_L * rs, bh0 = ROOM_W * rs + ROOM_L * rc;
-      const landscape = bw0 > bh0 * 1.02;               // A4 pe lat când sala e rotită pe orizontală
-      const PW = landscape ? 3508 : 2480, PH = landscape ? 2480 : 3508, M = 110;   // A4 la 300 dpi
+      const landscape = bw0 > bh0 * 1.02;
+      const PW = landscape ? 3508 : 2480, PH = landscape ? 2480 : 3508, M = 110;
       const off = document.createElement('canvas');
       off.width = PW; off.height = PH;
       const octx = off.getContext('2d');
@@ -2850,7 +3146,6 @@
       const tMin = Math.floor(totalSec / 60), tSec = Math.round(totalSec % 60);
       const normStep = ((currentStepNumber - 1) % pairs) + 1;
 
-      // Fundal alb + antet
       octx.fillStyle = '#ffffff';
       octx.fillRect(0, 0, PW, PH);
       octx.fillStyle = '#0f172a';
@@ -2865,20 +3160,18 @@
       octx.fillStyle = '#334155';
       const wTurn = corridorWTurn ? corridorWTurn : corridorW;
       octx.fillText(
-        `${partCount} participanți (${pairs} perechi) | ${nLanes} culoare | ${assistCount} asistenți | traseu ${totalPathLength.toFixed(1)} m | culoar ${corridorW.toFixed(2)} m, viraj ${wTurn.toFixed(2)} m`,
+        `${partCount} participanți (${pairs} perechi) | ${nLanes} culoare | ${assistCount} asistenți | traseu ${totalPathLength.toFixed(1)} m | culoar ${corridorW.toFixed(2)} m, spate în spate ${backGap.toFixed(2)} m`,
         M, M + 178);
       octx.fillText(
-        `Pauză față în față: ${stepIntervalSec.toFixed(0)} s / pas | ${pairs} pași = ${tMin} min ${tSec} s | Poziția afișată: pasul ${normStep} / ${pairs}`,
+        `Pauză față în față: ${stepIntervalSec.toFixed(0)} s / pas | ${pairs} pași = ${tMin} min ${tSec} s | Poziția afișată: pasul ${normStep} / ${pairs} | Toate dimensiunile și calculele: pagina 2`,
         M, M + 232);
 
-      // Zona planului
       const topY = M + 310, botY = PH - M - 70;
       const areaW = PW - 2 * M, areaH = botY - topY;
       const sc = Math.min((areaW - 300) / bw0, (areaH - 200) / bh0);
       const ox = M + areaW / 2;
       const oy = topY + areaH / 2;
 
-      // Randare scenă pe canvas-ul offscreen (stare temporară)
       const prevCtx = ctx, prevScale = scale, prevPX = panX, prevPY = panY;
       try {
         ctx = octx;
@@ -2897,51 +3190,84 @@
         ctx = prevCtx; scale = prevScale; panX = prevPX; panY = prevPY;
       }
 
-      // Subsol
       octx.fillStyle = '#64748b';
       octx.font = '32px Inter, system-ui, sans-serif';
       octx.textAlign = 'left';
-      octx.fillText(`Sală ${ROOM_W} m x ${ROOM_L} m | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M - 30);
+      octx.fillText(`Sală ${ROOM_W} m x ${ROOM_L} m | Pagina 1 din 2 | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M - 30);
+      return { canvas: off, landscape };
+    }
 
-      // JPEG -> PDF minimal (o pagină A4)
-      const b64 = off.toDataURL('image/jpeg', 0.92).split(',')[1];
-      const bin = atob(b64);
-      const jpg = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) jpg[i] = bin.charCodeAt(i);
+    // Pagina 2: dimensiuni, calcule și sugestii (portret)
+    function renderCalcPage() {
+      const PW = 2480, PH = 3508, M = 140;
+      const off = document.createElement('canvas');
+      off.width = PW; off.height = PH;
+      const c = off.getContext('2d');
+      c.fillStyle = '#ffffff'; c.fillRect(0, 0, PW, PH);
+      c.textBaseline = 'top'; c.textAlign = 'left';
+      const F = 'Inter, system-ui, sans-serif';
+      const rep = computeReport();
 
-      const enc = new TextEncoder();
-      const chunks = [];
-      let len = 0;
-      const offsets = [];
-      const push = (d) => { const u = typeof d === 'string' ? enc.encode(d) : d; chunks.push(u); len += u.length; };
-      const obj = (n, body) => { offsets[n] = len; push(`${n} 0 obj\n`); push(body); push('\nendobj\n'); };
+      let y = M;
+      c.fillStyle = '#0f172a'; c.font = `bold 66px ${F}`;
+      c.fillText('Dimensiuni, calcule și sugestii', M, y); y += 92;
+      c.fillStyle = '#0369a1'; c.font = `bold 42px ${F}`;
+      c.fillText(rep.title, M, y); y += 74;
 
-      push('%PDF-1.4\n');
-      obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
-      obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
-      const pgW = landscape ? 841.89 : 595.28, pgH = landscape ? 595.28 : 841.89;
-      obj(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pgW} ${pgH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
-      offsets[4] = len;
-      push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${PW} /Height ${PH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`);
-      push(jpg);
-      push('\nendstream\nendobj\n');
-      const content = `q ${pgW} 0 0 ${pgH} 0 0 cm /Im0 Do Q`;
-      obj(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
-      const xrefPos = len;
-      let xref = 'xref\n0 6\n0000000000 65535 f \n';
-      for (let i = 1; i <= 5; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
-      push(xref);
-      push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`);
+      const colA = M, colB = PW - M - 760, colC = PW - M;   // eticheta | valoare (aliniata la dreapta) | nota
+      const wrap = (text, font, maxW) => {
+        c.font = font;
+        const words = text.split(' '); const lines = []; let cur = '';
+        for (const w of words) {
+          const t = cur ? cur + ' ' + w : w;
+          if (c.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+        }
+        if (cur) lines.push(cur);
+        return lines;
+      };
 
-      const blob = new Blob(chunks, { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `plan_sala_${partCount}_pers_${currentSolution800}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      for (const sec of rep.sections) {
+        c.fillStyle = '#0f172a'; c.font = `bold 40px ${F}`;
+        c.fillText(sec.title, M, y);
+        c.strokeStyle = '#cbd5e1'; c.lineWidth = 3;
+        c.beginPath(); c.moveTo(M, y + 54); c.lineTo(PW - M, y + 54); c.stroke();
+        y += 70;
+        for (const [a, b, note] of sec.rows) {
+          c.font = `34px ${F}`; c.fillStyle = '#334155'; c.textAlign = 'left';
+          c.fillText(a, colA, y);
+          c.font = `bold 34px ${F}`; c.fillStyle = '#0f172a'; c.textAlign = 'right';
+          c.fillText(b, 1400, y);
+          c.font = `28px ${F}`; c.fillStyle = '#64748b'; c.textAlign = 'left';
+          c.fillText(note, 1450, y + 4);
+          y += 50;
+        }
+        c.textAlign = 'left';
+        y += 22;
+      }
+
+      c.fillStyle = '#0f172a'; c.font = `bold 40px ${F}`;
+      c.fillText('Formule folosite', M, y);
+      c.strokeStyle = '#cbd5e1'; c.beginPath(); c.moveTo(M, y + 54); c.lineTo(PW - M, y + 54); c.stroke();
+      y += 70;
+      c.font = `32px ${F}`; c.fillStyle = '#334155';
+      for (const f of rep.formulas) { c.fillText('• ' + f, M, y); y += 46; }
+      y += 24;
+
+      c.fillStyle = '#0f172a'; c.font = `bold 40px ${F}`;
+      c.fillText('Sugestii', M, y);
+      c.strokeStyle = '#cbd5e1'; c.beginPath(); c.moveTo(M, y + 54); c.lineTo(PW - M, y + 54); c.stroke();
+      y += 70;
+      c.fillStyle = '#334155';
+      for (const sgt of rep.sug) {
+        const lines = wrap(sgt, `32px ${F}`, PW - 2 * M - 40);
+        c.font = `32px ${F}`;
+        lines.forEach((ln, i) => { c.fillText((i === 0 ? '• ' : '   ') + ln, M, y); y += 44; });
+        y += 12;
+      }
+
+      c.fillStyle = '#64748b'; c.font = `32px ${F}`;
+      c.fillText(`Pagina 2 din 2 | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M);
+      return { canvas: off, landscape: false };
     }
 
     // --- Mouse Drag & Zoom ---
