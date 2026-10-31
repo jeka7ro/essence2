@@ -1205,6 +1205,7 @@
         <button class="tool-btn" title="Zoom In" onclick="zoom(1.3)">🔍+</button>
         <button class="tool-btn" title="Zoom Out" onclick="zoom(0.7)">🔍-</button>
         <button class="tool-btn" title="Reset View" onclick="resetZoom()">⟲</button>
+        <button class="tool-btn" title="Exportă planul în PDF" onclick="exportPlanPDF()" style="width:auto; padding:0 10px; font-weight:800; background:#0284c7; color:#fff;">📄 PDF</button>
       </div>
     </div>
 
@@ -1240,7 +1241,7 @@
 
     // Canvas
     const canvas = document.getElementById('simCanvas');
-    const ctx = canvas.getContext('2d');
+    let ctx = canvas.getContext('2d');
     let scale = 20;
     let panX = 0, panY = 0;
     let isDragging = false;
@@ -1847,6 +1848,12 @@
       ctx.translate(panX, panY);
       ctx.scale(scale, scale);
 
+      drawScene();
+
+      ctx.restore();
+    }
+
+    function drawScene() {
       drawRoomArchitecture();
       drawSlideTrack();
 
@@ -1858,8 +1865,6 @@
       drawContrasensParticipants();
 
       drawDimensions();
-
-      ctx.restore();
     }
 
     function drawRoomArchitecture() {
@@ -2512,6 +2517,118 @@
         document.querySelector('.tab-btn:nth-child(4)').classList.add('active');
         document.getElementById('tab-calc').classList.add('active');
       }
+    }
+
+
+    // --- EXPORT PLAN ÎN PDF (fără biblioteci externe, A4 portret) ---
+    function exportPlanPDF() {
+      const PW = 2480, PH = 3508, M = 110;             // A4 la 300 dpi
+      const off = document.createElement('canvas');
+      off.width = PW; off.height = PH;
+      const octx = off.getContext('2d');
+
+      const solNames = {
+        tapered: 'Soluția 1 - Culoar 0.70 m pe viraj',
+        transit: 'Soluția 2 - Viraj tranzit fluid',
+        staggered: 'Soluția 3 - Dispunere în șah',
+        max_path: 'Soluția 4 - Traseu maxim 305 m',
+        none: 'Configurația inițială (culoar 1.20 m pe viraj)'
+      };
+      const solName = solNames[currentSolution800] || '';
+      const pairs = Math.round(partCount / 2);
+      const totalSec = pairs * stepIntervalSec;
+      const tMin = Math.floor(totalSec / 60), tSec = Math.round(totalSec % 60);
+      const normStep = ((currentStepNumber - 1) % pairs) + 1;
+
+      // Fundal alb + antet
+      octx.fillStyle = '#ffffff';
+      octx.fillRect(0, 0, PW, PH);
+      octx.fillStyle = '#0f172a';
+      octx.textBaseline = 'top';
+      octx.textAlign = 'left';
+      octx.font = 'bold 74px sans-serif';
+      octx.fillText('Plan sală - Față în față, pas la dreapta în contrasens', M, M);
+      octx.font = 'bold 50px sans-serif';
+      octx.fillStyle = '#0369a1';
+      octx.fillText(solName, M, M + 100);
+      octx.font = '38px sans-serif';
+      octx.fillStyle = '#334155';
+      const wTurn = corridorWTurn ? corridorWTurn : corridorW;
+      octx.fillText(
+        `${partCount} participanți (${pairs} perechi) | ${nLanes} culoare | ${assistCount} asistenți | traseu ${totalPathLength.toFixed(1)} m | culoar ${corridorW.toFixed(2)} m, viraj ${wTurn.toFixed(2)} m`,
+        M, M + 178);
+      octx.fillText(
+        `Pauză față în față: ${stepIntervalSec.toFixed(0)} s / pas | ${pairs} pași = ${tMin} min ${tSec} s | Poziția afișată: pasul ${normStep} / ${pairs}`,
+        M, M + 232);
+
+      // Zona planului
+      const topY = M + 310, botY = PH - M - 70;
+      const areaW = PW - 2 * M, areaH = botY - topY;
+      const sc = Math.min((areaW - 300) / ROOM_W, areaH / ROOM_L);
+      const ox = M + (areaW - ROOM_W * sc) / 2;
+      const oy = topY + (areaH - ROOM_L * sc) / 2;
+
+      // Randare scenă pe canvas-ul offscreen (stare temporară)
+      const prevCtx = ctx, prevScale = scale, prevPX = panX, prevPY = panY;
+      try {
+        ctx = octx;
+        scale = sc; panX = ox; panY = oy;
+        octx.save();
+        octx.beginPath();
+        octx.rect(ox - 150, oy - 20, ROOM_W * sc + 300, ROOM_L * sc + 40);
+        octx.clip();
+        octx.translate(ox, oy);
+        octx.scale(sc, sc);
+        drawScene();
+        octx.restore();
+      } finally {
+        ctx = prevCtx; scale = prevScale; panX = prevPX; panY = prevPY;
+      }
+
+      // Subsol
+      octx.fillStyle = '#64748b';
+      octx.font = '32px sans-serif';
+      octx.textAlign = 'left';
+      octx.fillText(`Sală ${ROOM_W} m x ${ROOM_L} m | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M - 30);
+
+      // JPEG -> PDF minimal (o pagină A4)
+      const b64 = off.toDataURL('image/jpeg', 0.92).split(',')[1];
+      const bin = atob(b64);
+      const jpg = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) jpg[i] = bin.charCodeAt(i);
+
+      const enc = new TextEncoder();
+      const chunks = [];
+      let len = 0;
+      const offsets = [];
+      const push = (d) => { const u = typeof d === 'string' ? enc.encode(d) : d; chunks.push(u); len += u.length; };
+      const obj = (n, body) => { offsets[n] = len; push(`${n} 0 obj\n`); push(body); push('\nendobj\n'); };
+
+      push('%PDF-1.4\n');
+      obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+      obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+      obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+      offsets[4] = len;
+      push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${PW} /Height ${PH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`);
+      push(jpg);
+      push('\nendstream\nendobj\n');
+      const content = 'q 595.28 0 0 841.89 0 0 cm /Im0 Do Q';
+      obj(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+      const xrefPos = len;
+      let xref = 'xref\n0 6\n0000000000 65535 f \n';
+      for (let i = 1; i <= 5; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+      push(xref);
+      push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`);
+
+      const blob = new Blob(chunks, { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `plan_sala_${partCount}_pers_${currentSolution800}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
     // --- Mouse Drag & Zoom ---
