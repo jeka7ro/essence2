@@ -781,6 +781,9 @@
     .rep-table td.rep-val { text-align: right; font-weight: 700; color: #fff; padding-left: 10px; white-space: nowrap; }
     .rep-list { margin: 4px 0 0 16px; padding: 0; line-height: 1.5; }
     .rep-list li { margin-bottom: 4px; }
+
+    .dot-lime { background: #a3e635; box-shadow: 0 0 6px rgba(163,230,53,.7); }
+    #sol-btn-recommended.active, #card-sol-btn-recommended.active { background: #65a30d; border-color: #bef264; box-shadow: 0 0 10px rgba(190, 242, 100, 0.4); color: #fff; }
   </style>
 </head>
 <body>
@@ -1265,6 +1268,27 @@
           </button>
         </div>
 
+        <!-- Soluția 6: recomandarea mea -->
+        <div class="param-box" style="border-left:3px solid #a3e635;">
+          <div style="font-weight:700; color:#bef264; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 6 (RECOMANDAREA MEA): întorcători + 10 culoare
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            Combină tot ce ai cerut într-o singură configurație:<br>
+            • <b>Întorcători la capete</b> (oameni portocalii în zona portocalie din capăt): nu mai există viraje U, deci nu există înghesuială.<br>
+            • <b>Șirurile albastre fără asistenți în spate</b>, apropiate la <b>30 cm</b> spate în spate (poți coborî oricând până la 10 cm).<br>
+            • <b>Asistenții în zone portocalii</b>, în spatele șirurilor roz: 5 zone cu câte 8 asistenți (A1–A40), cu 86 cm liberi fiecare.<br>
+            • Spațiul câștigat de la albastre se folosește pentru <b>un al 10-lea culoar</b> (lățimea sălii rămâne cu 1,45 m până la pereții laterali).<br>
+            • <b style="color:#bef264;">83,0 cm între persoane</b> pe culoar (în loc de 74,7 cm la Soluția 5), cu 37 cm liberi față de umeri; pe fiecare culoar stau 80 de oameni în loc de 89.<br>
+            • Necesar: 40 de asistenți pe culoare și <b>18 întorcători</b> (2 la fiecare dintre cele 9 capete).<br>
+            • Rezerva: cu 46 cm pe persoană aceeași sală ar încăpea până la aproximativ 1.440 de participanți.<br>
+            <b style="color:#bef264;">Rezultat: 800 de oameni, zero înghesuială, cel mai mult spațiu pe persoană; durata turului rămâne aceeași (66 min 40 s la 10 s pe pas).</b>
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-recommended" style="background:#4d7c0f; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('recommended')">
+            <span class="dot dot-lime"></span>Afișează Soluția 6 pe Plan (Recomandat)
+          </button>
+        </div>
+
         <!-- Comparație cu Problema Inițială -->
         <div class="param-box" style="border-left:3px solid #ef4444;">
           <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;">
@@ -1364,6 +1388,7 @@
           <button class="sol-pill" id="sol-btn-staggered" onclick="setSolution800('staggered')"><span class="dot dot-yellow"></span>3 &middot; Șah</button>
           <button class="sol-pill" id="sol-btn-max" onclick="setSolution800('max_path')"><span class="dot dot-purple"></span>4 &middot; Traseu 305 m</button>
           <button class="sol-pill" id="sol-btn-turners" onclick="setSolution800('turners')"><span class="dot dot-teal"></span>5 &middot; Întorcători</button>
+          <button class="sol-pill" id="sol-btn-recommended" onclick="setSolution800('recommended')"><span class="dot dot-lime"></span>6 &middot; Recomandat</button>
           <button class="sol-pill" id="sol-btn-none" onclick="setSolution800('none')"><span class="dot dot-red"></span>Problema</button>
         </div>
 
@@ -1492,7 +1517,7 @@
       const rTurnMax = pitches.length ? Math.max(...pitches) / 2 : 1.0;
 
       // Apex-ul exterior al virajului U este la distanta wallDistEnd de perete:
-      const turnerMode = (currentSolution800 === 'turners');
+      const turnerMode = isTurnerMode();
       const endPad = wallDistEnd + (turnerMode ? 0 : rTurnMax) + halfW;   // la intorcatori nu mai e nevoie de raza virajului
       const yTop = endPad;
       const yBottom = ROOM_L - endPad;
@@ -1526,7 +1551,7 @@
         });
         totalPathLength += segLen;
 
-        if (i < nLanes - 1 && currentSolution800 === 'turners') {
+        if (i < nLanes - 1 && isTurnerMode()) {
           // Intoarcere asistata: culoarul merge drept pana aproape de perete, apoi un tronson scurt intre culoare
           const nextX = laneXs[i + 1];
           const yHop = goingDown ? yBottom : yTop;
@@ -1614,6 +1639,8 @@
     }
 
     // Soluțiile cu viraj U real verifică înghesuiala (cele cu tranzit/șah/întorcători o evită prin altă metodă)
+    // Soluțiile cu întorcători la capete (fără viraje U): 5 și 6
+    function isTurnerMode() { return currentSolution800 === 'turners' || currentSolution800 === 'recommended'; }
     function checksCongestion() { return ['none', 'tapered', 'max_path'].includes(currentSolution800); }
 
     // Zona asistentilor (portocalie): spatiul din spatele participantilor ROZ, nu intre participanti.
@@ -1720,6 +1747,8 @@
             solMsg = `<span class="dot dot-blue"></span>Soluția 2: Viraj Tranzit Fluid (66.1 cm pe linii drepte | Zero Roșu)`;
           } else if (currentSolution800 === 'staggered') {
             solMsg = `<span class="dot dot-yellow"></span>Soluția 3: Dispunere în Șah (Decalaj 20cm | Fără contact umeri)`;
+          } else if (currentSolution800 === 'recommended') {
+            solMsg = `<span class="dot dot-lime"></span>Soluția 6 (recomandată): ${nLanes} culoare, ${(stepDist*100).toFixed(1)} cm între persoane | ${2 * (nLanes - 1)} întorcători | fără viraje`;
           } else if (currentSolution800 === 'turners') {
             solMsg = `<span class="dot dot-teal"></span>Soluția 5: Întorcători la capete (${(stepDist*100).toFixed(1)} cm între persoane pe drept | 16 asistenți | fără viraje)`;
           } else if (currentSolution800 === 'max_path') {
@@ -1912,15 +1941,24 @@
     }
 
     function setSolution800(mode) {
+      const prevMode = currentSolution800;
       currentSolution800 = mode;
       partCount = 800;
-      nLanes = 9;
+      nLanes = (mode === 'recommended') ? 10 : 9;
       assistCount = 40;
+      if (mode === 'recommended') {
+        assistGap = 1.10;
+        backGap = 0.30;
+        backGapAuto = false;
+      } else if (prevMode === 'recommended') {
+        assistGap = 1.10;
+        backGapAuto = true;
+      }
 
       const inpPart = document.getElementById('rng-part');
       if (inpPart) inpPart.value = 800;
       const inpLanes = document.getElementById('rng-lanes');
-      if (inpLanes) inpLanes.value = 9;
+      if (inpLanes) inpLanes.value = nLanes;
       const inpAssist = document.getElementById('rng-assist');
       if (inpAssist) inpAssist.value = 40;
 
@@ -1944,7 +1982,7 @@
         corridorWTurn = 0.75;
         wallDistEnd = 0.60;
         wallDistSide = 0.80;
-      } else if (mode === 'turners') {
+      } else if (mode === 'turners' || mode === 'recommended') {
         corridorW = 1.20;
         corridorWTurn = 1.20;
         wallDistEnd = 0.90;
@@ -1975,6 +2013,7 @@
         { id: 'sol-btn-staggered', mode: 'staggered' },
         { id: 'sol-btn-max', mode: 'max_path' },
         { id: 'sol-btn-turners', mode: 'turners' },
+        { id: 'sol-btn-recommended', mode: 'recommended' },
         { id: 'sol-btn-none', mode: 'none' }
       ];
       pillMap.forEach(item => {
@@ -2115,7 +2154,7 @@
       const vp = document.getElementById('viewport');
       scale = 55;
       const turnX = 1.35 + pitch / 2;
-      const turnY = (currentSolution800 === 'turners') ? (ROOM_L - wallDistEnd - corridorW / 2 - 1.6) : (ROOM_L - 3.0);
+      const turnY = isTurnerMode() ? (ROOM_L - wallDistEnd - corridorW / 2 - 1.6) : (ROOM_L - 3.0);
       centerOn(turnX, turnY);
     }
 
@@ -2443,7 +2482,7 @@
     // Asistenti "intorcatori": oameni portocalii care stau in capatul traseului (intre ultimul sir si perete)
     // si rotesc participantii spre culoarul urmator
     function drawTurners() {
-      if (currentSolution800 !== 'turners') return;
+      if (!isTurnerMode()) return;
       const halfW = corridorW / 2;
       for (const seg of pathSegments) {
         if (seg.type !== 'hop') continue;
@@ -2946,7 +2985,7 @@
       const pairs = Math.round(partCount / 2);
       const halfW = corridorW / 2;
       const wTurn = corridorWTurn ? corridorWTurn : corridorW;
-      const turnerMode = currentSolution800 === 'turners';
+      const turnerMode = isTurnerMode();
       const laneSegs = pathSegments.filter(sg => sg.type === 'line');
       const laneLen = laneSegs.length ? laneSegs[0].length : 0;
       const sumLane = laneSegs.reduce((a, sg) => a + sg.length, 0);
@@ -2956,7 +2995,7 @@
       const freeAisle = Math.max(0, assistGap - TORSO_DEPTH);
       const totalSec = pairs * stepIntervalSec;
       const turnerAssist = turnerMode ? 2 * (nLanes - 1) : 0;
-      const solNames = { tapered: 'Soluția 1 - culoar îngustat pe viraj', transit: 'Soluția 2 - viraj tranzit fluid', staggered: 'Soluția 3 - dispunere în șah', max_path: 'Soluția 4 - traseu maxim', turners: 'Soluția 5 - întorcători la capete', none: 'Configurația inițială' };
+      const solNames = { tapered: 'Soluția 1 - culoar îngustat pe viraj', transit: 'Soluția 2 - viraj tranzit fluid', staggered: 'Soluția 3 - dispunere în șah', max_path: 'Soluția 4 - traseu maxim', turners: 'Soluția 5 - întorcători la capete', recommended: 'Soluția 6 - recomandarea mea', none: 'Configurația inițială' };
 
       const sections = [
         { title: 'Sala', rows: [
@@ -2984,7 +3023,7 @@
         { title: 'Persoane', rows: [
           ['Participanți', `${partCount} (${pairs} perechi)`, `${pairs} în fiecare șir`],
           ['Asistenți pe culoare', `${assistCount}`, 'în zonele portocalii, în spatele participanților'],
-          ['Asistenți întorcători', turnerMode ? `${turnerAssist}` : '0', turnerMode ? '2 la fiecare capăt' : 'doar la Soluția 5'],
+          ['Asistenți întorcători', turnerMode ? `${turnerAssist}` : '0', turnerMode ? '2 la fiecare capăt' : 'doar la Soluțiile 5 și 6'],
           ['Spațiu pe persoană pe culoar', fcm(stepDist), 'lungime traseu / perechi'],
           ['Liber față de umeri (46 cm)', fcm(stepDist - SHOULDER), 'spațiu pe persoană - 46 cm'],
           ['Spațiu pe interior de viraj', turnerMode ? 'nu există' : fcm(spaceInner), 'spațiu pe persoană x R interior / R axă'],
@@ -3129,6 +3168,7 @@
         staggered: 'Soluția 3 - Dispunere în șah',
         max_path: 'Soluția 4 - Traseu maxim 305 m',
         turners: 'Soluția 5 - Întorcători la capete (asistenți)',
+        recommended: 'Soluția 6 - Recomandată (întorcători + 10 culoare)',
         none: 'Configurația inițială (culoar 1.20 m pe viraj)'
       };
       const solName = solNames[currentSolution800] || '';
