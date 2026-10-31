@@ -1013,6 +1013,11 @@
           </div>
         </div>
 
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-4px 0 12px; font-size:11px; color:#94a3b8;">
+          <span>Setările se salvează automat și rămân după refresh.</span>
+          <button class="preset-btn" style="flex:0 0 auto; padding:7px 14px;" onclick="resetSavedState()">Setări implicite</button>
+        </div>
+
         <div class="section-title">Ajustează Oameni și Bucle</div>
 
         <!-- Slider Participanți -->
@@ -3405,6 +3410,73 @@
       redraw();
     });
 
+    // ===================== SALVARE AUTOMATA A SETARILOR (rămân după refresh) =====================
+    const STORE_KEY = 'fata-in-fata-setari-v1';
+    const CHK_IDS = ['chk-gaze', 'chk-dir-arrows', 'chk-lead-marker', 'chk-assistants', 'chk-wall-dims'];
+    const TAB_IDS = ['tab-circuit', 'tab-params', 'tab-congestion', 'tab-calc'];
+    let savedCam = null, savedTab = null;
+
+    function collectState() {
+      const sb = document.querySelector('.sidebar');
+      const hud = document.querySelector('.canvas-overlay-info');
+      const activeTabIdx = Array.from(document.querySelectorAll('.tab-btn')).findIndex(b => b.classList.contains('active'));
+      const chk = {};
+      CHK_IDS.forEach(id => { const el = document.getElementById(id); if (el) chk[id] = el.checked; });
+      return {
+        v: 1, partCount, assistCount, nLanes, corridorW, corridorWTurn, wallDistEnd, wallDistSide,
+        backGap, backGapAuto, assistGap, sol: currentSolution800, stepIntervalSec, stepGlideSec,
+        viewRot, cam: camMode, tab: TAB_IDS[Math.max(0, activeTabIdx)], chk,
+        sidebarCollapsed: !!(sb && sb.classList.contains('collapsed')), hudMin: !!(hud && hud.classList.contains('hud-min'))
+      };
+    }
+    let lastSavedJson = '';
+    let suppressSave = false;
+    function saveState() {
+      if (suppressSave) return;
+      try {
+        const json = JSON.stringify(collectState());
+        if (json !== lastSavedJson) { localStorage.setItem(STORE_KEY, json); lastSavedJson = json; }
+      } catch (e) { /* localStorage indisponibil: ignorăm */ }
+    }
+    function loadSavedState() {
+      let st = null;
+      try { st = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return; }
+      if (!st || st.v !== 1) return;
+      const num = (v, d) => (typeof v === 'number' && isFinite(v)) ? v : d;
+      partCount = num(st.partCount, partCount);
+      assistCount = num(st.assistCount, assistCount);
+      nLanes = Math.min(12, Math.max(4, Math.round(num(st.nLanes, nLanes))));
+      corridorW = num(st.corridorW, corridorW);
+      corridorWTurn = num(st.corridorWTurn, corridorWTurn);
+      wallDistEnd = num(st.wallDistEnd, wallDistEnd);
+      wallDistSide = num(st.wallDistSide, wallDistSide);
+      backGap = num(st.backGap, backGap);
+      backGapAuto = (typeof st.backGapAuto === 'boolean') ? st.backGapAuto : backGapAuto;
+      assistGap = num(st.assistGap, assistGap);
+      if (['none', 'tapered', 'transit', 'staggered', 'max_path', 'turners', 'recommended'].includes(st.sol)) currentSolution800 = st.sol;
+      viewRot = num(st.viewRot, 0);
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      setVal('rng-part', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
+      setVal('rng-corridor-w', corridorW); setVal('rng-wall-end', wallDistEnd); setVal('rng-wall-side', wallDistSide);
+      setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
+      setVal('rng-interval', num(st.stepIntervalSec, stepIntervalSec)); updateInterval(num(st.stepIntervalSec, stepIntervalSec));
+      setVal('rng-glide', num(st.stepGlideSec, stepGlideSec)); updateGlide(num(st.stepGlideSec, stepGlideSec));
+      if (st.chk) CHK_IDS.forEach(id => { const el = document.getElementById(id); if (el && typeof st.chk[id] === 'boolean') el.checked = st.chk[id]; });
+      if (st.sidebarCollapsed) document.querySelector('.sidebar')?.classList.add('collapsed');
+      if (st.hudMin) document.querySelector('.canvas-overlay-info')?.classList.add('hud-min');
+      savedCam = st.cam || null;
+      savedTab = TAB_IDS.includes(st.tab) ? st.tab : null;
+      syncRotUI();
+    }
+    function resetSavedState() {
+      suppressSave = true;
+      try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+      location.href = location.pathname;   // fără parametri, cu setările implicite
+    }
+    setInterval(saveState, 600);
+    window.addEventListener('beforeunload', saveState);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
+
     // Start
     const vpInit = document.getElementById('viewport');
     const dprInit = window.devicePixelRatio || 1;
@@ -3415,6 +3487,7 @@
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dprInit, dprInit);
 
+    loadSavedState();   // setările salvate (parametri, soluție, vedere); parametrii din URL le suprascriu
     const urlParams = new URLSearchParams(window.location.search);
     const pParts = urlParams.get('parts');
     if (pParts) {
@@ -3447,10 +3520,10 @@
       updateSolutionPills();
     }
     recalculateAll();
-    const initCam = urlParams.get('cam') || 'macro';
+    const initCam = urlParams.get('cam') || savedCam || 'macro';
     setCamMode(initCam);
     const initTab = urlParams.get('tab');
-    if (initTab) switchTab('tab-' + initTab);
+    if (initTab) switchTab('tab-' + initTab); else if (savedTab) switchTab(savedTab);
     requestAnimationFrame(animate);
 
   </script>
