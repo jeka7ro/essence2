@@ -733,6 +733,22 @@
     @media (max-width: 1350px) { .pill-extra { display: none; } }
     @media (max-width: 1150px) { .brand-title { display: none; } }
     .t-row.highlight { border-radius: 10px; }
+
+    /* ===== rotire + ecran complet ===== */
+    .sidebar.collapsed { display: none !important; }
+    body.fs .sidebar { display: none !important; }
+    body.fs .mobile-nav-bar { display: none !important; }
+    body.fs #viewport { display: block !important; flex: 1 !important; height: 100% !important; }
+    body.fs .tool-sidebar { display: none; }
+    .viewport-toolbar { align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 28px); border-radius: 26px !important; }
+    .tool-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.16); margin: 0 2px; }
+    .tool-btn.is-wide { width: auto; }
+    .hud-toggle { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.06); color: #cbd5e1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .hud-toggle:hover { background: rgba(255,255,255,0.14); color: #fff; }
+    .hud-toggle .ic { width: 14px; height: 14px; transition: transform .2s ease; }
+    .canvas-overlay-info.hud-min .hud-seg, .canvas-overlay-info.hud-min .hud-status { display: none; }
+    .canvas-overlay-info.hud-min .hud-toggle .ic { transform: rotate(180deg); }
+    @media (max-width: 900px) { .tool-zoom, .tool-sidebar { display: none; } }
   </style>
 </head>
 <body>
@@ -946,6 +962,26 @@
 
       <!-- TAB 2: PARAMETRI SALĂ -->
       <div id="tab-params" class="tab-content">
+        <div class="section-title">Vedere</div>
+        <div class="param-box">
+          <div class="param-header">
+            <span class="param-name">Rotire sală</span>
+            <span class="param-val" id="disp-rot">0°</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-rot" min="0" max="359" step="1" value="0" oninput="setViewRotation(this.value * Math.PI / 180)">
+          <div class="param-sub">
+            <span>0°</span>
+            <span>Shift + tragere = rotire liberă</span>
+            <span>359°</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="preset-btn" onclick="rotateToDeg(0)">0°</button>
+            <button class="preset-btn" onclick="rotateToDeg(90)">90°</button>
+            <button class="preset-btn" onclick="rotateToDeg(180)">180°</button>
+            <button class="preset-btn" onclick="rotateToDeg(270)">270°</button>
+          </div>
+        </div>
+
         <div class="section-title">Ajustează Oameni și Bucle</div>
 
         <!-- Slider Participanți -->
@@ -1235,6 +1271,7 @@
             <b id="ovl-total-time" class="hud-val">66 min 40s</b>
             <span id="ovl-total-sub" class="hud-sub">(400 pași la 10s)</span>
           </div>
+          <button class="hud-toggle" title="Micșorează / extinde panoul" onclick="toggleHud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
         </div>
 
         <div class="hud-seg" role="group" aria-label="Soluții 800 persoane">
@@ -1250,10 +1287,19 @@
 
       <!-- Top Tools -->
       <div class="viewport-toolbar">
-        <button class="tool-btn" title="Zoom In" onclick="zoom(1.3)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-        <button class="tool-btn" title="Zoom Out" onclick="zoom(0.7)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
-        <button class="tool-btn" title="Reset View" onclick="resetZoom()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
-        <button class="tool-btn" title="Exportă planul în PDF" onclick="exportPlanPDF()" style="width:auto; padding:0 10px; font-weight: 700; background:#0284c7; color:#fff;"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> PDF</button>
+        <button class="tool-btn" title="Rotește la stânga 90°" onclick="rotateView(-90)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <button class="tool-btn" title="Rotește la dreapta 90°" onclick="rotateView(90)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+        <span class="tool-sep"></span>
+        <button class="tool-btn tool-zoom" title="Zoom In" onclick="zoom(1.3)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="tool-btn tool-zoom" title="Zoom Out" onclick="zoom(0.7)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        <button class="tool-btn" title="Recentrează vederea" onclick="resetZoom()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+        <span class="tool-sep"></span>
+        <button class="tool-btn" id="tool-play" title="Pauză / Pornește" onclick="toolPlayToggle()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></button>
+        <button class="tool-btn" title="Pas la dreapta" onclick="triggerContrasensStep()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <span class="tool-sep"></span>
+        <button class="tool-btn tool-sidebar" title="Arată / ascunde meniul lateral" onclick="toggleSidebar()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18"/></svg></button>
+        <button class="tool-btn" id="tool-fs" title="Ecran complet (fără meniu lateral)" onclick="toggleFullscreen()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+        <button class="tool-btn" title="Exportă planul în PDF" onclick="exportPlanPDF()" style="width:auto; padding:0 12px; font-weight:700; background:#0284c7; color:#fff;"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> PDF</button>
       </div>
     </div>
 
@@ -1264,6 +1310,8 @@
       play: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16l13-8z" fill="currentColor"/></svg>',
       pause: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>',
       menu: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+      exitfull: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>',
+      full: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>',
       map: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>'
     };
 
@@ -1299,6 +1347,7 @@
     let ctx = canvas.getContext('2d');
     let scale = 20;
     let panX = 0, panY = 0;
+    let viewRot = 0; // rotirea vederii (radiani)
     let isDragging = false;
     let dragStart = { x: 0, y: 0 };
 
@@ -1570,6 +1619,7 @@
     function toggleFlowPlay() {
       isFlowPlaying = !isFlowPlaying;
       document.getElementById('btn-flow-play').innerHTML = `<span id="play-icon">${isFlowPlaying ? IC.pause : IC.play}</span> ${isFlowPlaying ? 'Pauză Mișcare' : 'Pornește Mișcare'}`;
+      const tp = document.getElementById('tool-play'); if (tp) tp.innerHTML = isFlowPlaying ? IC.pause : IC.play;
       document.getElementById('circuit-status').innerText = isFlowPlaying ? 'Rulează' : 'În pauză';
       document.getElementById('circuit-status').style.color = isFlowPlaying ? 'var(--accent-green)' : 'var(--accent-orange)';
     }
@@ -1810,18 +1860,89 @@
       redraw();
     }
 
+
+    // --- Rotire vedere ---
+    function viewportEl() { return document.getElementById('viewport'); }
+    function rotPt(wx, wy) {
+      const c = Math.cos(viewRot), sn = Math.sin(viewRot);
+      return { x: (c * wx - sn * wy) * scale, y: (sn * wx + c * wy) * scale };
+    }
+    function centerOn(wx, wy) {
+      const vp = viewportEl();
+      const r = rotPt(wx, wy);
+      panX = vp.clientWidth / 2 - r.x;
+      panY = vp.clientHeight / 2 - r.y;
+    }
+    function screenToWorld(sx, sy) {
+      const dx = sx - panX, dy = sy - panY;
+      const c = Math.cos(viewRot), sn = Math.sin(viewRot);
+      return { x: (c * dx + sn * dy) / scale, y: (-sn * dx + c * dy) / scale };
+    }
+    function setViewRotation(rad) {
+      const vp = viewportEl();
+      const w = screenToWorld(vp.clientWidth / 2, vp.clientHeight / 2);
+      viewRot = rad;
+      if (camMode === 'full') fitFullRoom(); else centerOn(w.x, w.y);
+      syncRotUI();
+      redraw();
+    }
+    let rotAnimId = null;
+    function animateRotateTo(targetRad) {
+      if (rotAnimId) cancelAnimationFrame(rotAnimId);
+      const from = viewRot, t0 = performance.now(), D = 280;
+      const step = (t) => {
+        const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+        setViewRotation(from + (targetRad - from) * e);
+        if (k < 1) rotAnimId = requestAnimationFrame(step);
+        else { viewRot = ((targetRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); syncRotUI(); rotAnimId = null; }
+      };
+      rotAnimId = requestAnimationFrame(step);
+    }
+    function rotateView(deg) { animateRotateTo(viewRot + deg * Math.PI / 180); }
+    function rotateToDeg(deg) {
+      const cur = ((viewRot * 180 / Math.PI) % 360 + 360) % 360;
+      const d = ((deg - cur + 540) % 360) - 180;
+      animateRotateTo(viewRot + d * Math.PI / 180);
+    }
+    function syncRotUI() {
+      const deg = Math.round(((viewRot * 180 / Math.PI) % 360 + 360) % 360) % 360;
+      const sl = document.getElementById('rng-rot'); if (sl) sl.value = deg;
+      const d = document.getElementById('disp-rot'); if (d) d.innerText = deg + '°';
+    }
+
+    // --- Ecran complet (fără sidebar) ---
+    function setFullscreen(on) {
+      document.body.classList.toggle('fs', on);
+      const btn = document.getElementById('tool-fs');
+      if (btn) btn.innerHTML = on ? IC.exitfull : IC.full;
+      if (btn) btn.title = on ? 'Ieși din ecran complet' : 'Ecran complet (fără meniu lateral)';
+      if (on) { try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {} }
+      else if (document.fullscreenElement) { try { document.exitFullscreen().catch(() => {}); } catch (e) {} }
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+    }
+    function toggleFullscreen() { setFullscreen(!document.body.classList.contains('fs')); }
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && document.body.classList.contains('fs')) setFullscreen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('fs')) setFullscreen(false);
+    });
+    function toggleHud() {
+      const h = document.querySelector('.canvas-overlay-info');
+      if (h) h.classList.toggle('hud-min');
+    }
+    function toolPlayToggle() { toggleFlowPlay(); }
+
     function fitMacro() {
       const vp = document.getElementById('viewport');
       scale = 90;
-      panX = vp.clientWidth / 2 - 1.35 * scale;
-      panY = vp.clientHeight / 2 - 8.5 * scale;
+      centerOn(1.35, 8.5);
     }
 
     function fitCloseUp() {
       const vp = document.getElementById('viewport');
       scale = 48;
-      panX = vp.clientWidth / 2 - 2.7 * scale;
-      panY = vp.clientHeight / 2 - 11.0 * scale;
+      centerOn(2.7, 11.0);
     }
 
     function fitCongestion() {
@@ -1829,18 +1950,18 @@
       scale = 55;
       const turnX = 1.35 + pitch / 2;
       const turnY = ROOM_L - 3.0;
-      panX = vp.clientWidth / 2 - turnX * scale;
-      panY = vp.clientHeight / 2 - turnY * scale;
+      centerOn(turnX, turnY);
     }
 
     function fitFullRoom() {
       const vp = document.getElementById('viewport');
       const pad = 30;
-      const scaleX = (vp.clientWidth - pad * 2) / ROOM_W;
-      const scaleY = (vp.clientHeight - pad * 2) / ROOM_L;
+      const c = Math.abs(Math.cos(viewRot)), sn = Math.abs(Math.sin(viewRot));
+      const bw = ROOM_W * c + ROOM_L * sn, bh = ROOM_W * sn + ROOM_L * c;
+      const scaleX = (vp.clientWidth - pad * 2) / bw;
+      const scaleY = (vp.clientHeight - pad * 2) / bh;
       scale = Math.min(scaleX, scaleY) * 0.95;
-      panX = (vp.clientWidth - ROOM_W * scale) / 2;
-      panY = (vp.clientHeight - ROOM_L * scale) / 2;
+      centerOn(ROOM_W / 2, ROOM_L / 2);
     }
 
     function zoom(f) { scale *= f; redraw(); }
@@ -1882,8 +2003,9 @@
         if (camMode === 'follow') {
           const pt = getPointAtDist(animShift);
           const vp = document.getElementById('viewport');
-          const targetPanX = vp.clientWidth / 2 - pt.x * scale;
-          const targetPanY = vp.clientHeight / 2 - pt.y * scale;
+          const rp = rotPt(pt.x, pt.y);
+          const targetPanX = vp.clientWidth / 2 - rp.x;
+          const targetPanY = vp.clientHeight / 2 - rp.y;
           panX += (targetPanX - panX) * 0.08;
           panY += (targetPanY - panY) * 0.08;
         }
@@ -1900,6 +2022,7 @@
       ctx.clearRect(0, 0, vp.clientWidth, vp.clientHeight);
 
       ctx.translate(panX, panY);
+      ctx.rotate(viewRot);
       ctx.scale(scale, scale);
 
       drawScene();
@@ -2089,11 +2212,15 @@
       const pStart = getPointAtDist(0.4);
       ctx.fillStyle = '#22c55e';
       const startBtnY = Math.max(0.15, pStart.y - 1.6);
-      roundRect(ctx, pStart.x - 1.2, startBtnY, 2.4, 0.85, 0.18, true, false);
+      ctx.save();
+      ctx.translate(pStart.x, startBtnY + 0.425);
+      ctx.rotate(-viewRot);
+      roundRect(ctx, -1.2, -0.425, 2.4, 0.85, 0.18, true, false);
       ctx.fillStyle = '#052e16';
       ctx.font = 'bold 0.40px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('START', pStart.x, startBtnY + 0.42);
+      ctx.fillText('START', 0, 0);
+      ctx.restore();
 
       // Curved entry arrow
       ctx.strokeStyle = '#22c55e';
@@ -2107,11 +2234,15 @@
       const isEndAtBottom = (pEnd.y > ROOM_L / 2);
       ctx.fillStyle = '#ef4444';
       const endBtnY = isEndAtBottom ? (pEnd.y + 0.6) : Math.max(0.15, pEnd.y - 1.6);
-      roundRect(ctx, pEnd.x - 1.2, endBtnY, 2.4, 0.85, 0.18, true, false);
+      ctx.save();
+      ctx.translate(pEnd.x, endBtnY + 0.425);
+      ctx.rotate(-viewRot);
+      roundRect(ctx, -1.2, -0.425, 2.4, 0.85, 0.18, true, false);
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 0.40px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('END', pEnd.x, endBtnY + 0.42);
+      ctx.fillText('END', 0, 0);
+      ctx.restore();
 
       // Exit arrow
       ctx.strokeStyle = '#ef4444';
@@ -2146,6 +2277,7 @@
       for (let a of assistants) {
         ctx.save();
         ctx.translate(a.x, a.y);
+        ctx.rotate(-viewRot);
 
         ctx.fillStyle = '#ea580c';
         ctx.beginPath(); ctx.arc(0, 0, 0.48, 0, Math.PI * 2); ctx.fill();
@@ -2484,17 +2616,21 @@
         ctx.stroke();
 
         const midY = (y1 + y2) / 2;
+        ctx.save();
+        ctx.translate(x1, midY);
+        ctx.rotate(-viewRot);
         ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
         const bw = 4.2, bh = 0.52;
-        roundRect(ctx, x1 - bw/2, midY - bh/2, bw, bh, 0.1, true, false);
+        roundRect(ctx, -bw/2, -bh/2, bw, bh, 0.1, true, false);
         ctx.strokeStyle = col;
         ctx.lineWidth = 0.025;
-        roundRect(ctx, x1 - bw/2, midY - bh/2, bw, bh, 0.1, false, true);
+        roundRect(ctx, -bw/2, -bh/2, bw, bh, 0.1, false, true);
 
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 0.23px Inter, system-ui, sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(label, x1, midY);
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
       } else {
         ctx.beginPath();
         ctx.moveTo(x1, y1 - 0.35); ctx.lineTo(x1, y1 + 0.35);
@@ -2502,17 +2638,21 @@
         ctx.stroke();
 
         const midX = (x1 + x2) / 2;
+        ctx.save();
+        ctx.translate(midX, y1);
+        ctx.rotate(-viewRot);
         ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
         const bw = 3.8, bh = 0.52;
-        roundRect(ctx, midX - bw/2, y1 - bh/2, bw, bh, 0.1, true, false);
+        roundRect(ctx, -bw/2, -bh/2, bw, bh, 0.1, true, false);
         ctx.strokeStyle = col;
         ctx.lineWidth = 0.025;
-        roundRect(ctx, midX - bw/2, y1 - bh/2, bw, bh, 0.1, false, true);
+        roundRect(ctx, -bw/2, -bh/2, bw, bh, 0.1, false, true);
 
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 0.23px Inter, system-ui, sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(label, midX, y1);
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
       }
       ctx.restore();
     }
@@ -2574,9 +2714,12 @@
     }
 
 
-    // --- EXPORT PLAN ÎN PDF (fără biblioteci externe, A4 portret) ---
+    // --- EXPORT PLAN ÎN PDF (fără biblioteci externe, A4; portret sau peisaj după rotire) ---
     function exportPlanPDF() {
-      const PW = 2480, PH = 3508, M = 110;             // A4 la 300 dpi
+      const rc = Math.abs(Math.cos(viewRot)), rs = Math.abs(Math.sin(viewRot));
+      const bw0 = ROOM_W * rc + ROOM_L * rs, bh0 = ROOM_W * rs + ROOM_L * rc;
+      const landscape = bw0 > bh0 * 1.02;               // A4 pe lat când sala e rotită pe orizontală
+      const PW = landscape ? 3508 : 2480, PH = landscape ? 2480 : 3508, M = 110;   // A4 la 300 dpi
       const off = document.createElement('canvas');
       off.width = PW; off.height = PH;
       const octx = off.getContext('2d');
@@ -2618,9 +2761,9 @@
       // Zona planului
       const topY = M + 310, botY = PH - M - 70;
       const areaW = PW - 2 * M, areaH = botY - topY;
-      const sc = Math.min((areaW - 300) / ROOM_W, areaH / ROOM_L);
-      const ox = M + (areaW - ROOM_W * sc) / 2;
-      const oy = topY + (areaH - ROOM_L * sc) / 2;
+      const sc = Math.min((areaW - 300) / bw0, (areaH - 200) / bh0);
+      const ox = M + areaW / 2;
+      const oy = topY + areaH / 2;
 
       // Randare scenă pe canvas-ul offscreen (stare temporară)
       const prevCtx = ctx, prevScale = scale, prevPX = panX, prevPY = panY;
@@ -2629,10 +2772,12 @@
         scale = sc; panX = ox; panY = oy;
         octx.save();
         octx.beginPath();
-        octx.rect(ox - 150, oy - 20, ROOM_W * sc + 300, ROOM_L * sc + 40);
+        octx.rect(M, topY - 60, areaW, areaH + 120);
         octx.clip();
         octx.translate(ox, oy);
+        octx.rotate(viewRot);
         octx.scale(sc, sc);
+        octx.translate(-ROOM_W / 2, -ROOM_L / 2);
         drawScene();
         octx.restore();
       } finally {
@@ -2661,12 +2806,13 @@
       push('%PDF-1.4\n');
       obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
       obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
-      obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+      const pgW = landscape ? 841.89 : 595.28, pgH = landscape ? 595.28 : 841.89;
+      obj(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pgW} ${pgH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
       offsets[4] = len;
       push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${PW} /Height ${PH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`);
       push(jpg);
       push('\nendstream\nendobj\n');
-      const content = 'q 595.28 0 0 841.89 0 0 cm /Im0 Do Q';
+      const content = `q ${pgW} 0 0 ${pgH} 0 0 cm /Im0 Do Q`;
       obj(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
       const xrefPos = len;
       let xref = 'xref\n0 6\n0000000000 65535 f \n';
@@ -2686,13 +2832,25 @@
     }
 
     // --- Mouse Drag & Zoom ---
+    let rotDrag = null;
     canvas.addEventListener('mousedown', (e) => {
+      if (e.shiftKey) {
+        const r = canvas.getBoundingClientRect();
+        rotDrag = { a0: Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)), r0: viewRot };
+        return;
+      }
       isDragging = true;
       dragStart.x = e.clientX - panX;
       dragStart.y = e.clientY - panY;
     });
 
     window.addEventListener('mousemove', (e) => {
+      if (rotDrag) {
+        const r = canvas.getBoundingClientRect();
+        const a = Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2));
+        setViewRotation(rotDrag.r0 + (a - rotDrag.a0));
+        return;
+      }
       if (isDragging) {
         panX = e.clientX - dragStart.x;
         panY = e.clientY - dragStart.y;
@@ -2700,7 +2858,7 @@
       }
     });
 
-    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mouseup', () => { isDragging = false; rotDrag = null; });
 
     // --- Mobile Touch Pan & Pinch-to-Zoom ---
     let touchStartDist = 0;
@@ -2708,6 +2866,7 @@
     let touchStartPan = { x: 0, y: 0 };
     let touchCenter = { x: 0, y: 0 };
     let isTouching = false;
+    let touchStartAngle = 0, touchStartRot = 0, touchStartWorld = { x: 0, y: 0 };
 
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length === 1) {
@@ -2720,8 +2879,12 @@
         const t2 = e.touches[1];
         touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
         touchStartScale = scale;
+        touchStartAngle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
+        touchStartRot = viewRot;
         touchCenter.x = (t1.clientX + t2.clientX) / 2;
         touchCenter.y = (t1.clientY + t2.clientY) / 2;
+        const rect0 = canvas.getBoundingClientRect();
+        touchStartWorld = screenToWorld(touchCenter.x - rect0.left, touchCenter.y - rect0.top);
         touchStartPan.x = panX;
         touchStartPan.y = panY;
       }
@@ -2740,11 +2903,14 @@
         if (touchStartDist > 10) {
           const factor = currentDist / touchStartDist;
           const rect = canvas.getBoundingClientRect();
-          const cx = touchCenter.x - rect.left;
-          const cy = touchCenter.y - rect.top;
+          const cx = (t1.clientX + t2.clientX) / 2 - rect.left;
+          const cy = (t1.clientY + t2.clientY) / 2 - rect.top;
           scale = Math.max(10, Math.min(250, touchStartScale * factor));
-          panX = cx - (cx - touchStartPan.x) * (scale / touchStartScale);
-          panY = cy - (cy - touchStartPan.y) * (scale / touchStartScale);
+          viewRot = touchStartRot + (Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) - touchStartAngle);
+          const rp = rotPt(touchStartWorld.x, touchStartWorld.y);
+          panX = cx - rp.x;
+          panY = cy - rp.y;
+          syncRotUI();
           redraw();
         }
       }
