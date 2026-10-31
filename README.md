@@ -65,3 +65,6 @@ python3 -m http.server 8000
 Accesează în browser:
 `http://localhost:8000`
 
+## Soluția 5: Întorcători la capete
+
+La capătul fiecărui culoar, 2 asistenți întorcători (16 în total) rotesc participanții și îi trec pe culoarul următor, fără viraj în U. Culoarele se lungesc la 33.1 m, spațiul între persoane pe culoar este 76.5 cm, iar zonele de înghesuială dispar.

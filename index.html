@@ -749,6 +749,9 @@
     .canvas-overlay-info.hud-min .hud-seg, .canvas-overlay-info.hud-min .hud-status { display: none; }
     .canvas-overlay-info.hud-min .hud-toggle .ic { transform: rotate(180deg); }
     @media (max-width: 900px) { .tool-zoom, .tool-sidebar { display: none; } }
+
+    .dot-teal { background: #2dd4bf; box-shadow: 0 0 6px rgba(45,212,191,.7); }
+    #sol-btn-turners.active, #card-sol-btn-turners.active { background: #0d9488; border-color: #5eead4; box-shadow: 0 0 10px rgba(94, 234, 212, 0.4); color: #fff; }
   </style>
 </head>
 <body>
@@ -1181,6 +1184,24 @@
           </button>
         </div>
 
+        <!-- Soluția 5 -->
+        <div class="param-box" style="border-left:3px solid #14b8a6;">
+          <div style="font-weight:700; color:#2dd4bf; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 5: Întorcători la capete (asistenți care rotesc participanții)
+          </div>
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+            • La capătul fiecărui culoar nu mai există viraj în U: participanții merg drept până aproape de perete, apoi un asistent îi întoarce și îi trece pe culoarul următor.<br>
+            • Nu mai există nicio zonă unde se înghesuie: lângă asistent trec pe rând, nu stau față în față.<br>
+            • Culoarele se lungesc de la <b>29.4 m</b> (Soluția 1) la <b style="color:#2dd4bf;">33.1 m</b>, pentru că nu mai e nevoie de raza virajului (capetele ajung la 0.50 m de perete).<br>
+            • Distanța între persoane pe culoar: <b style="color:#2dd4bf;">76.5 cm</b> (umeri 46 cm, deci rămân 30 cm liberi).<br>
+            • Necesar: <b>16 asistenți întorcători</b> (2 la fiecare dintre cele 8 capete), în plus față de A1–A40.<br>
+            <b style="color:#2dd4bf;">Rezultat: 800 de oameni, zero înghesuială; durata turului rămâne aceeași.</b>
+          </div>
+          <button class="ctrl-btn" id="card-sol-btn-turners" style="background:#0f766e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('turners')">
+            <span class="dot dot-teal"></span>Afișează Soluția 5 pe Plan (Întorcători)
+          </button>
+        </div>
+
         <!-- Comparație cu Problema Inițială -->
         <div class="param-box" style="border-left:3px solid #ef4444;">
           <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;">
@@ -1279,6 +1300,7 @@
           <button class="sol-pill" id="sol-btn-transit" onclick="setSolution800('transit')"><span class="dot dot-blue"></span>2 &middot; Tranzit</button>
           <button class="sol-pill" id="sol-btn-staggered" onclick="setSolution800('staggered')"><span class="dot dot-yellow"></span>3 &middot; Șah</button>
           <button class="sol-pill" id="sol-btn-max" onclick="setSolution800('max_path')"><span class="dot dot-purple"></span>4 &middot; Traseu 305 m</button>
+          <button class="sol-pill" id="sol-btn-turners" onclick="setSolution800('turners')"><span class="dot dot-teal"></span>5 &middot; Întorcători</button>
           <button class="sol-pill" id="sol-btn-none" onclick="setSolution800('none')"><span class="dot dot-red"></span>Problema</button>
         </div>
 
@@ -1357,6 +1379,8 @@
     let wallDistSide = 1.00; // Distanță liberă de la perete lateral (stânga/dreapta) până la culoar
     let pathSegments = [];
     let totalPathLength = 0;
+    let totalVirtualLength = 0; // lungimea pe care sunt distribuiti oamenii (la intorcatori, virajele se parcurg 'dintr-un pas')
+    const HOP_V = 1.0;          // lungimea virtuala a unei intoarceri asistate (m)
     let assistants = [];
 
     function recalculateAll() {
@@ -1367,8 +1391,10 @@
       rTurn = pitch / 2;
 
       // Apex-ul exterior al virajului U este exact la distanța wallDistEnd de perete:
-      const yTop = wallDistEnd + rTurn + halfW;
-      const yBottom = ROOM_L - (wallDistEnd + rTurn + halfW);
+      const turnerMode = (currentSolution800 === 'turners');
+      const endPad = wallDistEnd + (turnerMode ? 0 : rTurn) + halfW;   // la intorcatori nu mai e nevoie de raza virajului
+      const yTop = endPad;
+      const yBottom = ROOM_L - endPad;
 
       buildDynamicPath(yTop, yBottom, marginX);
       buildDynamicAssistants(yTop, yBottom, marginX);
@@ -1398,7 +1424,23 @@
         });
         totalPathLength += segLen;
 
-        if (i < nLanes - 1) {
+        if (i < nLanes - 1 && currentSolution800 === 'turners') {
+          // Intoarcere asistata: culoarul merge drept pana aproape de perete, apoi un tronson scurt intre culoare
+          const nextX = marginX + (i + 1) * pitch;
+          const yHop = goingDown ? yBottom : yTop;
+          const hopLen = Math.abs(nextX - x);
+          pathSegments.push({
+            type: 'hop',
+            x1: x, y1: yHop,
+            x2: nextX, y2: yHop,
+            startDist: totalPathLength,
+            length: hopLen,
+            vLen: HOP_V,
+            atBottom: goingDown,
+            turnIdx: i
+          });
+          totalPathLength += hopLen;
+        } else if (i < nLanes - 1) {
           const nextX = marginX + (i + 1) * pitch;
           const centerX = (x + nextX) / 2;
           const centerY = goingDown ? yBottom : yTop;
@@ -1420,6 +1462,26 @@
           totalPathLength += arcLen;
         }
       }
+
+      let vAcc = 0;
+      for (const sg of pathSegments) {
+        if (sg.vLen === undefined) sg.vLen = sg.length;
+        sg.vStart = vAcc;
+        vAcc += sg.vLen;
+      }
+      totalVirtualLength = vAcc;
+    }
+
+    // Punct pe traseu dupa distanta "virtuala" (identica cu cea fizica, mai putin la intorcatori)
+    function getPointAtV(dv) {
+      dv = ((dv % totalVirtualLength) + totalVirtualLength) % totalVirtualLength;
+      for (const sg of pathSegments) {
+        if (dv >= sg.vStart && dv <= sg.vStart + sg.vLen) {
+          const f = sg.vLen > 0 ? (dv - sg.vStart) / sg.vLen : 0;
+          return getPointAtDist(sg.startDist + f * sg.length);
+        }
+      }
+      return getPointAtDist(0);
     }
 
     function getPointAtDist(dist) {
@@ -1427,12 +1489,12 @@
       for (let seg of pathSegments) {
         if (dist >= seg.startDist && dist <= seg.startDist + seg.length) {
           const localD = dist - seg.startDist;
-          if (seg.type === 'line') {
+          if (seg.type === 'line' || seg.type === 'hop') {
             const t = localD / seg.length;
             const x = seg.x1 + t * (seg.x2 - seg.x1);
             const y = seg.y1 + t * (seg.y2 - seg.y1);
             const angle = Math.atan2(seg.y2 - seg.y1, seg.x2 - seg.x1);
-            return { x, y, angle, type: 'line', seg };
+            return { x, y, angle, type: seg.type, seg };
           } else if (seg.type === 'arc') {
             const t = localD / seg.length;
             // For bottom turn: ang goes from PI to 0 (through +PI/2)
@@ -1537,12 +1599,12 @@
       document.getElementById('calc-len').innerText = `${totalPathLength.toFixed(1)} m`;
       const pairs = Math.round(partCount / 2);
       document.getElementById('calc-pairs').innerText = `${pairs} perechi`;
-      const stepSize = ((totalPathLength / pairs) * 100).toFixed(1);
+      const stepSize = ((totalVirtualLength / pairs) * 100).toFixed(1);
       document.getElementById('calc-step-size').innerText = `${stepSize} cm`;
       updateLapTimeMetric();
 
       // Update Live Congestion Status
-      const stepDist = totalPathLength / pairs;
+      const stepDist = totalVirtualLength / pairs;
       const wTurn = (corridorWTurn ? corridorWTurn : corridorW);
       const rInner = Math.max(0.05, rTurn - wTurn / 2);
       const spaceInner = stepDist * (rInner / rTurn);
@@ -1568,6 +1630,8 @@
             solMsg = `<span class="dot dot-blue"></span>Soluția 2: Viraj Tranzit Fluid (66.1 cm pe linii drepte | Zero Roșu)`;
           } else if (currentSolution800 === 'staggered') {
             solMsg = `<span class="dot dot-yellow"></span>Soluția 3: Dispunere în Șah (Decalaj 20cm | Fără contact umeri)`;
+          } else if (currentSolution800 === 'turners') {
+            solMsg = `<span class="dot dot-teal"></span>Soluția 5: Întorcători la capete (${(stepDist*100).toFixed(1)} cm între persoane pe drept | 16 asistenți | fără viraje)`;
           } else if (currentSolution800 === 'max_path') {
             solMsg = `<span class="dot dot-purple"></span>Soluția 4: Traseu Maxim 305m (${(spaceInner*100).toFixed(1)}cm viraj, 76cm drept)`;
           }
@@ -1598,7 +1662,7 @@
     // Deplasarea relativă este de 1 pas complet, întâlnind exact partenerul următor FAȚĂ ÎN FAȚĂ!
     function triggerContrasensStep() {
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalPathLength / pairs;
+      const stepDist = totalVirtualLength / pairs;
 
       targetShift += stepDist / 2;
       currentStepNumber++;
@@ -1608,7 +1672,7 @@
 
     function triggerContrasensStepBack() {
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalPathLength / pairs;
+      const stepDist = totalVirtualLength / pairs;
 
       targetShift -= stepDist / 2;
       currentStepNumber = Math.max(1, currentStepNumber - 1);
@@ -1784,6 +1848,11 @@
         corridorWTurn = 0.75;
         wallDistEnd = 0.60;
         wallDistSide = 0.80;
+      } else if (mode === 'turners') {
+        corridorW = 1.20;
+        corridorWTurn = 1.20;
+        wallDistEnd = 0.50;
+        wallDistSide = 1.00;
       } else { // 'none'
         corridorW = 1.20;
         corridorWTurn = 1.20;
@@ -1809,6 +1878,7 @@
         { id: 'sol-btn-transit', mode: 'transit' },
         { id: 'sol-btn-staggered', mode: 'staggered' },
         { id: 'sol-btn-max', mode: 'max_path' },
+        { id: 'sol-btn-turners', mode: 'turners' },
         { id: 'sol-btn-none', mode: 'none' }
       ];
       pillMap.forEach(item => {
@@ -1949,7 +2019,7 @@
       const vp = document.getElementById('viewport');
       scale = 55;
       const turnX = 1.35 + pitch / 2;
-      const turnY = ROOM_L - 3.0;
+      const turnY = (currentSolution800 === 'turners') ? (ROOM_L - wallDistEnd - corridorW / 2 - 1.6) : (ROOM_L - 3.0);
       centerOn(turnX, turnY);
     }
 
@@ -2001,7 +2071,7 @@
 
         // Camera follow
         if (camMode === 'follow') {
-          const pt = getPointAtDist(animShift);
+          const pt = getPointAtV(animShift);
           const vp = document.getElementById('viewport');
           const rp = rotPt(pt.x, pt.y);
           const targetPanX = vp.clientWidth / 2 - rp.x;
@@ -2037,6 +2107,7 @@
       if (document.getElementById('chk-assistants').checked) {
         drawAssistants();
       }
+      drawTurners();
 
       // DRAW THE CONTRASENS FACE-TO-FACE PARTICIPANTS
       drawContrasensParticipants();
@@ -2138,7 +2209,7 @@
 
       // Highlight Congestion Zones or Resolved Solutions on U-Turns
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalPathLength / pairs;
+      const stepDist = totalVirtualLength / pairs;
 
       for (let i = 0; i < pathSegments.length; i++) {
         const seg = pathSegments[i];
@@ -2273,6 +2344,39 @@
       }
     }
 
+    // Asistenti "intorcatori": stau la capetele culoarelor si rotesc participantii spre culoarul urmator
+    function drawTurners() {
+      if (currentSolution800 !== 'turners') return;
+      for (const seg of pathSegments) {
+        if (seg.type !== 'hop') continue;
+        const y = seg.y1, xm = (seg.x1 + seg.x2) / 2;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(20, 184, 166, 0.20)';
+        ctx.lineWidth = corridorW;
+        ctx.beginPath(); ctx.moveTo(seg.x1, y); ctx.lineTo(seg.x2, y); ctx.stroke();
+        ctx.strokeStyle = 'rgba(94, 234, 212, 0.55)';
+        ctx.lineWidth = 0.05;
+        ctx.setLineDash([0.25, 0.18]);
+        ctx.beginPath(); ctx.moveTo(seg.x1, y); ctx.lineTo(seg.x2, y); ctx.stroke();
+        ctx.setLineDash([]);
+        for (const dx of [-0.45, 0.45]) {
+          ctx.save();
+          ctx.translate(xm + dx, y);
+          ctx.rotate(-viewRot);
+          ctx.fillStyle = '#0d9488';
+          ctx.beginPath(); ctx.arc(0, 0, 0.32, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.05; ctx.stroke();
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 0.30px Inter, system-ui, sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('Î', 0, 0.01);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+    }
+
     function drawAssistants() {
       for (let a of assistants) {
         ctx.save();
@@ -2295,7 +2399,7 @@
     // DRAW THE PARTICIPANTS: MOVING IN CONTRASENS (ONE TO HIS RIGHT, THE OTHER TO HIS RIGHT)
     function drawContrasensParticipants() {
       const pairs = Math.round(partCount / 2); // 400 pairs
-      const stepDist = totalPathLength / pairs; // ~66 cm
+      const stepDist = totalVirtualLength / pairs; // ~66 cm
       const halfW = corridorW / 2;
       const showGaze = document.getElementById('chk-gaze').checked;
       const showLead = document.getElementById('chk-lead-marker').checked;
@@ -2308,8 +2412,8 @@
 
       for (let i = 0; i < pairs; i++) {
         // Line 1: Blue / Cyan Suits (Moves forward by animShift)
-        const d1 = ((i + 0.5) * stepDist + animShift + totalPathLength * 100) % totalPathLength;
-        const pt1 = getPointAtDist(d1);
+        const d1 = ((i + 0.5) * stepDist + animShift + totalVirtualLength * 100) % totalVirtualLength;
+        const pt1 = getPointAtV(d1);
         const theta1 = pt1.angle;
         // Vector across corridor: U1 = (-sin(theta1), cos(theta1))
         const u1x = -Math.sin(theta1);
@@ -2323,8 +2427,8 @@
 
         // Line 2: Rose / Magenta Suits (Moves in CONTRASENS / backward by animShift)
         const staggerOffset = (currentSolution800 === 'staggered' && pt1.type === 'arc') ? 0.20 : 0;
-        const d2 = ((i + 0.5) * stepDist - animShift + staggerOffset + totalPathLength * 100) % totalPathLength;
-        const pt2 = getPointAtDist(d2);
+        const d2 = ((i + 0.5) * stepDist - animShift + staggerOffset + totalVirtualLength * 100) % totalVirtualLength;
+        const pt2 = getPointAtV(d2);
         const theta2 = pt2.angle;
         const u2x = -Math.sin(theta2);
         const u2y = Math.cos(theta2);
@@ -2389,7 +2493,7 @@
         const stepSkip = (scale < 30 ? 4 : (scale < 50 ? 2 : 1));
         for (let k = 0; k < pairs; k += stepSkip) {
           const spotD = (k + 0.5) * stepDist;
-          const pt = getPointAtDist(spotD);
+          const pt = getPointAtV(spotD);
           const theta = pt.angle;
           const ux = -Math.sin(theta);
           const uy = Math.cos(theta);
@@ -2729,6 +2833,7 @@
         transit: 'Soluția 2 - Viraj tranzit fluid',
         staggered: 'Soluția 3 - Dispunere în șah',
         max_path: 'Soluția 4 - Traseu maxim 305 m',
+        turners: 'Soluția 5 - Întorcători la capete (asistenți)',
         none: 'Configurația inițială (culoar 1.20 m pe viraj)'
       };
       const solName = solNames[currentSolution800] || '';
