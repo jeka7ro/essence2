@@ -4520,7 +4520,18 @@
       centerOn(ROOM_W / 2, ROOM_L / 2);
     }
 
-    function zoom(f) { enterFreeCam(); scale *= f; redraw(); }
+    function zoom(f) {
+      enterFreeCam();
+      const vp = viewportEl();
+      const cx = vp.clientWidth / 2;
+      const cy = vp.clientHeight / 2;
+      const oldScale = scale;
+      scale = Math.max(4, Math.min(250, scale * f));
+      const actualRatio = scale / oldScale;
+      panX = cx - (cx - panX) * actualRatio;
+      panY = cy - (cy - panY) * actualRatio;
+      redraw();
+    }
     function resetZoom() { setCamMode(camMode === 'free' ? lastCamMode : camMode); }
 
     // --- Animation Loop ---
@@ -5851,7 +5862,7 @@
       canvas.style.cursor = 'grabbing';
     });
 
-    canvas.addEventListener('pointermove', (e) => {
+    window.addEventListener('pointermove', (e) => {
       if (e.pointerType === 'touch') return;
       if (rotDrag) {
         const r = canvas.getBoundingClientRect();
@@ -5868,9 +5879,8 @@
     });
 
     const endPointerDrag = () => { isDragging = false; rotDrag = null; canvas.style.cursor = ''; };
-    canvas.addEventListener('pointerup', endPointerDrag);
-    canvas.addEventListener('pointercancel', endPointerDrag);
-    canvas.addEventListener('lostpointercapture', endPointerDrag);
+    window.addEventListener('pointerup', endPointerDrag);
+    window.addEventListener('pointercancel', endPointerDrag);
     window.addEventListener('blur', endPointerDrag);
 
     // --- Mobile Touch Pan & Pinch-to-Zoom (Neted, stabil, fără sărituri accidentale) ---
@@ -5975,12 +5985,46 @@
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       enterFreeCam();
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // 1. Pinch-to-zoom pe trackpad Mac (browserul trimite e.ctrlKey === true) sau Ctrl/Cmd + rotiță
+      if (e.ctrlKey || e.metaKey) {
+        const delta = Math.max(-50, Math.min(50, e.deltaY));
+        const factor = Math.exp(-delta * 0.012);
+        const oldScale = scale;
+        scale = Math.max(4, Math.min(250, scale * factor));
+        const actualRatio = scale / oldScale;
+        panX = mouseX - (mouseX - panX) * actualRatio;
+        panY = mouseY - (mouseY - panY) * actualRatio;
+        redraw();
+        return;
+      }
+
+      // 2. Shift + rotiță / trackpad -> mișcă orizontal (stânga / dreapta)
+      if (e.shiftKey) {
+        const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        panX -= d;
+        redraw();
+        return;
+      }
+
+      // 3. Glisare cu două degete pe trackpad (stânga, dreapta, sus, jos):
+      // Are deltaX sau mișcare fină deltaY (< 40 pixeli)
+      const isTrackpadScroll = Math.abs(e.deltaX) > 0 || (Math.abs(e.deltaY) < 40 && e.deltaMode === 0);
+      if (isTrackpadScroll) {
+        panX -= e.deltaX;
+        panY -= e.deltaY;
+        redraw();
+        return;
+      }
+
+      // 4. Rotiță clasică de mouse (trepte mari deltaY >= 40 sau mod linii) -> Zoom centrat pe cursor
       const delta = Math.max(-60, Math.min(60, e.deltaY));
-      const zoomFactor = Math.exp(-delta * 0.0018);
-      const mouseX = e.clientX - canvas.getBoundingClientRect().left;
-      const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+      const zoomFactor = Math.exp(-delta * 0.002);
       const oldScale = scale;
-      scale = Math.max(6, Math.min(150, scale * zoomFactor));
+      scale = Math.max(4, Math.min(250, scale * zoomFactor));
       const actualRatio = scale / oldScale;
       panX = mouseX - (mouseX - panX) * actualRatio;
       panY = mouseY - (mouseY - panY) * actualRatio;
