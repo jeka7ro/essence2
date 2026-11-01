@@ -859,6 +859,13 @@
     .app-modal-close { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; border-radius: 8px; }
     .app-modal-close:hover { color: #fff; background: rgba(255,255,255,0.1); }
 
+    .sidebar-conf-bar {
+      padding: 10px 14px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--card-border);
+      flex-shrink: 0;
+    }
+
     /* ===== telefon: navigare jos, panou compact ===== */
     .mob-bottom { display: none; }
     @media (max-width: 900px) {
@@ -957,6 +964,7 @@
     <button class="hdr-sim" id="hdr-fast" onclick="toggleFastSim()" title="Simulare rapidă: tot turul în câteva secunde"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span class="lbl">Simulare rapidă</span></button>
     <button class="hdr-sim" onclick="toggleFastSimVideo()" title="Simulare rapidă înregistrată ca video (se descarcă .webm)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span class="lbl">Video</span></button>
     <button class="hdr-sim" onclick="openGifModal()" title="Exportă animație GIF (10-15s, se descarcă .gif)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span class="lbl">GIF (10-15s)</span></button>
+    <button class="hdr-sim" style="border-color:#38bdf8; background:rgba(2,132,199,0.3); color:#fff;" onclick="openConfigModal()" title="Salvare & Încărcare configurații sală"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span class="lbl">Configurații</span></button>
     <button class="hdr-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Export PDF</button>
     </div>
   </header>
@@ -974,6 +982,25 @@
     <!-- Sidebar -->
     <div class="sidebar">
       
+      <!-- Bara Salvare Configurații mereu vizibilă sus în meniu -->
+      <div class="sidebar-conf-bar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:12px; font-weight:700; color:#38bdf8; display:inline-flex; align-items:center; gap:5px;">
+            <svg class="ic" style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Configurații Sală
+          </span>
+          <button class="preset-btn" style="padding:2px 8px; font-size:11px; color:#cbd5e1;" onclick="openConfigModal()">Gestionează</button>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <select id="sel-quick-configs" class="num-in" style="flex:1; text-align:left; padding:6px 8px; font-size:12px; background:#1e293b; color:#fff;" onchange="onQuickConfigSelect(this.value)">
+            <option value="">-- Alege / Încarcă o configurație --</option>
+          </select>
+          <button class="preset-btn" style="flex:0 0 auto; background:var(--primary); color:#fff; border-color:var(--primary); font-weight:600; padding:6px 10px; font-size:12px;" onclick="openConfigModal()" title="Salvează sau încarcă configurații">
+            Salvează
+          </button>
+        </div>
+      </div>
+
       <!-- Tab Navigation -->
       <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Pas</button>
@@ -1654,11 +1681,66 @@
   <nav class="mob-bottom">
     <button class="mb-btn active" data-go="plan" onclick="mobGo('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span>Plan</span></button>
     <button class="mb-btn" data-go="tab-circuit" onclick="mobGo('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>Pas</span></button>
+    <button class="mb-btn" onclick="openConfigModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Salvare</span></button>
     <button class="mb-btn" data-go="tab-params" onclick="mobGo('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Parametri</span></button>
     <button class="mb-btn" data-go="tab-congestion" onclick="mobGo('tab-congestion')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Soluții</span></button>
     <button class="mb-btn" data-go="tab-calc" onclick="mobGo('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg><span>Calcul</span></button>
     <button class="mb-btn" onclick="exportPlanPDF()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>PDF</span></button>
   </nav>
+
+  <!-- Modal Configurații (Salvare & Încărcare) -->
+  <div id="modal-config" class="app-modal-backdrop" onclick="if(event.target===this)closeConfigModal()">
+    <div class="app-modal-card">
+      <div class="app-modal-header">
+        <div>
+          <h3 class="app-modal-title">Configurații Sală (Salvare & Încărcare)</h3>
+          <div class="app-modal-sub">Salvează starea curentă a sălii cu un nume sau încarcă oricare dintre variantele salvate anterior.</div>
+        </div>
+        <button class="app-modal-close" onclick="closeConfigModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <!-- Salvare noua -->
+        <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:8px;">Salvează configurația curentă cu nume:</div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="modal-inp-conf-name" class="num-in" style="flex:1; text-align:left; padding:8px 12px; font-size:13px;" placeholder="Ex: Sala 800 - 9 culoare 0.70m...">
+            <button class="preset-btn" style="flex:0 0 auto; background:var(--primary); color:#fff; border-color:var(--primary); font-weight:600; padding:8px 14px;" onclick="modalSaveNamedConfig()">
+              Salvează
+            </button>
+          </div>
+        </div>
+
+        <!-- Incarca / Sterge -->
+        <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:12px; font-weight:700; color:#e2e8f0; margin-bottom:8px;">Configurații salvate anterior:</div>
+          <div style="display:flex; gap:8px;">
+            <select id="modal-sel-named-configs" class="num-in" style="flex:1; text-align:left; padding:8px 10px; font-size:12.5px; background:#0f172a; color:#fff;">
+              <option value="">-- Alege o configurație salvată --</option>
+            </select>
+            <button class="preset-btn" style="flex:0 0 auto; padding:8px 14px; background:#0ea5e9; color:#fff; font-weight:600;" onclick="modalLoadSelectedConfig()">
+              Încarcă
+            </button>
+            <button class="preset-btn" style="flex:0 0 auto; padding:8px 10px; color:#ef4444; border-color:rgba(239,68,68,0.35);" onclick="modalDeleteSelectedConfig()" title="Șterge configurația">
+              Șterge
+            </button>
+          </div>
+          <div id="modal-conf-status" style="font-size:11.5px; min-height:16px; margin-top:6px;"></div>
+        </div>
+
+        <!-- Preset-uri rapide -->
+        <div>
+          <div style="font-size:12px; color:#94a3b8; margin-bottom:6px;">Preset-uri rapide de bază:</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button class="preset-btn" style="font-size:11.5px; padding:6px 10px;" onclick="applyQuickConfig('std800'); closeConfigModal();">800p · Standard (0.70m)</button>
+            <button class="preset-btn" style="font-size:11.5px; padding:6px 10px;" onclick="applyQuickConfig('transit800'); closeConfigModal();">800p · Culoar Tranzit</button>
+            <button class="preset-btn" style="font-size:11.5px; padding:6px 10px;" onclick="applyQuickConfig('stagger800'); closeConfigModal();">800p · Decalat (Șah)</button>
+            <button class="preset-btn" style="font-size:11.5px; padding:6px 10px;" onclick="applyQuickConfig('room600'); closeConfigModal();">600p · Sală 30×20m</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Export GIF (10-15s) -->
   <div id="modal-gif" class="app-modal-backdrop" onclick="if(event.target===this)closeGifModal()">
@@ -4502,25 +4584,103 @@
 
     function showConfigNotice(msg, color = '#38bdf8') {
       const el = document.getElementById('conf-status-note');
-      if (!el) return;
-      el.style.color = color;
-      el.innerText = msg;
-      setTimeout(() => { if (el.innerText === msg) el.innerText = ''; }, 4500);
+      if (el) {
+        el.style.color = color;
+        el.innerText = msg;
+        setTimeout(() => { if (el.innerText === msg) el.innerText = ''; }, 4500);
+      }
+    }
+
+    function openConfigModal() {
+      const m = document.getElementById('modal-config');
+      if (m) {
+        m.classList.add('open');
+        refreshNamedConfigsUI();
+        const stat = document.getElementById('modal-conf-status');
+        if (stat) stat.innerText = '';
+        const inp = document.getElementById('modal-inp-conf-name');
+        if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 80); }
+      }
+    }
+    function closeConfigModal() {
+      const m = document.getElementById('modal-config');
+      if (m) m.classList.remove('open');
+    }
+
+    function modalSaveNamedConfig() {
+      const inp = document.getElementById('modal-inp-conf-name');
+      let name = (inp && inp.value.trim()) || '';
+      if (!name) {
+        const now = new Date();
+        name = `Configurație ${now.toLocaleDateString('ro-RO')} ${now.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
+      }
+      const cfgs = getNamedConfigs();
+      const st = collectState();
+      cfgs[name] = { name, savedAt: Date.now(), state: st };
+      setNamedConfigs(cfgs);
+      if (inp) inp.value = '';
+      refreshNamedConfigsUI(name);
+      const stat = document.getElementById('modal-conf-status');
+      if (stat) { stat.style.color = '#22c55e'; stat.innerText = `Configurația „${name}” a fost salvată!`; }
+      showConfigNotice(`Configurația „${name}” a fost salvată!`, '#22c55e');
+    }
+
+    function modalLoadSelectedConfig() {
+      const sel = document.getElementById('modal-sel-named-configs');
+      if (!sel || !sel.value) {
+        const stat = document.getElementById('modal-conf-status');
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o configurație din listă!'; }
+        return;
+      }
+      const cfgs = getNamedConfigs();
+      const item = cfgs[sel.value];
+      if (!item || !item.state) return;
+      applyLoadedState(item.state);
+      closeConfigModal();
+      showConfigNotice(`Configurația „${item.name}” a fost încărcată!`, '#22c55e');
+    }
+
+    function modalDeleteSelectedConfig() {
+      const sel = document.getElementById('modal-sel-named-configs');
+      if (!sel || !sel.value) return;
+      const name = sel.value;
+      const cfgs = getNamedConfigs();
+      delete cfgs[name];
+      setNamedConfigs(cfgs);
+      refreshNamedConfigsUI();
+      const stat = document.getElementById('modal-conf-status');
+      if (stat) { stat.style.color = '#ef4444'; stat.innerText = `Configurația „${name}” a fost ștearsă.`; }
+      showConfigNotice(`Configurația „${name}” a fost ștearsă.`, '#ef4444');
+    }
+
+    function onQuickConfigSelect(val) {
+      if (!val) return;
+      const cfgs = getNamedConfigs();
+      const item = cfgs[val];
+      if (item && item.state) {
+        applyLoadedState(item.state);
+        showConfigNotice(`Configurația „${item.name}” a fost încărcată!`, '#22c55e');
+      }
     }
 
     function refreshNamedConfigsUI(selectedName) {
-      const sel = document.getElementById('sel-named-configs');
-      if (!sel) return;
+      const selIds = ['sel-named-configs', 'sel-quick-configs', 'modal-sel-named-configs'];
       const cfgs = getNamedConfigs();
       const keys = Object.keys(cfgs).sort((a, b) => (cfgs[b].savedAt || 0) - (cfgs[a].savedAt || 0));
-      sel.innerHTML = '<option value="">-- Alege configurație salvată --</option>';
-      keys.forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k;
-        const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString('ro-RO') : '';
-        opt.text = `${k}${dateStr ? ` (${dateStr})` : ''}`;
-        if (selectedName && k === selectedName) opt.selected = true;
-        sel.appendChild(opt);
+
+      selIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isQuick = (id === 'sel-quick-configs');
+        el.innerHTML = isQuick ? '<option value="">-- Încarcă configurație salvată --</option>' : '<option value="">-- Alege configurație salvată --</option>';
+        keys.forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k;
+          const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString('ro-RO') : '';
+          opt.text = `${k}${dateStr ? ` (${dateStr})` : ''}`;
+          if (selectedName && k === selectedName) opt.selected = true;
+          el.appendChild(opt);
+        });
       });
     }
 
