@@ -1839,6 +1839,22 @@
           </div>
         </div>
 
+        <!-- Card Backup JSON -->
+        <div class="section-title">Copie de siguranță (Backup fișier)</div>
+        <div class="param-box">
+          <div class="ui-row">
+            <button class="ui-btn" style="flex:1;" onclick="exportConfigsJSON()">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exportă JSON
+            </button>
+            <label class="ui-btn" style="flex:1; cursor:pointer;">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Importă JSON
+              <input type="file" accept=".json" style="display:none;" onchange="importConfigsJSON(event)">
+            </label>
+          </div>
+        </div>
+
         <!-- Card Actiuni Reset -->
         <div class="section-title">Resetare setări</div>
         <div class="param-box">
@@ -1987,6 +2003,22 @@
             <button class="ui-preset-btn" onclick="applyQuickConfig('transit800'); closeConfigModal();">800p · Culoar Tranzit</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800'); closeConfigModal();">800p · Decalat (Șah)</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('room600'); closeConfigModal();">600p · Sală 30×20m</button>
+          </div>
+        </div>
+
+        <!-- Backup JSON -->
+        <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:8px;">Copie de siguranță (Backup fișier):</div>
+          <div class="ui-row">
+            <button class="ui-btn" style="flex:1;" onclick="exportConfigsJSON()">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exportă JSON
+            </button>
+            <label class="ui-btn" style="flex:1; cursor:pointer;">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Importă JSON
+              <input type="file" accept=".json" style="display:none;" onchange="importConfigsJSON(event)">
+            </label>
           </div>
         </div>
       </div>
@@ -4810,13 +4842,65 @@
       showConfigNotice(`Configurația „${name}” a fost ștearsă.`, '#ef4444');
     }
 
+    function showToast(msg, color = '#22c55e') {
+      let t = document.getElementById('app-toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'app-toast';
+        t.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#0f172a; border:1px solid #38bdf8; border-radius:999px; padding:10px 22px; color:#fff; font-size:13px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,0.6); z-index:999; pointer-events:none; transition:opacity 0.25s ease, transform 0.25s ease; opacity:0; display:flex; align-items:center; gap:8px;';
+        document.body.appendChild(t);
+      }
+      t.style.borderColor = color;
+      t.innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:${color}; box-shadow:0 0 8px ${color};"></span> ${msg}`;
+      t.style.opacity = '1';
+      t.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(t._tm);
+      t._tm = setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(-50%) translateY(10px)';
+      }, 3500);
+    }
+
     function showConfigNotice(msg, color = '#38bdf8') {
+      showToast(msg, color);
       const el = document.getElementById('conf-status-note');
       if (el) {
         el.style.color = color;
         el.innerText = msg;
         setTimeout(() => { if (el.innerText === msg) el.innerText = ''; }, 4500);
       }
+    }
+
+    function exportConfigsJSON() {
+      const data = localStorage.getItem('fata-in-fata-named-configs-v1') || '{}';
+      const blob = new Blob([data], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `configuratii-sala-800-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      showConfigNotice('Fișierul JSON cu toate configurațiile a fost descărcat!', '#22c55e');
+    }
+
+    function importConfigsJSON(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && typeof parsed === 'object') {
+            const current = getNamedConfigs();
+            const merged = { ...current, ...parsed };
+            setNamedConfigs(merged);
+            refreshNamedConfigsUI();
+            showConfigNotice('Configurațiile au fost importate cu succes!', '#22c55e');
+          }
+        } catch (err) {
+          alert('Fișier JSON invalid!');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
     }
 
     function openConfigModal() {
