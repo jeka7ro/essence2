@@ -1426,6 +1426,7 @@
             <button class="ui-preset-btn" onclick="applyQuickConfig('transit800')">800p · Culoar Tranzit</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800')">800p · Decalat (Șah)</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('room600')">600p · Sală 30×20m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('small50')">50p · Sală mică 16×12m</button>
           </div>
         </div>
 
@@ -1470,15 +1471,26 @@
 
         <!-- Slider Participanți -->
         <div class="param-box">
-          <div class="param-header">
-            <span class="param-name"> Total Participanți:</span>
-            <span class="param-val" id="disp-part">800 pers</span>
+          <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="param-name">👥 Total Participanți:</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="number" id="inp-part-num" min="4" max="1500" step="2" value="800" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPartNumInput(this.value)">
+              <span class="param-val" id="disp-part" style="min-width:54px; text-align:right;">800 pers</span>
+            </div>
           </div>
-          <input type="range" class="param-slider" id="rng-part" min="100" max="1200" step="20" value="800" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-part" min="4" max="1200" step="2" value="800" oninput="onParamChange()">
           <div class="param-sub">
-            <span>100</span>
+            <span>4 pers</span>
             <span id="disp-part-split" style="color:var(--accent-blue); font-weight:700;">400 Stg vs 400 Dr (Față în Față)</span>
-            <span>1200</span>
+            <span>1200 pers</span>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(20)">20p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(50)">50p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(80)">80p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(100)">100p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(400)">400p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(800)">800p</button>
           </div>
         </div>
 
@@ -1488,9 +1500,9 @@
             <span class="param-name"><span class="dot dot-orange"></span>Asistenți pe Culoare (Buline):</span>
             <span class="param-val" id="disp-assist">40 asistenți</span>
           </div>
-          <input type="range" class="param-slider" id="rng-assist" min="10" max="80" step="2" value="40" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-assist" min="2" max="80" step="2" value="40" oninput="onParamChange()">
           <div class="param-sub">
-            <span>10</span>
+            <span>2</span>
             <span id="disp-assist-dist" style="color:var(--accent-orange); font-weight:700;">A1 - A40 (conform slide)</span>
             <span>80</span>
           </div>
@@ -1873,6 +1885,7 @@
             <button class="ui-preset-btn" onclick="applyQuickConfig('transit800')">800p · Culoar Tranzit</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800')">800p · Decalat (Șah)</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('room600')">600p · Sală 30×20m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('small50')">50p · Sală mică 16×12m</button>
           </div>
         </div>
 
@@ -2040,6 +2053,7 @@
             <button class="ui-preset-btn" onclick="applyQuickConfig('transit800'); closeConfigModal();">800p · Culoar Tranzit</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800'); closeConfigModal();">800p · Decalat (Șah)</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('room600'); closeConfigModal();">600p · Sală 30×20m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('small50'); closeConfigModal();">50p · Sală mică 16×12m</button>
           </div>
         </div>
 
@@ -2563,6 +2577,8 @@
       syncStarUI();
       renderReportHTML();
       document.getElementById('disp-part').innerText = `${partCount} pers`;
+      const numIn = document.getElementById('inp-part-num');
+      if (numIn && document.activeElement !== numIn) numIn.value = partCount;
       document.getElementById('disp-part-split').innerText = `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
       document.getElementById('disp-assist').innerText = `${assistCount} asistenți`;
       document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) ? 'A1 - A40 (conform slide)' : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`;
@@ -3026,6 +3042,8 @@
 
     function onParamChange() {
       partCount = parseInt(document.getElementById('rng-part').value);
+      const numIn = document.getElementById('inp-part-num');
+      if (numIn) numIn.value = partCount;
       assistCount = parseInt(document.getElementById('rng-assist').value);
       nLanes = parseInt(document.getElementById('rng-lanes').value);
       corridorW = parseFloat(document.getElementById('rng-corridor-w').value);
@@ -3036,6 +3054,28 @@
       if (elSide) wallDistSide = parseFloat(elSide.value);
 
       recalculateAll();
+    }
+
+    function onPartNumInput(val) {
+      let n = parseInt(val, 10);
+      if (isNaN(n) || n < 2) return;
+      if (n % 2 !== 0) n += 1;
+      partCount = n;
+      const rng = document.getElementById('rng-part');
+      if (rng) rng.value = Math.min(1200, Math.max(4, n));
+      recalculateAll();
+      redraw();
+    }
+
+    function setExactParticipants(n) {
+      partCount = n;
+      const rng = document.getElementById('rng-part');
+      if (rng) rng.value = n;
+      const numIn = document.getElementById('inp-part-num');
+      if (numIn) numIn.value = n;
+      recalculateAll();
+      redraw();
+      showToast(`S-a setat la ${n} participanți (${Math.round(n/2)} perechi)`, '#38bdf8');
     }
 
     function setWallEndPreset(dist) {
@@ -4782,7 +4822,7 @@
       if (['none', 'tapered', 'transit', 'staggered', 'max_path', 'turners', 'recommended'].includes(st.sol)) currentSolution800 = st.sol;
       viewRot = num(st.viewRot, 0);
       const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-      setVal('rng-part', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
+      setVal('rng-part', partCount); setVal('inp-part-num', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
       setVal('rng-corridor-w', corridorW); setVal('rng-wall-end', wallDistEnd); setVal('rng-wall-side', wallDistSide);
       setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
       setVal('rng-interval', num(st.stepIntervalSec, stepIntervalSec)); updateInterval(num(st.stepIntervalSec, stepIntervalSec));
@@ -4855,6 +4895,7 @@
       { id: 'preset:transit800', name: '🔄 800p · Culoar Tranzit (0.65m)' },
       { id: 'preset:stagger800', name: '♟️ 800p · Decalat / Șah (0.60m)' },
       { id: 'preset:room600', name: '🏢 600p · Sală 30×20m (8 culoare)' },
+      { id: 'preset:small50', name: '👥 50p · Sală mică 16×12m (4 culoare)' },
     ];
 
     function loadConfigByValue(val) {
@@ -5128,7 +5169,7 @@
     function syncAllInputs() {
       const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
       setVal('inp-room-w', ROOM_W); setVal('inp-room-l', ROOM_L);
-      setVal('rng-part', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
+      setVal('rng-part', partCount); setVal('inp-part-num', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
       setVal('rng-corridor-w', corridorW); setVal('rng-wall-end', wallDistEnd); setVal('rng-wall-side', wallDistSide);
       setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
       setVal('rng-interval', stepIntervalSec); updateInterval(stepIntervalSec);
@@ -5144,6 +5185,8 @@
         ROOM_W = 21.6; ROOM_L = 35.3; partCount = 800; assistCount = 40; nLanes = 9; corridorW = 0.60; corridorWTurn = 0.60; currentSolution800 = 'staggered';
       } else if (type === 'room600') {
         ROOM_W = 20.0; ROOM_L = 30.0; partCount = 600; assistCount = 30; nLanes = 8; corridorW = 0.70; corridorWTurn = 0.70; currentSolution800 = 'tapered';
+      } else if (type === 'small50') {
+        ROOM_W = 12.0; ROOM_L = 16.0; partCount = 50; assistCount = 4; nLanes = 4; corridorW = 1.20; corridorWTurn = 0.70; currentSolution800 = 'tapered';
       }
       applyRoomDims();
       syncAllInputs();
