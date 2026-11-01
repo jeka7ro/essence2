@@ -1889,7 +1889,7 @@
             <span class="param-name" data-i18n="lbl_face_dist"> Distanță Față în Față (Culoar):</span>
             <span class="param-val" id="disp-dist-face">1.20 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-corridor-w" min="0.8" max="2.2" step="0.1" value="1.2" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-corridor-w" min="0.8" max="2.2" step="0.1" value="1.2" oninput="onParamChange()" onchange="saveState()">
           <div class="param-sub">
             <span data-i18n="lbl_face_dist_close">0.80 m (aproape)</span>
             <span data-i18n="lbl_face_dist_rec">1.20 m (recomandat)</span>
@@ -1903,7 +1903,7 @@
             <span class="param-name" data-i18n="lbl_back_blue">Spate în spate, șirurile albastre (fără asistenți)</span>
             <span class="param-val" id="disp-backgap">1.10 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-backgap" min="0.1" max="2.0" step="0.05" value="1.1" oninput="onBackGapChange(this.value)">
+          <input type="range" class="param-slider" id="rng-backgap" min="0.1" max="2.0" step="0.05" value="1.1" oninput="onBackGapChange(this.value)" onchange="saveState()">
           <div class="param-sub">
             <span>0.10 m</span>
             <span id="backgap-note" style="color:#38bdf8; font-weight:600;"></span>
@@ -1925,7 +1925,7 @@
             <span class="param-name" data-i18n="lbl_back_pink">Spate în spate, șirurile roz (zona asistenților)</span>
             <span class="param-val" id="disp-assistgap">1.10 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-assistgap" min="0.5" max="2.0" step="0.05" value="1.1" oninput="onAssistGapChange(this.value)">
+          <input type="range" class="param-slider" id="rng-assistgap" min="0.5" max="2.0" step="0.05" value="1.1" oninput="onAssistGapChange(this.value)" onchange="saveState()">
           <div class="param-sub">
             <span>0.50 m</span>
             <span id="assistgap-note" style="color:#fb923c; font-weight:600;"></span>
@@ -1942,7 +1942,7 @@
             <span class="param-name" data-i18n="lbl_wall_end"> Distanță Pereți Capăt (Sus / Jos):</span>
             <span class="param-val" id="disp-wall-end" style="color:#38bdf8; font-weight: 700;">1.20 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-wall-end" min="0.5" max="4.5" step="0.1" value="1.2" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-wall-end" min="0.5" max="4.5" step="0.1" value="1.2" oninput="onParamChange()" onchange="saveState()">
           <div class="param-sub">
             <span>0.5 m (minim)</span>
             <span id="disp-wall-end-sub" style="color:#38bdf8; font-weight:700;" data-i18n="desc_wall_end">Spațiu liber între viraj și perete</span>
@@ -1962,7 +1962,7 @@
             <span class="param-name" data-i18n="lbl_wall_side"> Distanță Pereți Laterali (Stânga / Dreapta):</span>
             <span class="param-val" id="disp-wall-side" style="color:#a855f7; font-weight: 700;">1.00 m</span>
           </div>
-          <input type="range" class="param-slider" id="rng-wall-side" min="0.5" max="3.5" step="0.1" value="1.0" oninput="backGapAuto = true; onParamChange()">
+          <input type="range" class="param-slider" id="rng-wall-side" min="0.5" max="3.5" step="0.1" value="1.0" oninput="onParamChange()" onchange="saveState()">
           <div class="param-sub">
             <span>0.5 m (minim)</span>
             <span id="disp-wall-side-sub" style="color:#a855f7; font-weight:700;" data-i18n="desc_wall_side">Spațiu liber la pereții laterali</span>
@@ -3019,6 +3019,7 @@
 
     let pitch = 2.70;
     let rTurn = 1.35;
+    let rTurnMax = 1.35;
     let wallDistEnd = 1.20;  // Distanță liberă de la perete capăt (sus/jos) până la viraj
     let wallDistSide = 1.00; // Distanță liberă de la perete lateral (stânga/dreapta) până la culoar
     let pathSegments = [];
@@ -3038,32 +3039,45 @@
       backGapClamped = false;
       const minB = isTurnerMode() ? 0.50 : 0.10;     // la intorcatori, omul din centrul curbei trebuie sa incapa intre sirurile albastre
 
-      let marginX, centered = !backGapAuto;
-      if (equalLoops || nLanes <= 8) {
+      const totalCW = nLanes * corridorW;
+      const gapsCount = Math.max(1, nLanes - 1);
+
+      // Verificăm spațiul maxim permis pentru wallDistSide astfel încât culoarul să încapă
+      const maxAllowedSide = Math.max(0.20, (ROOM_W - totalCW - gapsCount * minB) / 2);
+      if (wallDistSide > maxAllowedSide) {
+        wallDistSide = Math.max(0.50, maxAllowedSide);
+      }
+      const availWidth = Math.max(totalCW + gapsCount * minB, ROOM_W - 2 * wallDistSide);
+      const remForGaps = availWidth - totalCW;
+
+      let marginX;
+      if (equalLoops) {
         // Bucle 100% EGALE: distanța dintre oricare două culoare este identică
-        backGap = assistGap;
-        const totalW = nLanes * corridorW + (nLanes - 1) * assistGap;
-        marginX = Math.max(halfW + 0.5, (ROOM_W - totalW) / 2 + halfW);
-        wallDistSide = Math.max(0.5, marginX - halfW);
+        const eqGap = Math.max(minB, remForGaps / gapsCount);
+        assistGap = eqGap;
+        backGap = eqGap;
+        const totalUsedW = totalCW + gapsCount * eqGap;
+        marginX = (ROOM_W - totalUsedW) / 2 + halfW;
+        wallDistSide = Math.max(0.20, marginX - halfW);
       } else if (backGapAuto) {
-        const S = ROOM_W - 2 * (wallDistSide + halfW);
-        backGap = nB > 0 ? (S - sumCW - nA * assistGap) / nB : assistGap;
-        if (backGap < minB) { backGap = minB; centered = true; backGapClamped = true; }
-        const S2 = sumCW + nA * assistGap + nB * backGap;
-        marginX = (ROOM_W - (S2 + corridorW)) / 2 + halfW;
+        backGap = nB > 0 ? (remForGaps - nA * assistGap) / nB : assistGap;
+        if (backGap < minB) { backGap = minB; backGapClamped = true; }
+        const S2 = totalCW + nA * assistGap + nB * backGap;
+        marginX = (ROOM_W - S2) / 2 + halfW;
+        wallDistSide = Math.max(0.20, marginX - halfW);
       } else {
-        const maxB = nB > 0 ? Math.max(minB, (ROOM_W - 0.6 - corridorW - sumCW - nA * assistGap) / nB) : minB;
+        const maxB = nB > 0 ? Math.max(minB, (remForGaps - nA * assistGap) / nB) : minB;
         if (backGap > maxB) { backGap = maxB; backGapClamped = true; }
         if (backGap < minB) backGap = minB;
-        const S = sumCW + nA * assistGap + nB * backGap;
-        marginX = (ROOM_W - (S + corridorW)) / 2 + halfW;
-        wallDistSide = marginX - halfW;
+        const S = totalCW + nA * assistGap + nB * backGap;
+        marginX = (ROOM_W - S) / 2 + halfW;
+        wallDistSide = Math.max(0.20, marginX - halfW);
       }
 
       // Pozitiile culoarelor: pas uniform daca equalLoops este activ
       laneXs = [marginX];
       const pitches = [];
-      const useEqualPitches = equalLoops || (nLanes <= 8 && backGapAuto);
+      const useEqualPitches = equalLoops;
       for (let k = 0; k < nLanes - 1; k++) {
         const pk = corridorW + (useEqualPitches ? assistGap : (k % 2 === 0 ? assistGap : backGap));
         pitches.push(pk);
@@ -3071,7 +3085,7 @@
       }
       pitch = pitches.length ? pitches.reduce((u, v) => u + v, 0) / pitches.length : 2.0;
       rTurn = pitches.length ? Math.min(...pitches) / 2 : 1.0;          // cel mai strans viraj (cazul cel mai defavorabil)
-      const rTurnMax = pitches.length ? Math.max(...pitches) / 2 : 1.0;
+      rTurnMax = pitches.length ? Math.max(...pitches) / 2 : 1.0;
 
       // Calcul lungime culoare (Compact dupa oameni vs Toata lungimea salii):
       const turnerMode = isTurnerMode();
@@ -3463,10 +3477,10 @@
       out.innerHTML = h;
     }
 
-    function onBackGapChange(v) { backGap = parseFloat(v); backGapAuto = false; recalculateAll(); }
-    function setBackGap(v) { backGap = v; backGapAuto = false; recalculateAll(); }
-    function setBackGapAuto() { backGapAuto = true; recalculateAll(); }
-    function onAssistGapChange(v) { assistGap = parseFloat(v); recalculateAll(); }
+    function onBackGapChange(v) { backGap = parseFloat(v); backGapAuto = false; recalculateAll(); saveState(); }
+    function setBackGap(v) { backGap = v; backGapAuto = false; recalculateAll(); saveState(); }
+    function setBackGapAuto() { backGapAuto = true; recalculateAll(); saveState(); }
+    function onAssistGapChange(v) { assistGap = parseFloat(v); recalculateAll(); saveState(); }
     function syncBackGapUI() {
       const sl = document.getElementById('rng-backgap'); if (sl) sl.value = Math.min(2.0, Math.max(0.1, backGap));
       const d = document.getElementById('disp-backgap'); if (d) d.innerText = backGap.toFixed(2) + ' m';
@@ -3630,6 +3644,22 @@
       document.querySelectorAll('.btn-wside').forEach(b => {
         b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - wallDistSide) < 0.05);
       });
+
+      const elRngCW = document.getElementById('rng-corridor-w');
+      if (elRngCW && document.activeElement !== elRngCW) elRngCW.value = corridorW;
+      const elRngWE = document.getElementById('rng-wall-end');
+      if (elRngWE && document.activeElement !== elRngWE) elRngWE.value = wallDistEnd;
+      const elRngWS = document.getElementById('rng-wall-side');
+      if (elRngWS && document.activeElement !== elRngWS) elRngWS.value = wallDistSide;
+
+      const bComp = document.getElementById('btn-mode-compact');
+      const bFull = document.getElementById('btn-mode-fullhall');
+      if (bComp) bComp.classList.toggle('active', compactCorridors);
+      if (bFull) bFull.classList.toggle('active', !compactCorridors);
+      const dispComp = document.getElementById('disp-compact-status');
+      if (dispComp) dispComp.innerText = compactCorridors ? (currentLang === 'en' ? 'Auto-compact' : 'Auto-compact') : (currentLang === 'en' ? 'Full hall' : 'Toată sala');
+      const chkEq = document.getElementById('chk-equal-loops');
+      if (chkEq && document.activeElement !== chkEq) chkEq.checked = equalLoops;
       updateSolutionPills();
     }
 
@@ -4074,6 +4104,7 @@
       if (elSide) wallDistSide = parseFloat(elSide.value);
 
       recalculateAll();
+      saveState();
     }
 
     function onPartNumInput(val) {
@@ -4085,6 +4116,7 @@
       if (rng) rng.value = Math.min(1200, Math.max(0, n));
       recalculateAll();
       redraw();
+      saveState();
     }
 
     function setExactParticipants(n) {
@@ -4095,6 +4127,7 @@
       if (numIn) numIn.value = n;
       recalculateAll();
       redraw();
+      saveState();
       showToast(`S-a setat la ${n} participanți (${Math.round(n/2)} perechi)`, '#38bdf8');
     }
 
@@ -4111,6 +4144,7 @@
 
       recalculateAll();
       redraw();
+      saveState();
     }
 
     function setExactPerRow(n) {
@@ -4119,6 +4153,7 @@
         n = Math.max(1, Math.floor(straightLen / SHOULDER));
       }
       onPerRowChange(n);
+      saveState();
       showToast(`S-a setat la ${n} pers/șir (Total: ${partCount} participanți)`, '#38bdf8');
     }
 
@@ -4128,6 +4163,7 @@
       if (rngLanes) rngLanes.value = n;
       recalculateAll();
       redraw();
+      saveState();
       const bText = (n - 1) === 1 ? '1 buclă U' : `${Math.max(0, n - 1)} bucle U`;
       const lText = n === 1 ? '1 culoar' : `${n} culoare`;
       showToast(`S-au setat ${lText} (${bText})`, '#38bdf8');
@@ -4142,6 +4178,7 @@
       const st = document.getElementById('disp-compact-status');
       if (st) st.innerText = isCompact ? 'Auto-compact' : 'Toată sala';
       recalculateAll();
+      saveState();
       showToast(isCompact ? 'Traseu compact adaptat la numărul de oameni' : 'Traseu extins pe toată lungimea sălii', '#38bdf8');
     }
 
@@ -4150,6 +4187,7 @@
       const chk = document.getElementById('chk-equal-loops');
       if (chk) chk.checked = isEqual;
       recalculateAll();
+      saveState();
       showToast(isEqual ? 'Toate buclele au acum aceeași lățime/rază' : 'Distanțe asimetrice între bucle', '#38bdf8');
     }
 
@@ -4158,14 +4196,15 @@
       const el = document.getElementById('rng-wall-end');
       if (el) el.value = dist;
       onParamChange();
+      saveState();
     }
 
     function setWallSidePreset(dist) {
-      backGapAuto = true;
       wallDistSide = dist;
       const el = document.getElementById('rng-wall-side');
       if (el) el.value = dist;
       onParamChange();
+      saveState();
     }
 
     function applyPresetSolution(parts, lanes, corridorWidth) {
@@ -4181,6 +4220,7 @@
       if (inpW) inpW.value = corridorWidth;
 
       recalculateAll();
+      saveState();
       setCamMode('full');
     }
 
@@ -4247,6 +4287,7 @@
 
       updateSolutionPills();
       recalculateAll();
+      saveState();
       setCamMode('full');
       if (window.innerWidth <= 900) setMobileView('plan');
     }
@@ -5264,12 +5305,12 @@
         const halfW = corridorW / 2;
         // Distanță perete SUS
         const topTurnX = (nLanes > 2) ? (laneXs[1] + laneXs[2]) / 2 : (ROOM_W / 2);
-        const actualTopMargin = Math.max(0.1, laneYTop - rTurn - halfW);
+        const actualTopMargin = Math.max(0.1, laneYTop - rTurnMax - halfW);
         drawWallClearanceLine(topTurnX, 0, topTurnX, actualTopMargin, ` ${actualTopMargin.toFixed(2)} m ${en ? '(Top Wall)' : '(Perete Sus)'}`, '#38bdf8');
 
         // Distanță perete JOS
         const btmTurnX = (nLanes > 1) ? (laneXs[0] + laneXs[1]) / 2 : (laneXs[0] || (ROOM_W / 2));
-        const actualBtmMargin = Math.max(0.1, ROOM_L - (laneYBottom + rTurn + halfW));
+        const actualBtmMargin = Math.max(0.1, ROOM_L - (laneYBottom + rTurnMax + halfW));
         drawWallClearanceLine(btmTurnX, ROOM_L - actualBtmMargin, btmTurnX, ROOM_L, ` ${actualBtmMargin.toFixed(2)} m ${en ? '(Bottom Wall)' : '(Perete Jos)'}`, '#38bdf8');
 
         // Distanță perete STÂNGA
@@ -6066,6 +6107,40 @@
       setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
       setVal('rng-interval', num(st.stepIntervalSec, stepIntervalSec)); updateInterval(num(st.stepIntervalSec, stepIntervalSec));
       setVal('rng-glide', num(st.stepGlideSec, stepGlideSec)); updateGlide(num(st.stepGlideSec, stepGlideSec));
+
+      // Sync Compact Mode UI
+      const bComp = document.getElementById('btn-mode-compact');
+      const bFull = document.getElementById('btn-mode-fullhall');
+      if (bComp) bComp.classList.toggle('active', compactCorridors);
+      if (bFull) bFull.classList.toggle('active', !compactCorridors);
+      const stEl = document.getElementById('disp-compact-status');
+      if (stEl) stEl.innerText = compactCorridors ? (currentLang === 'en' ? 'Auto-compact' : 'Auto-compact') : (currentLang === 'en' ? 'Full hall' : 'Toată sala');
+
+      // Sync Equal Loops UI
+      const chkEq = document.getElementById('chk-equal-loops');
+      if (chkEq) chkEq.checked = equalLoops;
+
+      // Sync per row display and inputs
+      const nRows = 2 * nLanes;
+      const curPerRow = nRows > 0 ? Math.round(partCount / nRows) : 0;
+      setVal('rng-part-per-row', curPerRow);
+      setVal('inp-part-per-row', curPerRow);
+      const dispPR = document.getElementById('disp-part-per-row');
+      if (dispPR) dispPR.innerText = `${curPerRow} ${currentLang === 'en' ? 'pers/line' : 'pers/șir'}`;
+
+      // Sync wall presets and displays
+      const elDistFace = document.getElementById('disp-dist-face');
+      if (elDistFace) elDistFace.innerText = `${corridorW.toFixed(2)} m`;
+      const elDispWE = document.getElementById('disp-wall-end');
+      if (elDispWE) elDispWE.innerText = `${wallDistEnd.toFixed(2)} m`;
+      const elDispWS = document.getElementById('disp-wall-side');
+      if (elDispWS) elDispWS.innerText = `${wallDistSide.toFixed(2)} m`;
+      document.querySelectorAll('.btn-wend').forEach(b => {
+        b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - wallDistEnd) < 0.05);
+      });
+      document.querySelectorAll('.btn-wside').forEach(b => {
+        b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - wallDistSide) < 0.05);
+      });
       if (st.chk) CHK_IDS.forEach(id => { const el = document.getElementById(id); if (el && typeof st.chk[id] === 'boolean') el.checked = st.chk[id]; });
       if (st.sidebarCollapsed) document.querySelector('.sidebar')?.classList.add('collapsed');
       applySidebarState();
@@ -6622,6 +6697,16 @@
       wallDistSide = parseFloat(pWallSide);
       const inp = document.getElementById('rng-wall-side');
       if (inp) inp.value = wallDistSide;
+    }
+    const pCorrW = urlParams.get('corridor_w') || urlParams.get('corr_w');
+    if (pCorrW) {
+      corridorW = parseFloat(pCorrW);
+      const inp = document.getElementById('rng-corridor-w');
+      if (inp) inp.value = corridorW;
+    }
+    const pCompact = urlParams.get('compact');
+    if (pCompact !== null) {
+      compactCorridors = (pCompact === '1' || pCompact === 'true');
     }
     const pSol = urlParams.get('sol');
     if (pSol) {
