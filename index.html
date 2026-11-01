@@ -153,13 +153,12 @@
       z-index: 10;
       overflow-y: auto;
       overflow-x: hidden;
+      overscroll-behavior: contain;
       box-shadow: 6px 0 30px rgba(0,0,0,0.6);
-      transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-                  min-width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-                  max-width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.2s ease,
-                  transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: width, transform;
+      transition: margin-left 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+                  box-shadow 0.28s ease,
+                  opacity 0.22s ease;
+      will-change: margin-left;
     }
 
     .tab-nav {
@@ -668,11 +667,14 @@
         width: 100% !important;
         min-width: 100% !important;
         max-width: 100% !important;
+        margin-left: 0 !important;
         flex: 1 !important;
         max-height: none !important;
         border-right: none;
         overflow-x: hidden !important;
+        overflow-y: auto !important;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         transition: none !important;
         transform: none !important;
         opacity: 1 !important;
@@ -856,16 +858,12 @@
 
     /* ===== rotire + ecran complet & tranzitie lina meniu lateral ===== */
     .sidebar.collapsed {
-      width: 0 !important;
-      min-width: 0 !important;
-      max-width: 0 !important;
+      margin-left: -430px !important;
       border-right: none !important;
       box-shadow: none !important;
-      overflow: hidden !important;
       pointer-events: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
-      transform: translateX(-30px);
     }
     body.fs .sidebar:not(.collapsed) {
       display: flex !important;
@@ -876,6 +874,7 @@
       width: 430px !important;
       min-width: 430px !important;
       max-width: 430px !important;
+      margin-left: 0 !important;
       z-index: 1000;
       box-shadow: 12px 0 40px rgba(0,0,0,0.85);
       border-right: 1px solid rgba(56, 189, 248, 0.35);
@@ -885,6 +884,7 @@
       opacity: 1 !important;
       pointer-events: auto !important;
       transform: translateX(0);
+      transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease;
     }
     body.fs .sidebar.collapsed {
       display: flex !important;
@@ -895,12 +895,14 @@
       width: 430px !important;
       min-width: 430px !important;
       max-width: 430px !important;
+      margin-left: 0 !important;
       transform: translateX(-100%) !important;
       visibility: hidden !important;
       opacity: 0 !important;
       pointer-events: none !important;
       box-shadow: none !important;
       border-right: none !important;
+      transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease;
     }
     body.fs .mobile-nav-bar { display: none !important; }
     body.fs .stage { display: flex !important; flex: 1 !important; }
@@ -4515,10 +4517,14 @@
       if (!sb) return;
       sb.classList.toggle('collapsed');
       applySidebarState();
-      window.dispatchEvent(new Event('resize'));
-      setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-      }, 280);
+    }
+    const sbGlobal = document.querySelector('.sidebar');
+    if (sbGlobal) {
+      sbGlobal.addEventListener('transitionend', (e) => {
+        if (e.target === sbGlobal && (e.propertyName === 'margin-left' || e.propertyName === 'transform')) {
+          window.dispatchEvent(new Event('resize'));
+        }
+      });
     }
     function applySidebarState() {
       const sb = document.querySelector('.sidebar');
@@ -4536,7 +4542,6 @@
           if (!sb.contains(e.target) && btnToggle && !btnToggle.contains(e.target)) {
             sb.classList.add('collapsed');
             applySidebarState();
-            setTimeout(() => window.dispatchEvent(new Event('resize')), 280);
           }
         }
       }
@@ -7009,14 +7014,19 @@
     setCamMode(initCam);
     const initTab = urlParams.get('tab');
     if (initTab) switchTab('tab-' + initTab); else if (savedTab) switchTab(savedTab);
-    // refacem canvas-ul doar cand marimea zonei chiar se schimba (altfel pozitia planului se reseteaza)
+    // refacem canvas-ul doar cand marimea zonei chiar se schimba si s-a stabilizat
     {
       let lastVpW = -1, lastVpH = -1;
+      let roDebounce = null;
       new ResizeObserver(() => {
         const v = document.getElementById('viewport');
-        if (v.clientWidth !== lastVpW || v.clientHeight !== lastVpH) {
+        if (!v) return;
+        if (Math.abs(v.clientWidth - lastVpW) > 1 || Math.abs(v.clientHeight - lastVpH) > 1) {
           lastVpW = v.clientWidth; lastVpH = v.clientHeight;
-          window.dispatchEvent(new Event('resize'));
+          if (roDebounce) clearTimeout(roDebounce);
+          roDebounce = setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+          }, 80);
         }
       }).observe(document.getElementById('viewport'));
     }
