@@ -1750,39 +1750,6 @@
 
       <!-- TAB 2: PARAMETRI SALĂ -->
       <div id="tab-params" class="tab-content">
-        <!-- CONFIGURAȚII CU NUME (Salvare / Încărcare) -->
-        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span data-i18n="sec_hall_configs">Configurații Sală</span>
-          <span style="font-size:11px; font-weight:normal; color:#94a3b8;" data-i18n="sec_save_load">Salvare & Încărcare</span>
-        </div>
-        <div class="param-box" style="display:flex; flex-direction:column; gap:10px;">
-          <!-- Salveaza configuratia curenta -->
-          <div class="ui-row">
-            <input type="text" id="inp-conf-name" class="ui-input" placeholder="Nume configurație nouă..." data-i18n-placeholder="ph_new_conf_name">
-            <button class="ui-btn ui-btn-primary" onclick="saveNamedConfig()" title="Salvează setările curente cu acest nume" data-i18n-title="btn_save_current_title">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              <span data-i18n="btn_save">Salvează</span>
-            </button>
-          </div>
-
-          <!-- Incarca / Sterge configuratie salvata -->
-          <div class="ui-row">
-            <select id="sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
-              <option value="" data-i18n="opt_choose_saved_conf">-- Alege configurație salvată --</option>
-            </select>
-            <button id="btn-load-conf" class="ui-btn ui-btn-primary" onclick="loadSelectedNamedConfig()" title="Încarcă configurația selectată" data-i18n-title="btn_load_selected_title">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span data-i18n="btn_load">Încarcă</span>
-            </button>
-            <button id="btn-del-conf" class="ui-btn ui-btn-danger" onclick="deleteSelectedNamedConfig()" title="Șterge configurația selectată" data-i18n-title="btn_del_selected_title">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              <span data-i18n="btn_delete">Șterge</span>
-            </button>
-          </div>
-
-          <div id="conf-status-note" style="font-size:12px; color:#38bdf8; min-height:14px;"></div>
-        </div>
-
         <div class="section-title" data-i18n="sec_room_dims">Dimensiunile sălii</div>
         <div class="param-box">
           <div class="room-grid">
@@ -2256,36 +2223,37 @@
           • Toate configurațiile se păstrează în siguranță pe dispozitivul tău și le poți reîncărca oricând cu un singur click.
         </div>
 
-        <!-- Card Salvare Noua -->
-        <div class="section-title" data-i18n="sec_save_named">Salvează starea curentă cu nume</div>
-        <div class="param-box">
+        <!-- CONFIGURAȚII SALĂ (Salvare & Încărcare) -->
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span data-i18n="sec_hall_configs">Configurații Sală</span>
+          <span style="font-size:11px; font-weight:normal; color:#94a3b8;" data-i18n="sec_save_load">Salvare & Încărcare</span>
+        </div>
+        <div class="param-box" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Salveaza configuratia curenta -->
           <div class="ui-row">
             <input type="text" id="tab-inp-conf-name" class="ui-input" placeholder="Ex: Sala 800 - 9 culoare 0.70m..." data-i18n-placeholder="ph_new_conf_name">
-            <button class="ui-btn ui-btn-primary" onclick="tabSaveNamedConfig()">
+            <button class="ui-btn ui-btn-primary" onclick="tabSaveNamedConfig()" title="Salvează setările curente cu acest nume" data-i18n-title="btn_save_current_title">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               <span data-i18n="btn_save">Salvează</span>
             </button>
           </div>
-          <div id="tab-conf-save-status" style="font-size:12px; min-height:16px; margin-top:6px; color:#22c55e;"></div>
-        </div>
 
-        <!-- Card Incarcare / Stergere -->
-        <div class="section-title" data-i18n="sec_saved_configs">Configurații salvate anterior</div>
-        <div class="param-box">
+          <!-- Incarca / Sterge configuratie salvata -->
           <div class="ui-row">
             <select id="tab-sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
               <option value="" data-i18n="opt_choose_saved_conf">-- Alege configurație salvată --</option>
             </select>
-            <button class="ui-btn ui-btn-primary" onclick="tabLoadSelectedConfig()">
+            <button class="ui-btn ui-btn-primary" onclick="tabLoadSelectedConfig()" title="Încarcă configurația selectată" data-i18n-title="btn_load_selected_title">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <span data-i18n="btn_load">Încarcă</span>
             </button>
-            <button class="ui-btn ui-btn-danger" onclick="tabDeleteSelectedConfig()" title="Șterge configurația selectată">
+            <button class="ui-btn ui-btn-danger" onclick="tabDeleteSelectedConfig()" title="Șterge configurația selectată" data-i18n-title="btn_del_selected_title">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               <span data-i18n="btn_delete">Șterge</span>
             </button>
           </div>
-          <div id="tab-conf-load-status" style="font-size:12px; min-height:16px; margin-top:6px;"></div>
+
+          <div id="tab-conf-save-status" style="font-size:12px; min-height:14px; color:#22c55e;"></div>
         </div>
 
         <!-- Card Preset-uri Rapide -->
@@ -6719,7 +6687,7 @@
       const sel = document.getElementById('tab-sel-named-configs');
       const en = currentLang === 'en';
       if (!sel || !sel.value) {
-        const stat = document.getElementById('tab-conf-load-status');
+        const stat = document.getElementById('tab-conf-save-status') || document.getElementById('tab-conf-load-status');
         const msg = en ? 'Select an option from list!' : 'Alege o opțiune din listă!';
         if (stat) { stat.style.color = '#f59e0b'; stat.innerText = msg; }
         showConfigNotice(msg, '#f59e0b');
@@ -6734,7 +6702,7 @@
       const name = sel.value;
       const en = currentLang === 'en';
       if (name.startsWith('preset:')) {
-        const stat = document.getElementById('tab-conf-load-status');
+        const stat = document.getElementById('tab-conf-save-status') || document.getElementById('tab-conf-load-status');
         const msg = en ? 'Default presets cannot be deleted.' : 'Preset-urile implicite nu pot fi șterse.';
         if (stat) { stat.style.color = '#f59e0b'; stat.innerText = msg; }
         showConfigNotice(msg, '#f59e0b');
@@ -6744,7 +6712,7 @@
       delete cfgs[name];
       setNamedConfigs(cfgs);
       refreshNamedConfigsUI();
-      const stat = document.getElementById('tab-conf-load-status');
+      const stat = document.getElementById('tab-conf-save-status') || document.getElementById('tab-conf-load-status');
       const delMsg = en ? `Configuration “${name}” was deleted.` : `Configurația „${name}” a fost ștearsă.`;
       if (stat) { stat.style.color = '#ef4444'; stat.innerText = delMsg; }
       showConfigNotice(delMsg, '#ef4444');
