@@ -761,17 +761,76 @@
     }
 
     /* ===== antet curat, fara suprapuneri ===== */
-    header { gap: 16px; }
-    .header-left { min-width: 0; flex: 1 1 auto; }
-    .brand-title { min-width: 0; font-weight: 700; font-size: 15px; }
-    .brand-title span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cam-selector { flex-shrink: 0; }
-    .btn-cam { white-space: nowrap; padding: 6px 14px; font-weight: 600; }
-    .circuit-pill { white-space: nowrap; flex-shrink: 0; font-weight: 500; gap: 12px; padding: 6px 16px; }
+    header {
+      gap: 10px;
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 7px 14px;
+    }
+    .header-left {
+      min-width: 0;
+      flex: 0 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-title {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .brand-title span { white-space: nowrap; }
+    @media (max-width: 1550px) {
+      .brand-title { display: none; }
+    }
+    .cam-selector {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .btn-cam {
+      white-space: nowrap;
+      padding: 6px 12px;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .circuit-pill {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-weight: 500;
+      gap: 10px;
+      padding: 6px 14px;
+    }
     .circuit-pill b { font-family: inherit; font-weight: 700; font-size: 13px; color: var(--accent-blue); }
     .circuit-pill .sep { width: 1px; height: 14px; background: rgba(255,255,255,0.18); }
-    @media (max-width: 1350px) { .pill-extra { display: none; } }
-    @media (max-width: 1150px) { .brand-title { display: none; } }
+    .hdr-sim {
+      padding: 6px 11px;
+      font-size: 12.5px;
+      white-space: nowrap;
+    }
+    @media (max-width: 1500px) {
+      .pill-extra { display: none; }
+      .btn-cam { padding: 5px 8px; font-size: 12px; }
+      .hdr-sim { padding: 5px 8px; font-size: 12px; }
+      .circuit-pill { padding: 5px 10px; gap: 8px; }
+      .header-right { gap: 6px; }
+    }
+    @media (max-width: 1350px) {
+      .cam-selector .btn-cam span { display: none; }
+      .btn-cam { padding: 6px 8px; }
+    }
     .t-row.highlight { border-radius: 10px; }
 
     /* ===== rotire + ecran complet ===== */
@@ -793,8 +852,7 @@
     .dot-teal { background: #2dd4bf; box-shadow: 0 0 6px rgba(45,212,191,.7); }
 
     /* ===== buton Export PDF vizibil in antet ===== */
-    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .hdr-pdf { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 999px; border: 1px solid #38bdf8; background: #0284c7; color: #fff; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .hdr-pdf { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; border: 1px solid #38bdf8; background: #0284c7; color: #fff; font-weight: 600; font-size: 12.5px; cursor: pointer; white-space: nowrap; font-family: inherit; }
     .hdr-pdf:hover { background: #0ea5e9; }
     .mob-pdf { flex: 0 0 auto !important; background: #0284c7 !important; border-color: #38bdf8 !important; color: #fff !important; display: inline-flex; align-items: center; gap: 6px; }
     @media (max-width: 900px) { .header-right { display: none; } }
@@ -1148,6 +1206,84 @@
       outline-offset: 2px;
     }
 
+    /* Comutator limbă modern rotunjit (RO / EN toggle) */
+    .lang-switch-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 9999px;
+      user-select: none;
+      -webkit-user-select: none;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+    .lang-code {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    .lang-code.active {
+      color: #38bdf8;
+      font-weight: 800;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+    .ui-switch-lang {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .ui-switch-lang .ui-switch-slider {
+      width: 34px !important;
+      height: 19px !important;
+      background: #1e293b !important;
+      border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    }
+    .ui-switch-lang .ui-switch-slider::before {
+      height: 13px !important;
+      width: 13px !important;
+      left: 2px !important;
+      top: 2px !important;
+      background: #38bdf8 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+    }
+    .ui-switch-lang input:checked + .ui-switch-slider {
+      background: #0369a1 !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.35) !important;
+    }
+    .ui-switch-lang input:checked + .ui-switch-slider::before {
+      transform: translateX(15px) !important;
+      background: #ffffff !important;
+    }
+    .hud-lang-switch {
+      display: none;
+    }
+    .sidebar-mob-lang-bar {
+      display: none;
+    }
+    @media (max-width: 900px) {
+      .hud-lang-switch {
+        display: inline-flex;
+        margin-left: 4px;
+        padding: 2px 6px;
+      }
+      .sidebar-mob-lang-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #0f172a;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--card-border);
+        margin-bottom: 8px;
+        border-radius: 12px;
+      }
+    }
+
     /* Modal export GIF & Configurații */
     .app-modal-backdrop {
       position: fixed; inset: 0; background: rgba(2, 6, 23, 0.78); backdrop-filter: blur(6px);
@@ -1261,55 +1397,65 @@
   <!-- Top Bar -->
   <header>
     <div class="header-left">
-      <button id="btn-toggle-sidebar" class="sb-toggle" onclick="toggleSidebar()" title="Ascunde / arată meniul lateral"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18"/></svg><span>Meniu</span></button>
+      <button id="btn-toggle-sidebar" class="sb-toggle" onclick="toggleSidebar()" title="Ascunde / arată meniul lateral" data-i18n-title="btn_menu_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18"/></svg><span data-i18n="btn_menu">Meniu</span></button>
       <div class="brand-title">
-        <span>Față în față · Pas la dreapta în contrasens</span>
+        <span id="hdr-brand-title" data-i18n="hdr_brand_title">Față în față · Pas la dreapta în contrasens</span>
       </div>
 
       <!-- Quick Camera Switcher -->
       <div class="cam-selector">
         <button id="cam-macro" class="btn-cam" onclick="setCamMode('macro')">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> Macro
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> <span data-i18n="cam_macro">Macro</span>
         </button>
         <button id="cam-close" class="btn-cam" onclick="setCamMode('close')">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg> Culoar
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg> <span data-i18n="cam_lane">Culoar</span>
         </button>
         <button id="cam-congestion" class="btn-cam" onclick="setCamMode('congestion')" style="color:#f87171; border-color:#ef4444;">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> Viraj roșu
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> <span data-i18n="cam_congestion">Viraj roșu</span>
         </button>
         <button id="cam-follow" class="btn-cam" onclick="setCamMode('follow')">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> Lider
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span data-i18n="cam_leader">Lider</span>
         </button>
         <button id="cam-full" class="btn-cam active" onclick="setCamMode('full')">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg> Toată sala
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg> <span data-i18n="cam_full">Toată sala</span>
         </button>
       </div>
     </div>
 
-    <!-- Circuit Progress Pill -->
+    <!-- Circuit Progress Pill & Actions -->
     <div class="header-right">
-    <div class="circuit-pill">
-      <span>Pasul <b id="hdr-step-num">1 / 400</b></span>
-      <span class="sep"></span>
-      <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> <b id="hdr-countdown">10.0s</b></span>
-      <span class="sep pill-extra"></span>
-      <span class="pill-extra">Tur <b id="hdr-total-time">66m 40s</b></span>
-      <span class="sep pill-extra"></span>
-      <span class="pill-extra"><b id="hdr-progress">0%</b></span>
-    </div>
-    <button class="hdr-sim" id="hdr-fast" onclick="toggleFastSim()" title="Simulare rapidă: tot turul în câteva secunde"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span class="lbl">Simulare rapidă</span></button>
-    <button class="hdr-sim" onclick="toggleFastSimVideo()" title="Simulare rapidă înregistrată ca video (se descarcă .webm)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span class="lbl">Video</span></button>
-    <button class="hdr-sim" onclick="openGifModal()" title="Exportă animație GIF (10-15s, se descarcă .gif)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span class="lbl">GIF (10-15s)</span></button>
-    <button class="hdr-sim" style="border-color:#38bdf8; background:rgba(2,132,199,0.3); color:#fff;" onclick="openConfigModal()" title="Salvare & Încărcare configurații sală"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span class="lbl">Configurații</span></button>
-    <button class="hdr-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Export PDF</button>
+      <div class="circuit-pill">
+        <span><span id="hdr-step-prefix" data-i18n="hdr_step_lbl">Pasul</span> <b id="hdr-step-num">1 / 400</b></span>
+        <span class="sep"></span>
+        <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> <b id="hdr-countdown">10.0s</b></span>
+        <span class="sep pill-extra"></span>
+        <span class="pill-extra"><span id="hdr-tur-prefix" data-i18n="hdr_round_lbl">Tur</span> <b id="hdr-total-time">66m 40s</b></span>
+        <span class="sep pill-extra"></span>
+        <span class="pill-extra"><b id="hdr-progress">0%</b></span>
+      </div>
+      <button class="hdr-sim" id="hdr-fast" onclick="toggleFastSim()" title="Simulare rapidă: tot turul în câteva secunde" data-i18n-title="hdr_fast_sim_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span class="lbl" data-i18n="hdr_fast_sim">Simulare rapidă</span></button>
+      <button class="hdr-sim" onclick="toggleFastSimVideo()" title="Simulare rapidă înregistrată ca video (se descarcă .webm)" data-i18n-title="hdr_video_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span class="lbl" data-i18n="hdr_video">Video</span></button>
+      <button class="hdr-sim" onclick="openGifModal()" title="Exportă animație GIF (10-15s, se descarcă .gif)" data-i18n-title="hdr_gif_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span class="lbl" data-i18n="hdr_gif">GIF (10-15s)</span></button>
+      <button class="hdr-sim" style="border-color:#38bdf8; background:rgba(2,132,199,0.3); color:#fff;" onclick="openConfigModal()" title="Salvare & Încărcare configurații sală" data-i18n-title="hdr_configs_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span class="lbl" data-i18n="hdr_configs">Configurații</span></button>
+      <button class="hdr-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF" data-i18n-title="hdr_pdf_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> <span data-i18n="hdr_pdf">Export PDF</span></button>
+
+      <!-- Comutator rotunjit Limbă (RO / EN) în header -->
+      <div class="lang-switch-box" id="hdr-lang-box" title="Schimbă limba / Switch language (RO / EN)">
+        <span class="lang-code active" id="lbl-lang-ro" onclick="setLanguage('ro')">RO</span>
+        <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
+          <input type="checkbox" id="chk-lang" onchange="toggleLanguage(this.checked)">
+          <span class="ui-switch-slider"></span>
+        </label>
+        <span class="lang-code" id="lbl-lang-en" onclick="setLanguage('en')">EN</span>
+      </div>
     </div>
   </header>
 
   <!-- Mobile Tab Switcher: Plan vs Settings -->
   <div class="mobile-nav-bar">
-    <button id="mob-tab-plan" class="mob-nav-btn active" onclick="setMobileView('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg> Plan Sală & Animație</button>
-    <button id="mob-tab-ctrl" class="mob-nav-btn" onclick="setMobileView('ctrl')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg> Setări & Calcule (800)</button>
-    <button class="mob-nav-btn mob-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> PDF</button>
+    <button id="mob-tab-plan" class="mob-nav-btn active" onclick="setMobileView('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg> <span data-i18n="mob_plan_long">Plan Sală & Animație</span></button>
+    <button id="mob-tab-ctrl" class="mob-nav-btn" onclick="setMobileView('ctrl')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg> <span data-i18n="mob_ctrl_long">Setări & Calcule</span></button>
+    <button class="mob-nav-btn mob-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF" data-i18n-title="hdr_pdf_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> <span>PDF</span></button>
   </div>
 
   <!-- Main View -->
@@ -1317,20 +1463,33 @@
     
     <!-- Sidebar -->
     <div class="sidebar">
+
+      <!-- Mobile Language Bar in Sidebar -->
+      <div class="sidebar-mob-lang-bar">
+        <span style="font-size:12px; font-weight:700; color:#cbd5e1;">Limba / Language:</span>
+        <div class="lang-switch-box" title="Schimbă limba / Switch language (RO / EN)">
+          <span class="lang-code active" id="lbl-lang-ro-mob" onclick="setLanguage('ro')">RO</span>
+          <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
+            <input type="checkbox" id="chk-lang-mob" onchange="toggleLanguage(this.checked)">
+            <span class="ui-switch-slider"></span>
+          </label>
+          <span class="lang-code" id="lbl-lang-en-mob" onclick="setLanguage('en')">EN</span>
+        </div>
+      </div>
       
       <!-- Tab Navigation -->
       <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Pas</button>
-        <button class="tab-btn" onclick="switchTab('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg> Parametri</button>
-        <button class="tab-btn" onclick="switchTab('tab-congestion')" style="color:#f87171; font-weight: 700;"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> Soluții</button>
-        <button class="tab-btn" onclick="switchTab('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg> Calcul</button>
-        <button class="tab-btn" onclick="switchTab('tab-configs')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvare</button>
+        <button class="tab-btn active" onclick="switchTab('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> <span data-i18n="tab_circuit">Pas</span></button>
+        <button class="tab-btn" onclick="switchTab('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg> <span data-i18n="tab_params">Parametri</span></button>
+        <button class="tab-btn" onclick="switchTab('tab-congestion')" style="color:#f87171; font-weight: 700;"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> <span data-i18n="tab_solutions">Soluții</span></button>
+        <button class="tab-btn" onclick="switchTab('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg> <span data-i18n="tab_calc">Calcul</span></button>
+        <button class="tab-btn" onclick="switchTab('tab-configs')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span data-i18n="tab_configs">Salvare</span></button>
       </div>
 
       <!-- TAB 1: CIRCUIT CONTRASENS -->
       <div id="tab-circuit" class="tab-content active">
         
-        <div class="exercise-banner">
+        <div class="exercise-banner" id="ex-banner-circuit" data-i18n-html="ex_banner_full">
           <b> REGULA EXACTĂ DE MIȘCARE:</b><br>
           • Oamenii stau <b>față în față</b> peste culoar și <b>umăr la umăr</b> pe fiecare linie.<br>
           • <b>Când omul din stânga face un pas spre dreapta lui</b>, omul din fața lui face și el <b>un pas spre dreapta lui</b>.<br>
@@ -1340,46 +1499,46 @@
 
         <!-- Comenzi pas -->
         <div class="ctl-grid">
-          <button class="ctl" onclick="triggerContrasensStepBack()" title="Revino la partenerul precedent"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Înapoi</button>
-          <button class="ctl ctl-primary" onclick="triggerContrasensStep()">Pas la dreapta <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-          <button id="btn-flow-play" class="ctl" onclick="toggleFlowPlay()"><span id="play-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></span> Pauză</button>
-          <button class="ctl" onclick="resetCircuit()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reset</button>
+          <button class="ctl" onclick="triggerContrasensStepBack()" title="Revino la partenerul precedent" data-i18n-title="btn_back_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> <span data-i18n="btn_back">Înapoi</span></button>
+          <button class="ctl ctl-primary" onclick="triggerContrasensStep()"><span data-i18n="btn_step_right">Pas la dreapta</span> <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button id="btn-flow-play" class="ctl" onclick="toggleFlowPlay()"><span id="play-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></span> <span id="play-lbl" data-i18n="btn_pause">Pauză</span></button>
+          <button class="ctl" onclick="resetCircuit()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> <span data-i18n="btn_reset">Reset</span></button>
         </div>
 
         <!-- Simulare rapida: tot turul in cateva secunde -->
         <div class="fast-box">
-          <button id="btn-fastsim" class="ctl ctl-wide" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span id="fastsim-label">Simulare rapidă</span></button>
-          <button class="ctl ctl-wide" style="margin-top:8px;" onclick="toggleFastSimVideo()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span>Înregistrează Video (.webm)</span></button>
-          <button class="ctl ctl-wide" style="margin-top:8px; background:#1e293b; border-color:#0284c7; color:#38bdf8;" onclick="openGifModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span>Exportă Animație GIF</span></button>
+          <button id="btn-fastsim" class="ctl ctl-wide" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span id="fastsim-label" data-i18n="hdr_fast_sim">Simulare rapidă</span></button>
+          <button class="ctl ctl-wide" style="margin-top:8px;" onclick="toggleFastSimVideo()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span data-i18n="btn_record_video">Înregistrează Video (.webm)</span></button>
+          <button class="ctl ctl-wide" style="margin-top:8px; background:#1e293b; border-color:#0284c7; color:#38bdf8;" onclick="openGifModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span data-i18n="btn_export_gif">Exportă Animație GIF</span></button>
           <div class="param-header" style="margin-top:10px;">
-            <span class="param-name">Durata simulării rapide</span>
+            <span class="param-name" data-i18n="lbl_fast_dur">Durata simulării rapide</span>
             <span class="param-val" id="disp-fastdur">8 s</span>
           </div>
           <input type="range" class="param-slider" id="rng-fastdur" min="3" max="60" step="1" value="8" oninput="updateFastDur(this.value)">
-          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;">Rulează tot turul într-un timp scurt; după ce tot grupul a terminat turul, asistenții intră pe culoare și dau steluța tuturor.</div>
+          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;" data-i18n="fast_sim_desc">Rulează tot turul într-un timp scurt; după ce tot grupul a terminat turul, asistenții intră pe culoare și dau steluța tuturor.</div>
         </div>
 
         <!-- Progress Box -->
         <div class="progress-box">
           <div class="section-title">
-            <span>Tur complet în contrasens</span>
-            <span id="circuit-status" style="color:var(--accent-green);">Rulează</span>
+            <span data-i18n="prog_title">Tur complet în contrasens</span>
+            <span id="circuit-status" style="color:var(--accent-green);" data-i18n="status_running">Rulează</span>
           </div>
 
           <div class="progress-bar-bg">
             <div id="circuit-progress-fill" class="progress-bar-fill"></div>
           </div>
 
-          <div class="prog-meta"><span class="chip"><span class="dot dot-blue"></span>Șir stâng</span><span id="lbl-lap-count">Circuitul #1</span><span class="chip"><span class="dot dot-pink"></span>Șir drept</span></div>
+          <div class="prog-meta"><span class="chip"><span class="dot dot-blue"></span><span data-i18n="prog_left_row">Șir stâng</span></span><span id="lbl-lap-count">Circuitul #1</span><span class="chip"><span class="dot dot-pink"></span><span data-i18n="prog_right_row">Șir drept</span></span></div>
 
           <div class="param-header" style="margin-top:14px;">
-            <span class="param-name"> Timp față în față (înainte de pas):</span>
+            <span class="param-name" data-i18n="param_face_time"> Timp față în față (înainte de pas):</span>
             <span class="param-val" id="disp-interval">10.0 sec / pas</span>
           </div>
           <input type="range" class="param-slider" id="rng-interval" min="2" max="60" step="1" value="10" oninput="updateInterval(this.value)">
           <div class="param-sub">
             <span>2s</span>
-            <span style="color:var(--accent-green); font-weight:700;">10s (recomandat atelier)</span>
+            <span style="color:var(--accent-green); font-weight:700;" data-i18n="param_workshop_rec">10s (recomandat atelier)</span>
             <span>60s</span>
           </div>
 
@@ -1393,22 +1552,22 @@
           </div>
 
           <div class="param-header" style="margin-top:14px;">
-            <span class="param-name">Viteza mișcării (durata pasului)</span>
+            <span class="param-name" data-i18n="param_glide_time">Viteza mișcării (durata pasului)</span>
             <span class="param-val" id="disp-glide">0.30 s</span>
           </div>
           <input type="range" class="param-slider" id="rng-glide" min="0.1" max="2" step="0.05" value="0.3" oninput="updateGlide(this.value)">
-          <div class="param-sub"><span>Rapid 0.1 s</span><span>cât ține mișcarea, nu pauza</span><span>Lent 2 s</span></div>
+          <div class="param-sub"><span data-i18n="param_glide_sub_1">Rapid 0.1 s</span><span data-i18n="param_glide_sub_2">cât ține mișcarea, nu pauza</span><span data-i18n="param_glide_sub_3">Lent 2 s</span></div>
 
           <!-- Live Countdown Box -->
           <div style="margin-top:12px; background:#0f172a; border-radius:8px; padding:10px; border:1px solid #334155;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11.5px; font-weight:700; color:#38bdf8;"> Numărătoare pas:</span>
+              <span style="font-size:11.5px; font-weight:700; color:#38bdf8;" data-i18n="countdown_title"> Numărătoare pas:</span>
               <span id="disp-countdown" style="font-size:14px; font-weight: 700; color:var(--accent-green); font-variant-numeric: tabular-nums;">10.0s</span>
             </div>
             <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden; margin-top:6px; border:1px solid #334155;">
               <div id="countdown-bar-fill" style="height:100%; width:100%; background:linear-gradient(90deg, #38bdf8, #22c55e); transition:width 0.1s linear;"></div>
             </div>
-            <div style="font-size:10px; color:#94a3b8; margin-top:4px; text-align:center;">
+            <div style="font-size:10px; color:#94a3b8; margin-top:4px; text-align:center;" data-i18n="countdown_sub">
               Participanții stau nemișcați față în față, apoi pășesc lateral la dreapta
             </div>
           </div>
@@ -1417,8 +1576,8 @@
         <!-- Total Duration Workshop Summary Box (800 Persoane) -->
         <div class="time-summary-card">
           <div class="time-summary-header">
-            <span> Timp total ca să treacă toți</span>
-            <span style="background:rgba(34, 197, 94, 0.2); border:1px solid #22c55e; color:#86efac; font-size:10px; padding:2px 6px; border-radius:4px; font-weight: 700;">800 OAMENI</span>
+            <span data-i18n="summary_title"> Timp total ca să treacă toți</span>
+            <span id="summary-badge-part" style="background:rgba(34, 197, 94, 0.2); border:1px solid #22c55e; color:#86efac; font-size:10px; padding:2px 6px; border-radius:4px; font-weight: 700;">800 OAMENI</span>
           </div>
 
           <div class="time-summary-val" id="disp-total-duration">
@@ -1426,56 +1585,56 @@
           </div>
 
           <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px;">
-            <span style="color:#94a3b8;"> Timp rămas:</span>
+            <span style="color:#94a3b8;" data-i18n="summary_time_rem"> Timp rămas:</span>
             <b id="disp-time-remaining" style="color:var(--accent-green); font-variant-numeric: tabular-nums;">66m 40s (400 pași)</b>
           </div>
 
-          <div class="time-summary-details">
-            • <b>400 întâlniri față în față</b> (fiecare din cei 800 interacționează cu toți cei 400 de parteneri)<br>
+          <div class="time-summary-details" id="summary-details-box">
+            • <b>400 întâlniri față în față</b> (fiecare interacționează cu toți partenerii)<br>
             • La <b><span id="disp-calc-sec">10.0</span> secunde</b> pauză de privire la fiecare pas<br>
             • <b>În Varianta Verde (Soluția 1):</b> virajul îngustat la 0.70m asigură rotație fluidă, <b>fără niciun blocaj sau întârziere</b>!
           </div>
 
           <!-- Preset Comparison Table -->
-          <div style="font-size:10.5px; font-weight:700; color:#38bdf8; margin-bottom:4px; ">
+          <div style="font-size:10.5px; font-weight:700; color:#38bdf8; margin-bottom:4px;" data-i18n="summary_quick_calc">
             Calcul rapid la diverse durate de pas:
           </div>
           <div class="time-presets-table">
-            <div class="t-row"><span>La 3 sec/pas:</span><b>20 min</b></div>
-            <div class="t-row"><span>La 5 sec/pas:</span><b>33 min 20s</b></div>
-            <div class="t-row highlight"><span>La 10 sec/pas (recomandat):</span><b>1h 06min 40s</b></div>
-            <div class="t-row"><span>La 15 sec/pas:</span><b>1h 40min</b></div>
-            <div class="t-row"><span>La 20 sec/pas:</span><b>2h 13min</b></div>
-            <div class="t-row"><span>La 30 sec/pas:</span><b>3h 20min</b></div>
+            <div class="t-row"><span id="lbl-trow-3s">La 3 sec/pas:</span><b>20 min</b></div>
+            <div class="t-row"><span id="lbl-trow-5s">La 5 sec/pas:</span><b>33 min 20s</b></div>
+            <div class="t-row highlight"><span id="lbl-trow-10s">La 10 sec/pas (recomandat):</span><b>1h 06min 40s</b></div>
+            <div class="t-row"><span id="lbl-trow-15s">La 15 sec/pas:</span><b>1h 40min</b></div>
+            <div class="t-row"><span id="lbl-trow-20s">La 20 sec/pas:</span><b>2h 13min</b></div>
+            <div class="t-row"><span id="lbl-trow-30s">La 30 sec/pas:</span><b>3h 20min</b></div>
           </div>
         </div>
 
         <!-- Visual Toggles -->
-        <div class="section-title">Afișare Detalii Vizuale:</div>
+        <div class="section-title" data-i18n="vis_title">Afișare Detalii Vizuale:</div>
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-gaze" onchange="redraw()">
-            <span style="color:#38bdf8;"> Linie privire / conectare între partenerii față în față</span>
+            <span style="color:#38bdf8;" data-i18n="vis_gaze"> Linie privire / conectare între partenerii față în față</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-dir-arrows" onchange="redraw()">
-            <span style="color:#22c55e;"> Săgeți de direcție: arată pasul la dreapta pentru fiecare șir</span>
+            <span style="color:#22c55e;" data-i18n="vis_dir"> Săgeți de direcție: arată pasul la dreapta pentru fiecare șir</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-lead-marker" checked onchange="redraw()">
-            <span style="color:#f59e0b;"> Urmărește Participantul #1 (Linia Stângă) și #1 (Linia Dreaptă)</span>
+            <span style="color:#f59e0b;" data-i18n="vis_lead"> Urmărește Participantul #1 (Linia Stângă) și #1 (Linia Dreaptă)</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-assistants" checked onchange="redraw()">
-            <span style="color:#f97316;"><span class="dot dot-orange"></span>40 Asistenți pe Buline (A1-A40)</span>
+            <span style="color:#f97316;" id="vis-assist-label"><span class="dot dot-orange"></span><span data-i18n="vis_assist">40 Asistenți pe Buline (A1-A40)</span></span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-reach" onchange="redraw()">
-            <span style="color:#facc15;">Marchează cu punct roșu participanții la care asistenții nu ajung</span>
+            <span style="color:#facc15;" data-i18n="vis_reach">Marchează cu punct roșu participanții la care asistenții nu ajung</span>
           </label>
           <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
             <label for="chk-enable-stars-circuit" style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:#facc15; font-weight:600; margin:0;">
-              <span>⭐</span> Opțiune Exercițiu Steluțe
+              <span>⭐</span> <span data-i18n="vis_stars">Opțiune Exercițiu Steluțe</span>
             </label>
             <label class="ui-switch" title="Comută activarea exercițiului cu steluțe">
               <input type="checkbox" id="chk-enable-stars-circuit" checked onchange="toggleStarsFeature(this.checked)">
@@ -1484,7 +1643,7 @@
           </div>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-wall-dims" checked onchange="redraw()">
-            <span style="color:#38bdf8;"> Cote & Distanțe față de Pereți (Sus, Jos, Laterale)</span>
+            <span style="color:#38bdf8;" data-i18n="vis_walls"> Cote & Distanțe față de Pereți (Sus, Jos, Laterale)</span>
           </label>
         </div>
 
@@ -1494,37 +1653,37 @@
       <div id="tab-params" class="tab-content">
         <!-- CONFIGURAȚII CU NUME (Salvare / Încărcare) -->
         <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>Configurații Sală</span>
-          <span style="font-size:11px; font-weight:normal; color:#94a3b8;">Salvare & Încărcare</span>
+          <span data-i18n="sec_hall_configs">Configurații Sală</span>
+          <span style="font-size:11px; font-weight:normal; color:#94a3b8;" data-i18n="sec_save_load">Salvare & Încărcare</span>
         </div>
         <div class="param-box" style="display:flex; flex-direction:column; gap:10px;">
           <!-- Salveaza configuratia curenta -->
           <div class="ui-row">
-            <input type="text" id="inp-conf-name" class="ui-input" placeholder="Nume configurație nouă...">
+            <input type="text" id="inp-conf-name" class="ui-input" placeholder="Nume configurație nouă..." data-i18n-placeholder="ph_new_conf_name">
             <button class="ui-btn ui-btn-primary" onclick="saveNamedConfig()" title="Salvează setările curente cu acest nume">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Salvează
+              <span data-i18n="btn_save">Salvează</span>
             </button>
           </div>
 
           <!-- Incarca / Sterge configuratie salvata -->
           <div class="ui-row">
             <select id="sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
-              <option value="">-- Alege configurație salvată --</option>
+              <option value="" data-i18n="opt_choose_saved_conf">-- Alege configurație salvată --</option>
             </select>
             <button id="btn-load-conf" class="ui-btn ui-btn-primary" onclick="loadSelectedNamedConfig()" title="Încarcă configurația selectată">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Încarcă
+              <span data-i18n="btn_load">Încarcă</span>
             </button>
             <button id="btn-del-conf" class="ui-btn ui-btn-danger" onclick="deleteSelectedNamedConfig()" title="Șterge configurația selectată">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              Șterge
+              <span data-i18n="btn_delete">Șterge</span>
             </button>
           </div>
 
           <div id="conf-status-note" style="font-size:12px; color:#38bdf8; min-height:14px;"></div>
 
-          <div style="font-size:11px; color:#94a3b8; margin-top:2px;">Preset-uri rapide predefinite:</div>
+          <div style="font-size:11px; color:#94a3b8; margin-top:2px;" data-i18n="lbl_quick_presets">Preset-uri rapide predefinite:</div>
           <div class="ui-preset-grid">
             <button class="ui-preset-btn" onclick="applyQuickConfig('std800')">800p · Standard (0.70m)</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('transit800')">800p · Culoar Tranzit</button>
@@ -1534,28 +1693,28 @@
           </div>
         </div>
 
-        <div class="section-title">Dimensiunile sălii</div>
+        <div class="section-title" data-i18n="sec_room_dims">Dimensiunile sălii</div>
         <div class="param-box">
           <div class="room-grid">
-            <label>Lățime (m)<input type="number" class="num-in" id="inp-room-w" min="6" max="80" step="0.1" value="21.6" oninput="onRoomChange()"></label>
-            <label>Lungime (m)<input type="number" class="num-in" id="inp-room-l" min="6" max="80" step="0.1" value="35.3" oninput="onRoomChange()"></label>
+            <label><span data-i18n="lbl_room_w">Lățime (m)</span><input type="number" class="num-in" id="inp-room-w" min="6" max="80" step="0.1" value="21.6" oninput="onRoomChange()"></label>
+            <label><span data-i18n="lbl_room_l">Lungime (m)</span><input type="number" class="num-in" id="inp-room-l" min="6" max="80" step="0.1" value="35.3" oninput="onRoomChange()"></label>
           </div>
           <div class="param-sub" style="margin-top:8px;">
             <span id="room-area-note">Suprafață 762,5 m²</span>
-            <button class="preset-btn" style="flex:0 0 auto; padding:6px 12px;" onclick="resetRoomDims()">Dimensiuni originale</button>
+            <button class="preset-btn" style="flex:0 0 auto; padding:6px 12px;" onclick="resetRoomDims()" data-i18n="btn_orig_dims">Dimensiuni originale</button>
           </div>
         </div>
 
-        <div class="section-title">Vedere</div>
+        <div class="section-title" data-i18n="sec_view">Vedere</div>
         <div class="param-box">
           <div class="param-header">
-            <span class="param-name">Rotire sală</span>
+            <span class="param-name" data-i18n="lbl_rot">Rotire sală</span>
             <span class="param-val" id="disp-rot">0°</span>
           </div>
           <input type="range" class="param-slider" id="rng-rot" min="0" max="359" step="1" value="0" oninput="setViewRotation(this.value * Math.PI / 180)">
           <div class="param-sub">
             <span>0°</span>
-            <span>Shift + tragere = rotire liberă</span>
+            <span data-i18n="rot_drag_hint">Shift + tragere = rotire liberă</span>
             <span>359°</span>
           </div>
           <div style="display:flex; gap:6px; margin-top:8px;">
@@ -1567,16 +1726,16 @@
         </div>
 
         <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-4px 0 12px; font-size:11px; color:#94a3b8;">
-          <span>Setările se salvează automat și rămân după refresh.</span>
-          <button class="preset-btn" style="flex:0 0 auto; padding:7px 14px;" onclick="resetSavedState()">Setări implicite</button>
+          <span data-i18n="auto_save_note">Setările se salvează automat și rămân după refresh.</span>
+          <button class="preset-btn" style="flex:0 0 auto; padding:7px 14px;" onclick="resetSavedState()" data-i18n="btn_default_settings">Setări implicite</button>
         </div>
 
-        <div class="section-title">Ajustează Oameni și Bucle</div>
+        <div class="section-title" data-i18n="sec_adjust_people_loops">Ajustează Oameni și Bucle</div>
 
         <!-- Slider Participanți -->
         <div class="param-box">
           <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="param-name">👥 Total Participanți în sală:</span>
+            <span class="param-name" data-i18n="lbl_total_part">👥 Total Participanți în sală:</span>
             <div style="display:flex; align-items:center; gap:6px;">
               <input type="number" id="inp-part-num" min="0" max="1500" step="2" value="800" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPartNumInput(this.value)">
               <span class="param-val" id="disp-part" style="min-width:54px; text-align:right;">800 pers</span>
@@ -1602,20 +1761,20 @@
         <!-- Format Traseu & Bucle: Compact vs Toată sala -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
           <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="param-name">📐 Format Traseu & Bucle:</span>
+            <span class="param-name" data-i18n="lbl_format_route">📐 Format Traseu & Bucle:</span>
             <span class="param-val" id="disp-compact-status" style="color:#22c55e; font-weight:700;">Auto-compact</span>
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; margin-bottom:6px;">
+          <div style="font-size:11.5px; color:#cbd5e1; margin-bottom:6px;" data-i18n="desc_compact">
             Ocupă doar spațiul necesar oamenilor (bucle egale, fără goluri uriașe în sală):
           </div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-            <button id="btn-mode-compact" class="ui-preset-btn active" style="padding:6px 4px; font-size:11px;" onclick="setCompactMode(true)">Auto-compact (după oameni)</button>
-            <button id="btn-mode-fullhall" class="ui-preset-btn" style="padding:6px 4px; font-size:11px;" onclick="setCompactMode(false)">Toată lungimea sălii</button>
+            <button id="btn-mode-compact" class="ui-preset-btn active" style="padding:6px 4px; font-size:11px;" onclick="setCompactMode(true)" data-i18n="btn_mode_compact">Auto-compact (după oameni)</button>
+            <button id="btn-mode-fullhall" class="ui-preset-btn" style="padding:6px 4px; font-size:11px;" onclick="setCompactMode(false)" data-i18n="btn_mode_fullhall">Toată lungimea sălii</button>
           </div>
           <div style="margin-top:8px;">
             <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
               <input type="checkbox" id="chk-equal-loops" checked onchange="toggleEqualLoops(this.checked)">
-              <span style="color:#86efac; font-weight:600;"> Bucle 100% egale (simetric, fără bucle uriașe)</span>
+              <span style="color:#86efac; font-weight:600;" data-i18n="chk_equal_loops_lbl"> Bucle 100% egale (simetric, fără bucle uriașe)</span>
             </label>
           </div>
         </div>
@@ -1623,7 +1782,7 @@
         <!-- Control Participanți pe Rând (Șir) -->
         <div class="param-box" style="border-left:3px solid #38bdf8;">
           <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="param-name">👤 Participanți pe un rând (șir):</span>
+            <span class="param-name" data-i18n="lbl_part_per_row">👤 Participanți pe un rând (șir):</span>
             <div style="display:flex; align-items:center; gap:6px;">
               <input type="number" id="inp-part-per-row" min="0" max="80" step="1" value="44" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPerRowChange(this.value)">
               <span class="param-val" id="disp-part-per-row" style="min-width:65px; text-align:right;">44 pers/șir</span>
@@ -1650,7 +1809,7 @@
         <!-- Slider Asistenți -->
         <div class="param-box">
           <div class="param-header">
-            <span class="param-name"><span class="dot dot-orange"></span>Asistenți pe Culoare (Buline):</span>
+            <span class="param-name"><span class="dot dot-orange"></span><span data-i18n="lbl_assist_lanes">Asistenți pe Culoare (Buline):</span></span>
             <span class="param-val" id="disp-assist">40 asistenți</span>
           </div>
           <input type="range" class="param-slider" id="rng-assist" min="0" max="80" step="2" value="40" oninput="onParamChange()">
@@ -1668,10 +1827,10 @@
               <span style="font-size:18px; line-height:1;">⭐</span>
               <div>
                 <div style="font-weight:700; color:#f8fafc; font-size:13px; display:flex; align-items:center; gap:6px;">
-                  <span>Opțiune Steluțe</span>
+                  <span data-i18n="opt_stars_box_title">Opțiune Steluțe</span>
                   <span id="disp-stars-badge" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:12px; background:rgba(234,179,8,0.2); color:#facc15; border:1px solid rgba(250,204,21,0.3);">ACTIV</span>
                 </div>
-                <div style="font-size:11px; color:#94a3b8;">Distribuire steluțe de către asistenți</div>
+                <div style="font-size:11px; color:#94a3b8;" data-i18n="opt_stars_box_sub">Distribuire steluțe de către asistenți</div>
               </div>
             </div>
             <label class="ui-switch" title="Activează / Dezactivează exercițiul cu steluțe">
@@ -1682,12 +1841,12 @@
 
           <div id="stars-controls-wrapper">
             <div class="param-header">
-              <span class="param-name">Steluțe: timp pe participant</span>
+              <span class="param-name" data-i18n="lbl_star_sec">Steluțe: timp pe participant</span>
               <span class="param-val" id="disp-starsec">5 s</span>
             </div>
             <input type="range" class="param-slider" id="rng-starsec" min="2" max="20" step="1" value="5" oninput="onStarChange()">
             <div class="param-header" style="margin-top:12px;">
-              <span class="param-name">Steluțe: timp maxim de distribuire</span>
+              <span class="param-name" data-i18n="lbl_distrib_min">Steluțe: timp maxim de distribuire</span>
               <span class="param-val" id="disp-distrib">10 min</span>
             </div>
             <input type="range" class="param-slider" id="rng-distrib" min="2" max="90" step="1" value="10" oninput="onStarChange()">
@@ -1695,15 +1854,15 @@
           </div>
           <div id="stars-disabled-notice" style="display:none; font-size:12px; color:#94a3b8; background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; padding:12px; text-align:center; line-height:1.45;">
             <div style="font-size:18px; margin-bottom:4px; opacity:0.7;">⭐</div>
-            <b style="color:#cbd5e1;">Exercițiul cu steluțe este dezactivat</b><br>
-            <span style="font-size:11px; color:#64748b;">Comutați toggle-ul de mai sus pentru a activa calculul asistenților și distribuirea steluțelor.</span>
+            <b style="color:#cbd5e1;" data-i18n="stars_disabled_h">Exercițiul cu steluțe este dezactivat</b><br>
+            <span style="font-size:11px; color:#64748b;" data-i18n="stars_disabled_sub">Comutați toggle-ul de mai sus pentru a activa calculul asistenților și distribuirea steluțelor.</span>
           </div>
         </div>
 
         <!-- Slider Bucle / Culoare -->
         <div class="param-box">
           <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="param-name">📐 Număr Culoare (Lanes / Bucle):</span>
+            <span class="param-name" data-i18n="lbl_lanes_count">📐 Număr Culoare (Lanes / Bucle):</span>
             <span class="param-val" id="disp-lanes">9 Culoare (8 Bucle U)</span>
           </div>
           <input type="range" class="param-slider" id="rng-lanes" min="1" max="14" step="1" value="9" oninput="onParamChange()">
@@ -1727,21 +1886,21 @@
         <!-- Slider Distanță Față în Față -->
         <div class="param-box">
           <div class="param-header">
-            <span class="param-name"> Distanță Față în Față (Culoar):</span>
+            <span class="param-name" data-i18n="lbl_face_dist"> Distanță Față în Față (Culoar):</span>
             <span class="param-val" id="disp-dist-face">1.20 m</span>
           </div>
           <input type="range" class="param-slider" id="rng-corridor-w" min="0.8" max="2.2" step="0.1" value="1.2" oninput="onParamChange()">
           <div class="param-sub">
-            <span>0.80 m (aproape)</span>
-            <span>1.20 m (recomandat)</span>
-            <span>2.20 m (depărtat)</span>
+            <span data-i18n="lbl_face_dist_close">0.80 m (aproape)</span>
+            <span data-i18n="lbl_face_dist_rec">1.20 m (recomandat)</span>
+            <span data-i18n="lbl_face_dist_far">2.20 m (depărtat)</span>
           </div>
         </div>
 
         <!-- Distanță spate în spate: șiruri albastre (fără asistenți) -->
         <div class="param-box" style="border-left:3px solid #38bdf8;">
           <div class="param-header">
-            <span class="param-name">Spate în spate, șirurile albastre (fără asistenți)</span>
+            <span class="param-name" data-i18n="lbl_back_blue">Spate în spate, șirurile albastre (fără asistenți)</span>
             <span class="param-val" id="disp-backgap">1.10 m</span>
           </div>
           <input type="range" class="param-slider" id="rng-backgap" min="0.1" max="2.0" step="0.05" value="1.1" oninput="onBackGapChange(this.value)">
@@ -1763,7 +1922,7 @@
         <!-- Zona asistenților: șiruri roz -->
         <div class="param-box" style="border-left:3px solid #fb923c;">
           <div class="param-header">
-            <span class="param-name">Spate în spate, șirurile roz (zona asistenților)</span>
+            <span class="param-name" data-i18n="lbl_back_pink">Spate în spate, șirurile roz (zona asistenților)</span>
             <span class="param-val" id="disp-assistgap">1.10 m</span>
           </div>
           <input type="range" class="param-slider" id="rng-assistgap" min="0.5" max="2.0" step="0.05" value="1.1" oninput="onAssistGapChange(this.value)">
@@ -1775,18 +1934,18 @@
         </div>
 
         <!-- SECȚIUNE NOUĂ: DISTANȚE FAȚĂ DE PEREȚI -->
-        <div class="section-title" style="color:#38bdf8; margin-top:14px;"> Distanțe față de Pereții Sălii</div>
+        <div class="section-title" style="color:#38bdf8; margin-top:14px;" data-i18n="sec_wall_dist"> Distanțe față de Pereții Sălii</div>
 
         <!-- Slider Distanță Pereți Capăt (Sus / Jos) -->
         <div class="param-box" style="border-left:3px solid #38bdf8;">
           <div class="param-header">
-            <span class="param-name"> Distanță Pereți Capăt (Sus / Jos):</span>
+            <span class="param-name" data-i18n="lbl_wall_end"> Distanță Pereți Capăt (Sus / Jos):</span>
             <span class="param-val" id="disp-wall-end" style="color:#38bdf8; font-weight: 700;">1.20 m</span>
           </div>
           <input type="range" class="param-slider" id="rng-wall-end" min="0.5" max="4.5" step="0.1" value="1.2" oninput="onParamChange()">
           <div class="param-sub">
             <span>0.5 m (minim)</span>
-            <span id="disp-wall-end-sub" style="color:#38bdf8; font-weight:700;">Spațiu liber între viraj și perete</span>
+            <span id="disp-wall-end-sub" style="color:#38bdf8; font-weight:700;" data-i18n="desc_wall_end">Spațiu liber între viraj și perete</span>
             <span>4.5 m (foarte larg)</span>
           </div>
           <div style="display:flex; gap:6px; margin-top:8px;">
@@ -1800,13 +1959,13 @@
         <!-- Slider Distanță Pereți Laterali (Stânga / Dreapta) -->
         <div class="param-box" style="border-left:3px solid #a855f7;">
           <div class="param-header">
-            <span class="param-name"> Distanță Pereți Laterali (Stânga / Dreapta):</span>
+            <span class="param-name" data-i18n="lbl_wall_side"> Distanță Pereți Laterali (Stânga / Dreapta):</span>
             <span class="param-val" id="disp-wall-side" style="color:#a855f7; font-weight: 700;">1.00 m</span>
           </div>
           <input type="range" class="param-slider" id="rng-wall-side" min="0.5" max="3.5" step="0.1" value="1.0" oninput="backGapAuto = true; onParamChange()">
           <div class="param-sub">
             <span>0.5 m (minim)</span>
-            <span id="disp-wall-side-sub" style="color:#a855f7; font-weight:700;">Spațiu liber la pereții laterali</span>
+            <span id="disp-wall-side-sub" style="color:#a855f7; font-weight:700;" data-i18n="desc_wall_side">Spațiu liber la pereții laterali</span>
             <span>3.5 m (larg)</span>
           </div>
           <div style="display:flex; gap:6px; margin-top:8px;">
@@ -1821,45 +1980,45 @@
 
       <!-- TAB 3: CALCUL MATEMATIC -->
       <div id="tab-calc" class="tab-content">
-        <div class="section-title">Calcul Matematic Exact</div>
+        <div class="section-title" data-i18n="sec_calc_title">Calcul Matematic Exact</div>
         <div style="background:#1e293b; border-radius:8px; padding:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
-          <p><b>Suprafață Sală:</b> <span id="calc-room">35,3 m × 21,6 m = <b>762,48 m²</b></span>.</p>
-          <p style="margin-top:6px;"><b>Lungime Totală Traseu:</b> <span id="calc-len">264,1 m</span>.</p>
-          <p style="margin-top:6px;"><b>Culoare & Bucle:</b> <span id="calc-lanes-rows">9 culoare = 18 rânduri (8 bucle U)</span>.</p>
-          <p style="margin-top:6px;"><b>Participanți pe Rând:</b> <span id="calc-per-row">44 pers/șir &times; 18 rânduri = 800 pers</span>.</p>
-          <p style="margin-top:6px;"><b>Număr Perechi Față în Față:</b> <span id="calc-pairs">400 perechi</span>.</p>
-          <p style="margin-top:6px;"><b>Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> per pas la dreapta.</p>
-          <p style="margin-top:6px;"><b>Distanță Viraje U față de Pereți (Sus/Jos):</b> <b style="color:#38bdf8;" id="calc-wall-end">1.20 m</b>.</p>
-          <p style="margin-top:6px;"><b>Distanță Culoare față de Pereți (Laterale):</b> <b style="color:#a855f7;" id="calc-wall-side">1.00 m</b>.</p>
-          <p style="margin-top:6px;"><b>Viteză Relativă:</b> Deoarece ambele șiruri fac un pas la dreapta în sensuri opuse, avansul relativ este de <b>2 poziții per pas</b>!</p>
-          <p style="margin-top:6px;"><b>Timp pentru un Circuit Complet:</b> <span id="calc-lap-time">400 pași la 1.8s = 12 minute</span>.</p>
+          <p><b data-i18n="calc_room_lbl">Suprafață Sală:</b> <span id="calc-room">35,3 m × 21,6 m = <b>762,48 m²</b></span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_len_lbl">Lungime Totală Traseu:</b> <span id="calc-len">264,1 m</span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_lanes_lbl">Culoare & Bucle:</b> <span id="calc-lanes-rows">9 culoare = 18 rânduri (8 bucle U)</span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_per_row_lbl">Participanți pe Rând:</b> <span id="calc-per-row">44 pers/șir &times; 18 rânduri = 800 pers</span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_pairs_lbl">Număr Perechi Față în Față:</b> <span id="calc-pairs">400 perechi</span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_step_lbl">Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> <span id="calc-step-dir">per pas la dreapta</span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_wall_end_lbl">Distanță Viraje U față de Pereți (Sus/Jos):</b> <b style="color:#38bdf8;" id="calc-wall-end">1.20 m</b>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_wall_side_lbl">Distanță Culoare față de Pereți (Laterale):</b> <b style="color:#a855f7;" id="calc-wall-side">1.00 m</b>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_rel_speed_lbl">Viteză Relativă:</b> <span id="calc-rel-speed-txt" data-i18n-html="calc_rel_speed_txt">Deoarece ambele șiruri fac un pas la dreapta în sensuri opuse, avansul relativ este de <b>2 poziții per pas</b>!</span></p>
+          <p style="margin-top:6px;"><b data-i18n="calc_total_time_lbl">Timp pentru un Circuit Complet:</b> <span id="calc-lap-time">400 pași la 1.8s = 12 minute</span>.</p>
         </div>
-        <div class="section-title" style="margin-top:14px;">Dimensiuni, calcule și sugestii (ca în PDF, pagina 2)</div>
+        <div class="section-title" style="margin-top:14px;" data-i18n="sec_report_title">Dimensiuni, calcule și sugestii (ca în PDF, pagina 2)</div>
         <div id="calc-report"></div>
       </div>
 
       <!-- TAB 4: 4 SOLUȚII PENTRU PĂSTRAREA A EXACT 800 PERSOANE -->
       <div id="tab-congestion" class="tab-content">
-        <div class="section-title" style="color:#38bdf8; font-size:12px;"> 4 Soluții Concrete pentru 800 Persoane (Fără Reducere)</div>
+        <div class="section-title" style="color:#38bdf8; font-size:12px;" data-i18n="sec_solutions_title"> 4 Soluții Concrete pentru 800 Persoane (Fără Reducere)</div>
         
         <!-- Diagnostic Box -->
-        <div style="background:rgba(15, 23, 42, 0.85); border:1px solid #334155; border-radius:8px; padding:12px; margin-bottom:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
-          <b style="color:#f87171; font-size:13px;">DE CE APARE PROBLEMA LA 800 OAMENI PE SCHEMA STANDARD:</b><br>
-          • <b>Pe linia dreaptă</b>: Există <b>73.4 cm</b> per persoană → foarte lejer (> 46 cm umeri).<br>
-          • <b>Pe interiorul celor 8 viraje U (la 1.20m lățime)</b>: Curbura strânsă comprimă rândul interior la <b style="color:#f87171; font-variant-numeric: tabular-nums;">35.1 cm</b> (< 46 cm umeri = suprapunere -10.9 cm).<br>
+        <div id="box-congestion-diag" style="background:rgba(15, 23, 42, 0.85); border:1px solid #334155; border-radius:8px; padding:12px; margin-bottom:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
+          <b style="color:#f87171; font-size:13px;" data-i18n="sol_why_title">DE CE APARE PROBLEMA LA 800 OAMENI PE SCHEMA STANDARD:</b><br>
+          • <b>Pe linia dreaptă</b>: Există <b>73.4 cm</b> per persoană → foarte lejer (&gt; 46 cm umeri).<br>
+          • <b>Pe interiorul celor 8 viraje U (la 1.20m lățime)</b>: Curbura strânsă comprimă rândul interior la <b style="color:#f87171; font-variant-numeric: tabular-nums;">35.1 cm</b> (&lt; 46 cm umeri = suprapunere -10.9 cm).<br>
           • <b style="color:#38bdf8;">Pentru a păstra toți cei 800 de oameni</b>, apasă pe oricare din cele 4 soluții de mai jos pentru a o vedea live în animație:
         </div>
 
         <!-- Soluția 1 -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
-          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_1_title">
             PROPUNEREA 1 [REAL]: Culoar Conic / 0.70m pe Viraj
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • Pe liniile drepte păstrezi <b>1.20 m</b> lățime pentru contactul vizual față în față.<br>
             • Pe virajele U culoarul se îngustează la <b>0.70 m</b> (la pas de rotație nu e nevoie de 1.2m).<br>
             • Raza interioară crește de la 0.55m la <b>0.80 m</b>.<br>
-            • Spațiul pe interior crește la <b style="color:#22c55e; font-weight: 700;">51.0 cm</b> (> 46 cm umeri).<br>
+            • Spațiul pe interior crește la <b style="color:#22c55e; font-weight: 700;">51.0 cm</b> (&gt; 46 cm umeri).<br>
             •  <b style="color:#38bdf8;">Timp total ca toți cei 800 să treacă unii prin fața celorlalți (400 pași):</b><br>
             &nbsp;&nbsp;→ La <b>10 secunde/pas</b>: exact <b style="color:#4ade80;">66 min 40s (1h 06m)</b>.<br>
             &nbsp;&nbsp;→ La <b>5 secunde/pas</b>: exact <b style="color:#4ade80;">33 min 20s</b>.<br>
@@ -1867,13 +2026,13 @@
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni încap perfect și parcurg tot turul fără nicio secundă pierdută din cauza blocajelor.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-tapered" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('tapered')">
-            <span class="dot dot-green"></span>Afișează Soluția 1 pe Plan (REAL: Culoar 0.70m Viraj)
+            <span class="dot dot-green"></span><span data-i18n="sol_1_btn">Afișează Soluția 1 pe Plan (REAL: Culoar 0.70m Viraj)</span>
           </button>
         </div>
 
         <!-- Soluția 2 -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
-          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_2_title">
             PROPUNEREA 2 [REAL]: Viraje de Tranzit Fluid (Staționare doar pe Drept)
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
@@ -1883,13 +2042,13 @@
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! Nimeni nu stă blocat pe viraj; totul decurge natural și fluid.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-transit" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('transit')">
-            <span class="dot dot-green"></span>Afișează Soluția 2 pe Plan (REAL: Viraje Tranzit Fluid)
+            <span class="dot dot-green"></span><span data-i18n="sol_2_btn">Afișează Soluția 2 pe Plan (REAL: Viraje Tranzit Fluid)</span>
           </button>
         </div>
 
         <!-- Soluția 3 -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
-          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_3_title">
             PROPUNEREA 3 [REAL]: Dispunere în Șah (Decalaj 20 cm pe Viraj)
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
@@ -1899,13 +2058,13 @@
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! Se păstrează lățimea de 1.20m peste tot, fără frecare de umeri.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-staggered" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('staggered')">
-            <span class="dot dot-green"></span>Afișează Soluția 3 pe Plan (REAL: Dispunere în Șah)
+            <span class="dot dot-green"></span><span data-i18n="sol_3_btn">Afișează Soluția 3 pe Plan (REAL: Dispunere în Șah)</span>
           </button>
         </div>
 
         <!-- Soluția 4 -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
-          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_4_title">
             PROPUNEREA 4 [REAL]: Maximizare Traseu la Pereți (0.60m) + Viraj 0.75m
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
@@ -1915,13 +2074,13 @@
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! Circuit extins la maximum în sala de 35.3m × 21.6m.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-max" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('max_path')">
-            <span class="dot dot-green"></span>Afișează Soluția 4 pe Plan (REAL: Traseu Maxim 305m)
+            <span class="dot dot-green"></span><span data-i18n="sol_4_btn">Afișează Soluția 4 pe Plan (REAL: Traseu Maxim 305m)</span>
           </button>
         </div>
 
         <!-- Soluția 5 -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
-          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_5_title">
             PROPUNEREA 5 [REAL]: Întorcător în centrul fiecărei curbe
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
@@ -1932,13 +2091,13 @@
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni, fără înghesuială la curbe; durata turului rămâne aceeași.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-turners" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('turners')">
-            <span class="dot dot-green"></span>Afișează Soluția 5 pe Plan (REAL: Întorcători)
+            <span class="dot dot-green"></span><span data-i18n="sol_5_btn">Afișează Soluția 5 pe Plan (REAL: Întorcători)</span>
           </button>
         </div>
 
         <!-- Soluția 6: recomandarea mea -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
-          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_6_title">
             PROPUNEREA 6 [REAL - RECOMANDAT]: Întorcători în curbe + 10 culoare
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
@@ -1953,25 +2112,25 @@
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni, zero înghesuială, cel mai mult spațiu pe persoană; durata turului rămâne aceeași.</b>
           </div>
           <button class="ctrl-btn" id="card-sol-btn-recommended" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('recommended')">
-            <span class="dot dot-green"></span>Afișează Soluția 6 pe Plan (REAL: Recomandat)
+            <span class="dot dot-green"></span><span data-i18n="sol_6_btn">Afișează Soluția 6 pe Plan (REAL: Recomandat)</span>
           </button>
         </div>
 
         <!-- Comparație cu Problema Inițială -->
         <div class="param-box" style="border-left:3px solid #ef4444;">
-          <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;">
+          <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;" data-i18n="sol_none_title">
             COMPARAȚIE [NEREAL - PROBLEMĂ]: Configurația Inițială cu Blocaje Roșii
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
-            Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje (< 46cm umeri = coliziune garantată).
+            Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje (&lt; 46cm umeri = coliziune garantată).
           </div>
           <button class="ctrl-btn" id="card-sol-btn-none" style="background:#dc2626; border-color:#ef4444; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('none')">
-            <span class="dot dot-red"></span>Arată Problema Inițială (NEREAL: Zone Roșii)
+            <span class="dot dot-red"></span><span data-i18n="sol_none_btn">Arată Problema Inițială (NEREAL: Zone Roșii)</span>
           </button>
         </div>
 
         <!-- SECȚIUNE CLARIFICARE & VARIANTE ALTERNATIVE SOLICITATE -->
-        <div class="section-title" style="color:#f59e0b; font-size:12.5px; margin-top:16px;">
+        <div class="section-title" style="color:#f59e0b; font-size:12.5px; margin-top:16px;" data-i18n="sec_why_tapered">
            Ce înseamnă exact „Culoar 0.70m pe Viraj”?
         </div>
         <div style="background:rgba(15, 23, 42, 0.9); border:1.5px solid #f59e0b; border-radius:8px; padding:12px; font-size:11.5px; line-height:1.55; color:#cbd5e1; margin-bottom:14px;">
@@ -1984,7 +2143,7 @@
           •  <i>Dacă NU vrei să se apropie la 70 cm pe viraj, folosește <b>Soluția 2 (Tranzit Fluid)</b>: pe viraj nimeni nu se oprește, iar contactul de 10 secunde se face EXCLUSIV pe liniile drepte la 1.20m distanță!</i>
         </div>
 
-        <div class="section-title" style="color:#38bdf8; font-size:12.5px;">
+        <div class="section-title" style="color:#38bdf8; font-size:12.5px;" data-i18n="sec_why_not_diag">
            De ce nu Culoare pe Diagonală sau Orizontală?
         </div>
         
@@ -2028,46 +2187,46 @@
 
       <!-- TAB 5: SALVARE & CONFIGURAȚII SALĂ -->
       <div id="tab-configs" class="tab-content">
-        <div class="exercise-banner">
+        <div class="exercise-banner" id="banner-configs-save" data-i18n-html="banner_save_html">
           <b> SALVARE & ÎNCĂRCARE CONFIGURAȚII:</b><br>
           • Salvează starea curentă a sălii (dimensiuni, culoare, număr oameni, soluție, decalaje) cu un nume personalizat.<br>
           • Toate configurațiile se păstrează în siguranță pe dispozitivul tău și le poți reîncărca oricând cu un singur click.
         </div>
 
         <!-- Card Salvare Noua -->
-        <div class="section-title">Salvează starea curentă cu nume</div>
+        <div class="section-title" data-i18n="sec_save_named">Salvează starea curentă cu nume</div>
         <div class="param-box">
           <div class="ui-row">
-            <input type="text" id="tab-inp-conf-name" class="ui-input" placeholder="Ex: Sala 800 - 9 culoare 0.70m...">
+            <input type="text" id="tab-inp-conf-name" class="ui-input" placeholder="Ex: Sala 800 - 9 culoare 0.70m..." data-i18n-placeholder="ph_new_conf_name">
             <button class="ui-btn ui-btn-primary" onclick="tabSaveNamedConfig()">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Salvează
+              <span data-i18n="btn_save">Salvează</span>
             </button>
           </div>
           <div id="tab-conf-save-status" style="font-size:12px; min-height:16px; margin-top:6px; color:#22c55e;"></div>
         </div>
 
         <!-- Card Incarcare / Stergere -->
-        <div class="section-title">Configurații salvate anterior</div>
+        <div class="section-title" data-i18n="sec_saved_configs">Configurații salvate anterior</div>
         <div class="param-box">
           <div class="ui-row">
             <select id="tab-sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
-              <option value="">-- Alege configurație salvată --</option>
+              <option value="" data-i18n="opt_choose_saved_conf">-- Alege configurație salvată --</option>
             </select>
             <button class="ui-btn ui-btn-primary" onclick="tabLoadSelectedConfig()">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Încarcă
+              <span data-i18n="btn_load">Încarcă</span>
             </button>
             <button class="ui-btn ui-btn-danger" onclick="tabDeleteSelectedConfig()" title="Șterge configurația selectată">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              Șterge
+              <span data-i18n="btn_delete">Șterge</span>
             </button>
           </div>
           <div id="tab-conf-load-status" style="font-size:12px; min-height:16px; margin-top:6px;"></div>
         </div>
 
         <!-- Card Preset-uri Rapide -->
-        <div class="section-title">Preset-uri rapide de bază</div>
+        <div class="section-title" data-i18n="sec_quick_presets">Preset-uri rapide de bază</div>
         <div class="param-box">
           <div class="ui-preset-grid">
             <button class="ui-preset-btn" onclick="applyQuickConfig('std800')">800p · Standard (0.70m)</button>
@@ -2079,27 +2238,27 @@
         </div>
 
         <!-- Card Backup JSON -->
-        <div class="section-title">Copie de siguranță (Backup fișier)</div>
+        <div class="section-title" data-i18n="sec_backup">Copie de siguranță (Backup fișier)</div>
         <div class="param-box">
           <div class="ui-row">
             <button class="ui-btn" style="flex:1;" onclick="exportConfigsJSON()">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exportă JSON
+              <span data-i18n="btn_export_json">Exportă JSON</span>
             </button>
             <label class="ui-btn" style="flex:1; cursor:pointer;">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Importă JSON
+              <span data-i18n="btn_import_json">Importă JSON</span>
               <input type="file" accept=".json" style="display:none;" onchange="importConfigsJSON(event)">
             </label>
           </div>
         </div>
 
         <!-- Card Actiuni Reset -->
-        <div class="section-title">Resetare setări</div>
+        <div class="section-title" data-i18n="sec_reset">Resetare setări</div>
         <div class="param-box">
           <div class="ui-row">
-            <button class="ui-btn" style="flex:1;" onclick="resetSavedState()">Revin-o la setările implicite</button>
-            <button class="ui-btn" style="flex:1;" onclick="resetRoomDims()">Dimensiuni originale sală</button>
+            <button class="ui-btn" style="flex:1;" onclick="resetSavedState()" data-i18n="btn_reset_defaults">Revin-o la setările implicite</button>
+            <button class="ui-btn" style="flex:1;" onclick="resetRoomDims()" data-i18n="btn_orig_dims">Dimensiuni originale sală</button>
           </div>
         </div>
       </div>
@@ -2111,24 +2270,33 @@
       <!-- Viewport Overlay with Direct Solution Selector -->
     <div class="canvas-overlay-info">
       <div class="hud-row">
-        <button class="hud-sol" id="hud-sol" onclick="mobGo('tab-congestion')" title="Schimbă soluția"><span class="dot dot-green"></span><span id="hud-sol-txt">Sol. 1</span></button>
+        <button class="hud-sol" id="hud-sol" onclick="mobGo('tab-congestion')" title="Schimbă soluția" data-i18n-title="hud_change_sol"><span class="dot dot-green"></span><span id="hud-sol-txt">Sol. 1</span></button>
         <div class="hud-stat">
           <svg class="ic" style="width:16px;height:16px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <span class="hud-label" id="hud-timer-label">Următorul pas în</span>
+          <span class="hud-label" id="hud-timer-label" data-i18n="hud_next_step">Următorul pas în</span>
           <b id="overlay-timer" class="hud-val hud-green">10.0s</b>
         </div>
         <span class="hud-sep"></span>
         <div class="hud-stat">
           <svg class="ic" style="width:16px;height:16px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></svg>
-          <span class="hud-label">Tur complet</span>
+          <span class="hud-label" id="hud-tour-label" data-i18n="hud_full_tour">Tur complet</span>
           <b id="ovl-total-time" class="hud-val">66 min 40s</b>
           <span id="ovl-total-sub" class="hud-sub">(400 pași la 10s)</span>
         </div>
         <span class="hud-sep" id="hud-stars-sep"></span>
         <div class="hud-stat" id="hud-stat-stars">
           <svg class="ic" style="width:16px;height:16px;color:#facc15;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 6.5 7 .9-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.9z"/></svg>
-          <span class="hud-label">Steluțe</span>
+          <span class="hud-label" id="hud-stars-label" data-i18n="hud_stars">Steluțe</span>
           <b id="hud-stars" class="hud-val">0 / 800</b>
+        </div>
+        <!-- Comutator rotunjit Limbă în HUD (pentru ecran mic / mobil) -->
+        <div class="lang-switch-box hud-lang-switch" title="Schimbă limba / Switch language (RO / EN)">
+          <span class="lang-code active" id="lbl-lang-ro-hud" onclick="setLanguage('ro')">RO</span>
+          <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
+            <input type="checkbox" id="chk-lang-hud" onchange="toggleLanguage(this.checked)">
+            <span class="ui-switch-slider"></span>
+          </label>
+          <span class="lang-code" id="lbl-lang-en-hud" onclick="setLanguage('en')">EN</span>
         </div>
         <button class="hud-toggle" title="Micșorează / extinde panoul" onclick="toggleHud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
       </div>
@@ -2173,6 +2341,14 @@
         <button class="tool-btn tool-ctl" id="tool-fast" title="Simulare rapidă (tot turul în câteva secunde)" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg></button>
         <button class="tool-btn tool-ctl" title="Pas la dreapta" onclick="triggerContrasensStep()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         <span class="tool-sep"></span>
+        <div class="lang-switch-box" style="margin: 0 2px;" title="Schimbă limba / Switch language (RO / EN)">
+          <span class="lang-code active" id="lbl-lang-ro-tool" onclick="setLanguage('ro')">RO</span>
+          <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
+            <input type="checkbox" id="chk-lang-tool" onchange="toggleLanguage(this.checked)">
+            <span class="ui-switch-slider"></span>
+          </label>
+          <span class="lang-code" id="lbl-lang-en-tool" onclick="setLanguage('en')">EN</span>
+        </div>
         <button class="tool-btn" id="tool-fs" title="Ecran complet (fără meniu lateral)" onclick="toggleFullscreen()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div>
     </div>
@@ -2182,13 +2358,13 @@
 
   <!-- Navigare jos (telefon) -->
   <nav class="mob-bottom">
-    <button class="mb-btn active" data-go="plan" onclick="mobGo('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span>Plan</span></button>
-    <button class="mb-btn" data-go="tab-circuit" onclick="mobGo('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>Pas</span></button>
-    <button class="mb-btn" data-go="tab-configs" onclick="mobGo('tab-configs')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Salvare</span></button>
-    <button class="mb-btn" data-go="tab-params" onclick="mobGo('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Setări</span></button>
-    <button class="mb-btn" data-go="tab-congestion" onclick="mobGo('tab-congestion')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Soluții</span></button>
-    <button class="mb-btn" data-go="tab-calc" onclick="mobGo('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg><span>Calcul</span></button>
-    <button class="mb-btn" onclick="exportPlanPDF()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>PDF</span></button>
+    <button class="mb-btn active" data-go="plan" onclick="mobGo('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span data-i18n="mob_plan">Plan</span></button>
+    <button class="mb-btn" data-go="tab-circuit" onclick="mobGo('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span data-i18n="mob_step">Pas</span></button>
+    <button class="mb-btn" data-go="tab-configs" onclick="mobGo('tab-configs')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span data-i18n="mob_save">Salvare</span></button>
+    <button class="mb-btn" data-go="tab-params" onclick="mobGo('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-i18n="mob_settings">Setări</span></button>
+    <button class="mb-btn" data-go="tab-congestion" onclick="mobGo('tab-congestion')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span data-i18n="mob_solutions">Soluții</span></button>
+    <button class="mb-btn" data-go="tab-calc" onclick="mobGo('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg><span data-i18n="mob_calc">Calcul</span></button>
+    <button class="mb-btn" onclick="exportPlanPDF()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i18n="mob_pdf">PDF</span></button>
   </nav>
 
   <!-- Modal Configurații (Salvare & Încărcare) -->
@@ -2196,8 +2372,8 @@
     <div class="app-modal-card">
       <div class="app-modal-header">
         <div>
-          <h3 class="app-modal-title">Configurații Sală (Salvare & Încărcare)</h3>
-          <div class="app-modal-sub">Salvează starea curentă a sălii cu un nume sau încarcă oricare dintre variantele salvate anterior.</div>
+          <h3 class="app-modal-title" data-i18n="modal_conf_title">Configurații Sală (Salvare & Încărcare)</h3>
+          <div class="app-modal-sub" data-i18n="modal_conf_sub">Salvează starea curentă a sălii cu un nume sau încarcă oricare dintre variantele salvate anterior.</div>
         </div>
         <button class="app-modal-close" onclick="closeConfigModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
@@ -2205,30 +2381,30 @@
       <div style="display:flex; flex-direction:column; gap:14px;">
         <!-- Salvare noua -->
         <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
-          <div style="font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:8px;">Salvează configurația curentă cu nume:</div>
+          <div style="font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:8px;" data-i18n="modal_conf_save_hdr">Salvează configurația curentă cu nume:</div>
           <div class="ui-row">
-            <input type="text" id="modal-inp-conf-name" class="ui-input" placeholder="Ex: Sala 800 - 9 culoare 0.70m...">
+            <input type="text" id="modal-inp-conf-name" class="ui-input" placeholder="Ex: Sala 800 - 9 culoare 0.70m..." data-i18n-placeholder="modal_conf_inp_ph">
             <button class="ui-btn ui-btn-primary" onclick="modalSaveNamedConfig()">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Salvează
+              <span data-i18n="btn_save">Salvează</span>
             </button>
           </div>
         </div>
 
         <!-- Incarca / Sterge -->
         <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
-          <div style="font-size:12px; font-weight:700; color:#e2e8f0; margin-bottom:8px;">Configurații salvate anterior:</div>
+          <div style="font-size:12px; font-weight:700; color:#e2e8f0; margin-bottom:8px;" data-i18n="modal_conf_saved_hdr">Configurații salvate anterior:</div>
           <div class="ui-row">
             <select id="modal-sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
-              <option value="">-- Alege o configurație salvată --</option>
+              <option value="" data-i18n="modal_conf_sel_ph">-- Alege o configurație salvată --</option>
             </select>
             <button class="ui-btn ui-btn-primary" onclick="modalLoadSelectedConfig()">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Încarcă
+              <span data-i18n="btn_load">Încarcă</span>
             </button>
-            <button class="ui-btn ui-btn-danger" onclick="modalDeleteSelectedConfig()" title="Șterge configurația">
+            <button class="ui-btn ui-btn-danger" onclick="modalDeleteSelectedConfig()" title="Șterge configurația" data-i18n-title="btn_delete_title">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              Șterge
+              <span data-i18n="btn_delete">Șterge</span>
             </button>
           </div>
           <div id="modal-conf-status" style="font-size:12px; min-height:16px; margin-top:6px;"></div>
@@ -2236,7 +2412,7 @@
 
         <!-- Preset-uri rapide -->
         <div>
-          <div style="font-size:12px; color:#94a3b8; margin-bottom:8px;">Preset-uri rapide de bază:</div>
+          <div style="font-size:12px; color:#94a3b8; margin-bottom:8px;" data-i18n="lbl_quick_presets">Preset-uri rapide de bază:</div>
           <div class="ui-preset-grid">
             <button class="ui-preset-btn" onclick="applyQuickConfig('std800'); closeConfigModal();">800p · Standard (0.70m)</button>
             <button class="ui-preset-btn" onclick="applyQuickConfig('transit800'); closeConfigModal();">800p · Culoar Tranzit</button>
@@ -2248,15 +2424,15 @@
 
         <!-- Backup JSON -->
         <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
-          <div style="font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:8px;">Copie de siguranță (Backup fișier):</div>
+          <div style="font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:8px;" data-i18n="sec_backup_hdr">Copie de siguranță (Backup fișier):</div>
           <div class="ui-row">
             <button class="ui-btn" style="flex:1;" onclick="exportConfigsJSON()">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exportă JSON
+              <span data-i18n="btn_export_json">Exportă JSON</span>
             </button>
             <label class="ui-btn" style="flex:1; cursor:pointer;">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Importă JSON
+              <span data-i18n="btn_import_json">Importă JSON</span>
               <input type="file" accept=".json" style="display:none;" onchange="importConfigsJSON(event)">
             </label>
           </div>
@@ -2270,43 +2446,43 @@
     <div class="app-modal-card">
       <div class="app-modal-header">
         <div>
-          <h3 class="app-modal-title">Export Animație GIF (10-15s)</h3>
-          <div class="app-modal-sub">Generează un GIF animat demonstrativ cu mișcarea în contrasens, privirea față în față și direcțiile de mers.</div>
+          <h3 class="app-modal-title" data-i18n="modal_gif_title">Export Animație GIF (10-15s)</h3>
+          <div class="app-modal-sub" data-i18n="modal_gif_sub">Generează un GIF animat demonstrativ cu mișcarea în contrasens, privirea față în față și direcțiile de mers.</div>
         </div>
         <button class="app-modal-close" onclick="closeGifModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:12px;">
         <label style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600;">
-          Durată animație GIF:
+          <span data-i18n="gif_opt_dur_lbl">Durată animație GIF:</span>
           <select id="gif-opt-dur" class="ui-select" style="background:#1e293b;">
-            <option value="12" selected>12 secunde (120 cadre @ 10 fps) - Recomandat</option>
-            <option value="10">10 secunde (100 cadre @ 10 fps)</option>
-            <option value="15">15 secunde (150 cadre @ 10 fps)</option>
+            <option value="12" selected data-i18n="gif_dur_12">12 secunde (120 cadre @ 10 fps) - Recomandat</option>
+            <option value="10" data-i18n="gif_dur_10">10 secunde (100 cadre @ 10 fps)</option>
+            <option value="15" data-i18n="gif_dur_15">15 secunde (150 cadre @ 10 fps)</option>
           </select>
         </label>
 
         <label style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600;">
-          Tip mișcare în GIF:
+          <span data-i18n="gif_opt_mode_lbl">Tip mișcare în GIF:</span>
           <select id="gif-opt-mode" class="ui-select" style="background:#1e293b;">
-            <option value="steps" selected>Mișcare continuă & direcții (arată clar pașii și privirea)</option>
-            <option value="fast">Tur accelerat (de la pasul 1 la pasul 400)</option>
+            <option value="steps" selected data-i18n="gif_mode_steps">Mișcare continuă & direcții (arată clar pașii și privirea)</option>
+            <option value="fast" data-i18n="gif_mode_fast">Tur accelerat (de la pasul 1 la pasul 400)</option>
           </select>
         </label>
 
         <label style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600;">
-          Cadru / Cameră:
+          <span data-i18n="gif_opt_cam_lbl">Cadru / Cameră:</span>
           <select id="gif-opt-cam" class="ui-select" style="background:#1e293b;">
-            <option value="full" selected>Toată sala (Full Room - panoramă completă)</option>
-            <option value="current">Vedere curentă din ecran (Zoom & Pan curent)</option>
-            <option value="macro">Detaliu culoar & participanți (Macro)</option>
+            <option value="full" selected data-i18n="gif_cam_full">Toată sala (Full Room - panoramă completă)</option>
+            <option value="current" data-i18n="gif_cam_current">Vedere curentă din ecran (Zoom & Pan curent)</option>
+            <option value="macro" data-i18n="gif_cam_macro">Detaliu culoar & participanți (Macro)</option>
           </select>
         </label>
 
         <!-- Progress Box -->
         <div id="gif-progress-box" style="display:none; flex-direction:column; gap:6px; margin-top:6px; padding:12px; background:rgba(2,132,199,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:12px;">
           <div style="display:flex; justify-content:space-between; font-size:12px;">
-            <span id="gif-status-text" style="color:#38bdf8; font-weight:600;">Se generează cadrele GIF...</span>
+            <span id="gif-status-text" style="color:#38bdf8; font-weight:600;" data-i18n="gif_status_gen">Se generează cadrele GIF...</span>
             <span id="gif-pct-text" style="color:#fff; font-weight:700;">0%</span>
           </div>
           <div style="height:8px; background:#1e293b; border-radius:999px; overflow:hidden;">
@@ -2316,12 +2492,14 @@
       </div>
 
       <div class="ui-row" style="justify-content:flex-end; gap:10px; margin-top:6px;">
-        <button class="ui-btn" onclick="closeGifModal()" id="btn-gif-cancel">Anulează</button>
+        <button class="ui-btn" onclick="closeGifModal()" id="btn-gif-cancel" data-i18n="modal_gif_btn_cancel">Anulează</button>
         <button class="ui-btn ui-btn-primary" onclick="startGifExport()" id="btn-gif-generate">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Generează și Descarcă GIF
+          <span data-i18n="modal_gif_btn_generate">Generează și Descarcă GIF</span>
         </button>
       </div>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -2409,6 +2587,432 @@
     let backGapAuto = true;   // true = culoarele umplu sala (distanta rezulta); false = distanta setata manual
     let backGapClamped = false;
     let laneYTop = 0, laneYBottom = 0;
+    
+    // ===================== LOCALIZARE LINGVISTICĂ (RO / EN) =====================
+    let currentLang = 'ro';
+
+    const I18N = {
+      ro: {
+      "btn_menu_title": "Ascunde / arată meniul lateral",
+      "btn_menu": "Meniu",
+      "hdr_brand_title": "Față în față · Pas la dreapta în contrasens",
+      "cam_macro": "Macro",
+      "cam_lane": "Culoar",
+      "cam_congestion": "Viraj roșu",
+      "cam_leader": "Lider",
+      "cam_full": "Toată sala",
+      "hdr_step_lbl": "Pasul",
+      "hdr_round_lbl": "Tur",
+      "hdr_fast_sim_title": "Simulare rapidă: tot turul în câteva secunde",
+      "hdr_fast_sim": "Simulare rapidă",
+      "hdr_video_title": "Simulare rapidă înregistrată ca video (se descarcă .webm)",
+      "hdr_video": "Video",
+      "hdr_gif_title": "Exportă animație GIF (10-15s, se descarcă .gif)",
+      "hdr_gif": "GIF (10-15s)",
+      "hdr_configs_title": "Salvare & Încărcare configurații sală",
+      "hdr_configs": "Configurații",
+      "hdr_pdf_title": "Exportă planul în PDF",
+      "hdr_pdf": "Export PDF",
+      "mob_plan_long": "Plan Sală & Animație",
+      "mob_ctrl_long": "Setări & Calcule",
+      "tab_circuit": "Pas",
+      "tab_params": "Parametri",
+      "tab_solutions": "Soluții",
+      "tab_calc": "Calcul",
+      "tab_configs": "Salvare",
+      "ex_banner_full": "<b> REGULA EXACTĂ DE MIȘCARE:",
+      "btn_back_title": "Revino la partenerul precedent",
+      "btn_back": "Înapoi",
+      "btn_step_right": "Pas la dreapta",
+      "btn_pause": "Pauză",
+      "btn_reset": "Reset",
+      "btn_record_video": "Înregistrează Video (.webm)",
+      "btn_export_gif": "Exportă Animație GIF",
+      "lbl_fast_dur": "Durata simulării rapide",
+      "fast_sim_desc": "Rulează tot turul într-un timp scurt; după ce tot grupul a terminat turul, asistenții intră pe culoare și dau steluța tuturor.",
+      "prog_title": "Tur complet în contrasens",
+      "status_running": "Rulează",
+      "prog_left_row": "Șir stâng",
+      "prog_right_row": "Șir drept",
+      "param_face_time": "Timp față în față (înainte de pas):",
+      "param_workshop_rec": "10s (recomandat atelier)",
+      "param_glide_time": "Viteza mișcării (durata pasului)",
+      "param_glide_sub_1": "Rapid 0.1 s",
+      "param_glide_sub_2": "cât ține mișcarea, nu pauza",
+      "param_glide_sub_3": "Lent 2 s",
+      "countdown_title": "Numărătoare pas:",
+      "countdown_sub": "Participanții stau nemișcați față în față, apoi pășesc lateral la dreapta",
+      "summary_title": "Timp total ca să treacă toți",
+      "summary_time_rem": "Timp rămas:",
+      "summary_quick_calc": "Calcul rapid la diverse durate de pas:",
+      "vis_title": "Afișare Detalii Vizuale:",
+      "vis_gaze": "Linie privire / conectare între partenerii față în față",
+      "vis_dir": "Săgeți de direcție: arată pasul la dreapta pentru fiecare șir",
+      "vis_lead": "Urmărește Participantul #1 (Linia Stângă) și #1 (Linia Dreaptă)",
+      "vis_assist": "40 Asistenți pe Buline (A1-A40)",
+      "vis_reach": "Marchează cu punct roșu participanții la care asistenții nu ajung",
+      "vis_stars": "Opțiune Exercițiu Steluțe",
+      "vis_walls": "Cote & Distanțe față de Pereți (Sus, Jos, Laterale)",
+      "sec_hall_configs": "Configurații Sală",
+      "sec_save_load": "Salvare & Încărcare",
+      "ph_new_conf_name": "Ex: Sala 800 - 9 culoare 0.70m...",
+      "btn_save": "Salvează",
+      "opt_choose_saved_conf": "-- Alege configurație salvată --",
+      "btn_load": "Încarcă",
+      "btn_delete": "Șterge",
+      "lbl_quick_presets": "Preset-uri rapide de bază:",
+      "sec_room_dims": "Dimensiunile sălii",
+      "lbl_room_w": "Lățime (m)",
+      "lbl_room_l": "Lungime (m)",
+      "btn_orig_dims": "Dimensiuni originale sală",
+      "sec_view": "Vedere",
+      "lbl_rot": "Rotire sală",
+      "rot_drag_hint": "Shift + tragere = rotire liberă",
+      "auto_save_note": "Setările se salvează automat și rămân după refresh.",
+      "btn_default_settings": "Setări implicite",
+      "sec_adjust_people_loops": "Ajustează Oameni și Bucle",
+      "lbl_total_part": "👥 Total Participanți în sală:",
+      "lbl_format_route": "📐 Format Traseu & Bucle:",
+      "desc_compact": "Ocupă doar spațiul necesar oamenilor (bucle egale, fără goluri uriașe în sală):",
+      "btn_mode_compact": "Auto-compact (după oameni)",
+      "btn_mode_fullhall": "Toată lungimea sălii",
+      "chk_equal_loops_lbl": "Bucle 100% egale (simetric, fără bucle uriașe)",
+      "lbl_part_per_row": "👤 Participanți pe un rând (șir):",
+      "lbl_assist_lanes": "Asistenți pe Culoare (Buline):",
+      "opt_stars_box_title": "Opțiune Steluțe",
+      "opt_stars_box_sub": "Distribuire steluțe de către asistenți",
+      "lbl_star_sec": "Steluțe: timp pe participant",
+      "lbl_distrib_min": "Steluțe: timp maxim de distribuire",
+      "stars_disabled_h": "Exercițiul cu steluțe este dezactivat",
+      "stars_disabled_sub": "Comutați toggle-ul de mai sus pentru a activa calculul asistenților și distribuirea steluțelor.",
+      "lbl_lanes_count": "📐 Număr Culoare (Lanes / Bucle):",
+      "lbl_face_dist": "Distanță Față în Față (Culoar):",
+      "lbl_face_dist_close": "0.80 m (aproape)",
+      "lbl_face_dist_rec": "1.20 m (recomandat)",
+      "lbl_face_dist_far": "2.20 m (depărtat)",
+      "lbl_back_blue": "Spate în spate, șirurile albastre (fără asistenți)",
+      "lbl_back_pink": "Spate în spate, șirurile roz (zona asistenților)",
+      "sec_wall_dist": "Distanțe față de Pereții Sălii",
+      "lbl_wall_end": "Distanță Pereți Capăt (Sus / Jos):",
+      "desc_wall_end": "Spațiu liber între viraj și perete",
+      "lbl_wall_side": "Distanță Pereți Laterali (Stânga / Dreapta):",
+      "desc_wall_side": "Spațiu liber la pereții laterali",
+      "sec_calc_title": "Calcul Matematic Exact",
+      "calc_room_lbl": "Suprafață Sală:",
+      "calc_len_lbl": "Lungime Totală Traseu:",
+      "calc_lanes_lbl": "Culoare & Bucle:",
+      "calc_per_row_lbl": "Participanți pe Rând:",
+      "calc_pairs_lbl": "Număr Perechi Față în Față:",
+      "calc_step_lbl": "Mărimea Pasului:",
+      "calc_wall_end_lbl": "Distanță Viraje U față de Pereți (Sus/Jos):",
+      "calc_wall_side_lbl": "Distanță Culoare față de Pereți (Laterale):",
+      "calc_rel_speed_lbl": "Viteză Relativă:",
+      "calc_rel_speed_txt": "Deoarece ambele șiruri fac un pas la dreapta în sensuri opuse, avansul relativ este de <b>2 poziții per pas",
+      "calc_total_time_lbl": "Timp pentru un Circuit Complet:",
+      "sec_report_title": "Dimensiuni, calcule și sugestii (ca în PDF, pagina 2)",
+      "sec_solutions_title": "4 Soluții Concrete pentru 800 Persoane (Fără Reducere)",
+      "sol_why_title": "DE CE APARE PROBLEMA LA 800 OAMENI PE SCHEMA STANDARD:",
+      "sol_1_title": "PROPUNEREA 1 [REAL]: Culoar Conic / 0.70m pe Viraj",
+      "sol_1_btn": "Afișează Soluția 1 pe Plan (REAL: Culoar 0.70m Viraj)",
+      "sol_2_title": "PROPUNEREA 2 [REAL]: Viraje de Tranzit Fluid (Staționare doar pe Drept)",
+      "sol_2_btn": "Afișează Soluția 2 pe Plan (REAL: Viraje Tranzit Fluid)",
+      "sol_3_title": "PROPUNEREA 3 [REAL]: Dispunere în Șah (Decalaj 20 cm pe Viraj)",
+      "sol_3_btn": "Afișează Soluția 3 pe Plan (REAL: Dispunere în Șah)",
+      "sol_4_title": "PROPUNEREA 4 [REAL]: Maximizare Traseu la Pereți (0.60m) + Viraj 0.75m",
+      "sol_4_btn": "Afișează Soluția 4 pe Plan (REAL: Traseu Maxim 305m)",
+      "sol_5_title": "PROPUNEREA 5 [REAL]: Întorcător în centrul fiecărei curbe",
+      "sol_5_btn": "Afișează Soluția 5 pe Plan (REAL: Întorcători)",
+      "sol_6_title": "PROPUNEREA 6 [REAL - RECOMANDAT]: Întorcători în curbe + 10 culoare",
+      "sol_6_btn": "Afișează Soluția 6 pe Plan (REAL: Recomandat)",
+      "sol_none_title": "COMPARAȚIE [NEREAL - PROBLEMĂ]: Configurația Inițială cu Blocaje Roșii",
+      "sol_none_btn": "Arată Problema Inițială (NEREAL: Zone Roșii)",
+      "sec_why_tapered": "Ce înseamnă exact „Culoar 0.70m pe Viraj”?",
+      "sec_why_not_diag": "De ce nu Culoare pe Diagonală sau Orizontală?",
+      "banner_save_html": "<b> SALVARE & ÎNCĂRCARE CONFIGURAȚII:",
+      "sec_save_named": "Salvează starea curentă cu nume",
+      "sec_saved_configs": "Configurații salvate anterior",
+      "sec_quick_presets": "Preset-uri rapide de bază",
+      "sec_backup": "Copie de siguranță (Backup fișier)",
+      "btn_export_json": "Exportă JSON",
+      "btn_import_json": "Importă JSON",
+      "sec_reset": "Resetare setări",
+      "btn_reset_defaults": "Revin-o la setările implicite",
+      "hud_change_sol": "Schimbă soluția",
+      "hud_next_step": "Următorul pas în",
+      "hud_full_tour": "Tur complet",
+      "hud_stars": "Steluțe",
+      "mob_plan": "Plan",
+      "mob_step": "Pas",
+      "mob_save": "Salvare",
+      "mob_settings": "Setări",
+      "mob_solutions": "Soluții",
+      "mob_calc": "Calcul",
+      "mob_pdf": "PDF",
+      "modal_conf_title": "Configurații Sală (Salvare & Încărcare)",
+      "modal_conf_sub": "Salvează starea curentă a sălii cu un nume sau încarcă oricare dintre variantele salvate anterior.",
+      "modal_conf_save_hdr": "Salvează configurația curentă cu nume:",
+      "modal_conf_inp_ph": "Ex: Sala 800 - 9 culoare 0.70m...",
+      "modal_conf_saved_hdr": "Configurații salvate anterior:",
+      "modal_conf_sel_ph": "-- Alege o configurație salvată --",
+      "btn_delete_title": "Șterge configurația",
+      "sec_backup_hdr": "Copie de siguranță (Backup fișier):",
+      "modal_gif_title": "Export Animație GIF (10-15s)",
+      "modal_gif_sub": "Generează un GIF animat demonstrativ cu mișcarea în contrasens, privirea față în față și direcțiile de mers.",
+      "gif_opt_dur_lbl": "Durată animație GIF:",
+      "gif_dur_12": "12 secunde (120 cadre @ 10 fps) - Recomandat",
+      "gif_dur_10": "10 secunde (100 cadre @ 10 fps)",
+      "gif_dur_15": "15 secunde (150 cadre @ 10 fps)",
+      "gif_opt_mode_lbl": "Tip mișcare în GIF:",
+      "gif_mode_steps": "Mișcare continuă & direcții (arată clar pașii și privirea)",
+      "gif_mode_fast": "Tur accelerat (de la pasul 1 la pasul 400)",
+      "gif_opt_cam_lbl": "Cadru / Cameră:",
+      "gif_cam_full": "Toată sala (Full Room - panoramă completă)",
+      "gif_cam_current": "Vedere curentă din ecran (Zoom & Pan curent)",
+      "gif_cam_macro": "Detaliu culoar & participanți (Macro)",
+      "gif_status_gen": "Se generează cadrele GIF...",
+      "modal_gif_btn_cancel": "Anulează",
+      "modal_gif_btn_generate": "Generează și Descarcă GIF"
+},
+      en: {
+      "auto_save_note": "Settings are automatically saved and restored on reload.",
+      "banner_save_html": "<b>💾 SAVE & LOAD CONFIGURATIONS:</b> Save current state with a name, reload later, or export/import a JSON file backup.",
+      "btn_back": "Back",
+      "btn_back_title": "Return to the previous partner",
+      "btn_default_settings": "Default settings",
+      "btn_delete": "Delete",
+      "btn_delete_title": "Delete configuration",
+      "btn_export_gif": "Export GIF Animation",
+      "btn_export_json": "Export JSON",
+      "btn_import_json": "Import JSON",
+      "btn_load": "Load",
+      "btn_menu": "Menu",
+      "btn_menu_title": "Show / hide sidebar menu",
+      "btn_mode_compact": "Auto-compact (fit people)",
+      "btn_mode_fullhall": "Full hall length",
+      "btn_orig_dims": "Original hall dimensions",
+      "btn_pause": "Pause",
+      "btn_record_video": "Record Video (.webm)",
+      "btn_reset": "Reset",
+      "btn_reset_defaults": "Reset to default settings",
+      "btn_save": "Save",
+      "btn_step_right": "Step Right",
+      "calc_lanes_lbl": "Lanes & Loops:",
+      "calc_len_lbl": "Total Path Length:",
+      "calc_pairs_lbl": "Face-to-Face Pairs:",
+      "calc_per_row_lbl": "Participants per Row:",
+      "calc_rel_speed_lbl": "Relative Speed:",
+      "calc_rel_speed_txt": "Because both lines step to their own right, the relative movement between facing people is double (opposite directions).",
+      "calc_room_lbl": "Hall Area:",
+      "calc_step_lbl": "Step Size:",
+      "calc_total_time_lbl": "Time for a Complete Circuit:",
+      "calc_wall_end_lbl": "U-turn Distance to End Walls (Top/Bottom):",
+      "calc_wall_side_lbl": "Lane Distance to Side Walls (Left/Right):",
+      "cam_congestion: 'Viraj roșu'": "Red turn",
+      "cam_congestion": "Red turn",
+      "cam_full": "Full hall",
+      "cam_lane": "Lane",
+      "cam_leader": "Leader",
+      "cam_macro": "Macro",
+      "chk_equal_loops_lbl": "100% equal loops (symmetric, no 5m asymmetric loop)",
+      "countdown_sub": "Participants stand motionless face-to-face, then step sideways to their right",
+      "countdown_title": "Step countdown:",
+      "desc_compact": "Occupies only space needed for people (equal U-loops, without spreading across entire 35m room):",
+      "desc_wall_end": "Clear space between turn and wall",
+      "desc_wall_side": "Clear space to side walls",
+      "ex_banner_full": "<b>🎯 EXACT MOVEMENT RULE:</b><br>• People stand <b>face to face</b> across the lane and shoulder-to-shoulder in each row.<br>• When the person on the left steps to their right, the person in front also steps to their own right.<br>• Being face-to-face, „each person's right” means <b>opposite directions (counter-flow)</b>!<br>• Thus, the two lines glide in opposite directions, meeting a new partner with every step, until completing the full circuit.",
+      "fast_sim_desc": "Runs the whole lap in a few seconds; after everyone finishes the tour, assistants enter lanes and hand out stars to all participants.",
+      "gif_cam_current": "Current screen view (current Zoom & Pan)",
+      "gif_cam_full": "Full hall (Full Room - complete panorama)",
+      "gif_cam_macro": "Corridor detail & participants (Macro)",
+      "gif_dur_10": "10 seconds (100 frames @ 10 fps)",
+      "gif_dur_12": "12 seconds (120 frames @ 10 fps) - Recommended",
+      "gif_dur_15": "15 seconds (150 frames @ 10 fps)",
+      "gif_mode_fast": "Fast lap (from step 1 to step 400)",
+      "gif_mode_steps": "Continuous motion & directions (shows steps and gaze clearly)",
+      "gif_opt_cam_lbl": "Frame / Camera:",
+      "gif_opt_dur_lbl": "GIF Animation Duration:",
+      "gif_opt_mode_lbl": "Motion Type in GIF:",
+      "gif_status_gen": "Generating GIF frames...",
+      "hdr_brand_title": "Face to face · Right step in counter-flow",
+      "hdr_configs": "Configs",
+      "hdr_configs_title": "Save & Load hall configurations",
+      "hdr_fast_sim": "Fast Sim",
+      "hdr_fast_sim_title": "Fast simulation: full lap in a few seconds",
+      "hdr_gif": "GIF (10-15s)",
+      "hdr_gif_title": "Export GIF animation (10-15s, downloads .gif)",
+      "hdr_pdf": "Export PDF",
+      "hdr_pdf_title": "Export plan as PDF",
+      "hdr_round_lbl": "Round",
+      "hdr_step_lbl": "Step",
+      "hdr_video": "Video",
+      "hdr_video_title": "Fast simulation recorded as video (downloads .webm)",
+      "hud_change_sol": "Change solution",
+      "hud_full_tour": "Full lap",
+      "hud_next_step": "Next step in",
+      "hud_stars": "Stars",
+      "lbl_assist_lanes": "Assistants on Lanes (Dots):",
+      "lbl_back_blue": "Back to back, blue rows (no assistants)",
+      "lbl_back_pink": "Back to back, pink rows (assistants zone)",
+      "lbl_distrib_min": "Stars: max distribution time",
+      "lbl_face_dist": "Face-to-Face Distance (Lane):",
+      "lbl_face_dist_close": "0.80 m (close)",
+      "lbl_face_dist_far": "2.20 m (distant)",
+      "lbl_face_dist_rec": "1.20 m (recommended)",
+      "lbl_fast_dur": "Fast simulation duration",
+      "lbl_format_route": "📐 Route Format & Loops:",
+      "lbl_lanes_count": "📐 Number of Lanes (Loops):",
+      "lbl_part_per_row": "👤 Participants per row (line):",
+      "lbl_quick_presets": "Predefined quick presets:",
+      "lbl_room_l": "Length (m)",
+      "lbl_room_w": "Width (m)",
+      "lbl_rot": "Hall rotation",
+      "lbl_star_sec": "Stars: time per participant",
+      "lbl_total_part": "👥 Total Participants in hall:",
+      "lbl_wall_end": "End Wall Distance (Top / Bottom):",
+      "lbl_wall_side": "Side Wall Distance (Left / Right):",
+      "mob_calc": "Calc",
+      "mob_ctrl_long": "Settings & Calculations",
+      "mob_pdf": "PDF",
+      "mob_plan": "Plan",
+      "mob_plan_long": "Hall Plan & Animation",
+      "mob_save": "Save",
+      "mob_settings": "Settings",
+      "mob_solutions": "Solutions",
+      "mob_step": "Step",
+      "modal_conf_inp_ph": "Ex: Hall 800 - 9 lanes 0.70m...",
+      "modal_conf_save_hdr": "Save current configuration with name:",
+      "modal_conf_saved_hdr": "Previously saved configurations:",
+      "modal_conf_sel_ph": "-- Choose a saved configuration --",
+      "modal_conf_sub": "Save the current state of the hall with a name or load any previously saved configuration.",
+      "modal_conf_title": "Hall Configurations (Save & Load)",
+      "modal_gif_btn_cancel": "Cancel",
+      "modal_gif_btn_generate": "Generate and Download GIF",
+      "modal_gif_sub": "Generates a demo animated GIF showing counter-flow movement, face-to-face gaze, and walking directions.",
+      "modal_gif_title": "Export GIF Animation (10-15s)",
+      "opt_choose_saved_conf": "-- Choose saved configuration --",
+      "opt_stars_box_sub": "Star distribution by assistants",
+      "opt_stars_box_title": "Star Option",
+      "param_face_time": "Face-to-face time (before step):",
+      "param_glide_sub_1": "Fast 0.1 s",
+      "param_glide_sub_2": "step motion duration, not pause",
+      "param_glide_sub_3": "Slow 2 s",
+      "param_glide_time": "Movement speed (step duration)",
+      "param_workshop_rec": "10s (workshop recommended)",
+      "ph_new_conf_name": "Ex: Hall 800 - 9 lanes 0.70m...",
+      "prog_left_row": "Left line",
+      "prog_right_row": "Right line",
+      "prog_title": "Full lap in counter-flow",
+      "rot_drag_hint": "Shift + drag = free rotation",
+      "sec_adjust_people_loops": "Adjust People and Loops",
+      "sec_backup": "Backup Copy (File Backup)",
+      "sec_backup_hdr": "Backup Copy (File Backup):",
+      "sec_calc_title": "Exact Mathematical Calculation",
+      "sec_hall_configs": "Hall Configurations",
+      "sec_quick_presets": "Predefined quick presets",
+      "sec_report_title": "Dimensions, calculations, and suggestions (as in PDF):",
+      "sec_reset": "Reset settings",
+      "sec_room_dims": "Hall dimensions",
+      "sec_save_load": "Save & Load",
+      "sec_save_named": "Save current state with name",
+      "sec_saved_configs": "Previously saved configurations",
+      "sec_solutions_title": "4 Concrete Solutions for 800 People (Bottleneck Diagnosis)",
+      "sec_view": "View",
+      "sec_wall_dist": "Distances to Hall Walls",
+      "sec_why_not_diag": "Why not Diagonal or Horizontal Lanes?",
+      "sec_why_tapered": "What exactly does „0.70m Lane on Turn” mean?",
+      "sol_1_btn": "Display Solution 1 on Plan (VIABLE: 0.70m Lane)",
+      "sol_1_title": "PROPOSAL 1 [VIABLE]: Tapered / 0.70m Lane on U-Turns",
+      "sol_2_btn": "Display Solution 2 on Plan (VIABLE: Fluid Transit Turns)",
+      "sol_2_title": "PROPOSAL 2 [VIABLE]: Fluid Transit Turns (1-by-1)",
+      "sol_3_btn": "Display Solution 3 on Plan (VIABLE: Staggered Layout)",
+      "sol_3_title": "PROPOSAL 3 [VIABLE]: Staggered Chess Layout (20cm Offset)",
+      "sol_4_btn": "Display Solution 4 on Plan (VIABLE: Max Route 305m)",
+      "sol_4_title": "PROPOSAL 4 [VIABLE]: Maximum Route Length 305m (8 U-Turns)",
+      "sol_5_btn": "Display Solution 5 on Plan (VIABLE: Turners at Ends)",
+      "sol_5_title": "PROPOSAL 5 [VIABLE]: Turner Assistant in Curve Center (Quick 180° Spin)",
+      "sol_6_btn": "Display Solution 6 on Plan (VIABLE - RECOMMENDED): Turners + 9 Lanes",
+      "sol_6_title": "PROPOSAL 6 [VIABLE - RECOMMENDED]: Turner Assistants + 9 Lanes (Original Geometry)",
+      "sol_none_btn": "Show Initial Problem (UNREAL: Red Congestion Zones)",
+      "sol_none_title": "COMPARISON [UNREAL - PROBLEM]: Original Configuration (Red Turn Bottleneck)",
+      "sol_why_title": "WHY THE BOTTLENECK OCCURS FOR 800 PEOPLE ON ORIGINAL SLIDE",
+      "stars_disabled_h": "Star exercise is disabled",
+      "stars_disabled_sub": "Toggle the switch above to enable assistants calculation and star distribution.",
+      "status_running": "Running",
+      "summary_quick_calc": "Quick calculation at various step durations:",
+      "summary_time_rem": "Time remaining:",
+      "summary_title": "Total time for everyone to meet",
+      "tab_calc": "Calc",
+      "tab_circuit": "Step",
+      "tab_configs": "Save",
+      "tab_params": "Parameters",
+      "tab_solutions": "Solutions",
+      "vis_assist": "40 Assistants on Dots (A1-A40)",
+      "vis_dir": "Direction arrows: show step to the right",
+      "vis_gaze": "Gaze / connection line between facing partners",
+      "vis_lead": "Follow Participant #1 (Left Row, Blue)",
+      "vis_reach": "Mark with red dot participants assistants cannot reach",
+      "vis_stars": "Star Exercise Option",
+      "vis_title": "Visual Overlays:",
+      "vis_walls": "Clearances & Distances to Walls (Top, Bottom, Sides)"
+}
+    };
+
+    function toggleLanguage(checked) {
+      setLanguage(checked ? 'en' : 'ro');
+    }
+
+    function setLanguage(lang, save = true) {
+      currentLang = (lang === 'en' ? 'en' : 'ro');
+      const isEn = (currentLang === 'en');
+
+      // Sincronizare toate comutatoarele rotunjite de limbă
+      ['chk-lang', 'chk-lang-hud', 'chk-lang-mob', 'chk-lang-tool'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = isEn;
+      });
+
+      // Actualizare clase active pe etichetele RO / EN
+      document.querySelectorAll('[id^="lbl-lang-ro"]').forEach(el => el.classList.toggle('active', !isEn));
+      document.querySelectorAll('[id^="lbl-lang-en"]').forEach(el => el.classList.toggle('active', isEn));
+
+      document.documentElement.lang = currentLang;
+      applyTranslations();
+
+      if (save) {
+        try { localStorage.setItem('fata-in-fata-lang', currentLang); } catch (e) {}
+      }
+
+      updateMetrics();
+      updateSolutionPills();
+      updateStepProgressUI();
+      updateLapTimeMetric();
+      syncStarUI();
+      syncFastUI();
+      syncPlayButtonUI();
+      renderReportHTML();
+      redraw();
+    }
+
+    function applyTranslations() {
+      const dict = I18N[currentLang] || I18N.ro;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key] !== undefined) el.textContent = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (dict[key] !== undefined) el.innerHTML = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key] !== undefined) el.title = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key] !== undefined) el.placeholder = dict[key];
+      });
+    }
+
     const SHOULDER = 0.46, TORSO_DEPTH = 0.24, ASSIST_DIA = 0.76;
     let isDragging = false;
     let dragStart = { x: 0, y: 0 };
@@ -2763,12 +3367,12 @@
 
       if (badge) {
         if (enableStars) {
-          badge.innerText = 'ACTIV';
+          badge.innerText = currentLang === 'en' ? 'ACTIVE' : 'ACTIV';
           badge.style.background = 'rgba(234, 179, 8, 0.2)';
           badge.style.color = '#facc15';
           badge.style.borderColor = 'rgba(250, 204, 21, 0.3)';
         } else {
-          badge.innerText = 'OPRIT';
+          badge.innerText = currentLang === 'en' ? 'OFF' : 'OPRIT';
           badge.style.background = 'rgba(148, 163, 184, 0.15)';
           badge.style.color = '#94a3b8';
           badge.style.borderColor = 'rgba(148, 163, 184, 0.25)';
@@ -2816,12 +3420,12 @@
 
       if (badge) {
         if (enableStars) {
-          badge.innerText = 'ACTIV';
+          badge.innerText = currentLang === 'en' ? 'ACTIVE' : 'ACTIV';
           badge.style.background = 'rgba(234, 179, 8, 0.2)';
           badge.style.color = '#facc15';
           badge.style.borderColor = 'rgba(250, 204, 21, 0.3)';
         } else {
-          badge.innerText = 'OPRIT';
+          badge.innerText = currentLang === 'en' ? 'OFF' : 'OPRIT';
           badge.style.background = 'rgba(148, 163, 184, 0.15)';
           badge.style.color = '#94a3b8';
           badge.style.borderColor = 'rgba(148, 163, 184, 0.25)';
@@ -2840,11 +3444,22 @@
       const sp = computeStarPlan();
       const fc = (v) => (Math.max(0, v) * 100).toFixed(0) + ' cm';
       const need = (WALK_W * 100).toFixed(0);
-      let h = `Asistenții intră pe culoarul dintre cele două șiruri și dau steluța ambelor șiruri (roz și albastru).<br>`;
-      h += `Loc liber pe culoar: <span class="${sp.corridorFree >= WALK_W ? 'ok' : 'bad'}">${fc(sp.corridorFree)}</span> (necesar ${need} cm)<br>`;
-      h += `Spațiu între doi participanți: <span class="${sp.gapBetween >= TORSO_DEPTH ? 'ok' : 'bad'}">${fc(sp.gapBetween)}</span> (asistentul trece lateral: necesar ${(TORSO_DEPTH * 100).toFixed(0)} cm)<br>`;
-      h += `Participanți la care ajung asistenții: <b>${sp.reachable} din ${sp.total}</b><br>`;
-      h += `Asistenți necesari pentru ${distribMin} min: <span class="${sp.needed <= assistCount ? 'ok' : 'bad'}"><b>${sp.needed}</b></span> (ai ${assistCount}; cu ei durează ${fmtDur(sp.haveSec)})`;
+      const en = currentLang === 'en';
+      let h = en 
+        ? `Assistants enter the corridor between the two rows and hand out stars to both rows (pink and blue).<br>`
+        : `Asistenții intră pe culoarul dintre cele două șiruri și dau steluța ambelor șiruri (roz și albastru).<br>`;
+      h += en 
+        ? `Free corridor space: <span class="${sp.corridorFree >= WALK_W ? 'ok' : 'bad'}">${fc(sp.corridorFree)}</span> (required ${need} cm)<br>`
+        : `Loc liber pe culoar: <span class="${sp.corridorFree >= WALK_W ? 'ok' : 'bad'}">${fc(sp.corridorFree)}</span> (necesar ${need} cm)<br>`;
+      h += en 
+        ? `Space between two participants: <span class="${sp.gapBetween >= TORSO_DEPTH ? 'ok' : 'bad'}">${fc(sp.gapBetween)}</span> (assistant squeezes sideways: required ${(TORSO_DEPTH * 100).toFixed(0)} cm)<br>`
+        : `Spațiu între doi participanți: <span class="${sp.gapBetween >= TORSO_DEPTH ? 'ok' : 'bad'}">${fc(sp.gapBetween)}</span> (asistentul trece lateral: necesar ${(TORSO_DEPTH * 100).toFixed(0)} cm)<br>`;
+      h += en 
+        ? `Reachable participants: <b>${sp.reachable} of ${sp.total}</b><br>`
+        : `Participanți la care ajung asistenții: <b>${sp.reachable} din ${sp.total}</b><br>`;
+      h += en 
+        ? `Assistants needed for ${distribMin} min: <span class="${sp.needed <= assistCount ? 'ok' : 'bad'}"><b>${sp.needed}</b></span> (you have ${assistCount}; takes ${fmtDur(sp.haveSec)})`
+        : `Asistenți necesari pentru ${distribMin} min: <span class="${sp.needed <= assistCount ? 'ok' : 'bad'}"><b>${sp.needed}</b></span> (ai ${assistCount}; cu ei durează ${fmtDur(sp.haveSec)})`;
       out.innerHTML = h;
     }
 
@@ -2881,16 +3496,21 @@
       syncBackGapUI();
       syncStarUI();
       renderReportHTML();
-      document.getElementById('disp-part').innerText = `${partCount} pers`;
+      const en = currentLang === 'en';
+      document.getElementById('disp-part').innerText = `${partCount} ${en ? 'people' : 'pers'}`;
       const numIn = document.getElementById('inp-part-num');
       if (numIn && document.activeElement !== numIn) numIn.value = partCount;
-      document.getElementById('disp-part-split').innerText = `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
-      document.getElementById('disp-assist').innerText = `${assistCount} asistenți`;
-      document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) ? 'A1 - A40 (conform slide)' : (assistCount > 0 ? `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m` : 'Fără asistenți');
-      const bucleText = (nLanes - 1) === 1 ? '1 Buclă U' : `${Math.max(0, nLanes - 1)} Bucle U`;
-      const laneText = nLanes === 1 ? '1 Culoar' : `${nLanes} Culoare`;
+      document.getElementById('disp-part-split').innerText = en 
+        ? `${Math.round(partCount/2)} Left vs ${Math.round(partCount/2)} Right (Face to Face)` 
+        : `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
+      document.getElementById('disp-assist').innerText = `${assistCount} ${en ? 'assistants' : 'asistenți'}`;
+      document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) 
+        ? (en ? 'A1 - A40 (per slide)' : 'A1 - A40 (conform slide)') 
+        : (assistCount > 0 ? (en ? `Every ${(totalPathLength/assistCount).toFixed(1)} m` : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`) : (en ? 'No assistants' : 'Fără asistenți'));
+      const bucleText = (nLanes - 1) === 1 ? (en ? '1 U-Loop' : '1 Buclă U') : `${Math.max(0, nLanes - 1)} ${en ? 'U-Loops' : 'Bucle U'}`;
+      const laneText = nLanes === 1 ? (en ? '1 Lane' : '1 Culoar') : `${nLanes} ${en ? 'Lanes' : 'Culoare'}`;
       document.getElementById('disp-lanes').innerText = `${laneText} (${bucleText})`;
-      document.getElementById('disp-pitch').innerText = `Pas între axe: ${(corridorW + assistGap).toFixed(2)} / ${(corridorW + backGap).toFixed(2)} m`;
+      document.getElementById('disp-pitch').innerText = `${en ? 'Axis pitch:' : 'Pas între axe:'} ${(corridorW + assistGap).toFixed(2)} / ${(corridorW + backGap).toFixed(2)} m`;
       document.getElementById('disp-dist-face').innerText = `${corridorW.toFixed(2)} m`;
 
       // Update Participanți pe Rând metrics
@@ -2912,11 +3532,13 @@
       }
       const dispRow = document.getElementById('disp-part-per-row');
       if (dispRow) {
-        dispRow.innerText = `${perRow} pers/șir`;
+        dispRow.innerText = `${perRow} ${en ? 'pers/line' : 'pers/șir'}`;
       }
       const dispRowSub = document.getElementById('disp-part-per-row-sub');
       if (dispRowSub) {
-        dispRowSub.innerHTML = `<b>${nLanes} cul (${nRows} rânduri) &times; ${perRow} pers/șir = ${perRow * nRows} pers</b> (Max: ${maxPerRow})`;
+        dispRowSub.innerHTML = en
+          ? `<b>${nLanes} lanes (${nRows} lines) &times; ${perRow} pers/line = ${perRow * nRows} pers</b> (Max: ${maxPerRow})`
+          : `<b>${nLanes} cul (${nRows} rânduri) &times; ${perRow} pers/șir = ${perRow * nRows} pers</b> (Max: ${maxPerRow})`;
       }
       const dispMaxRow = document.getElementById('disp-max-per-row');
       if (dispMaxRow) {
@@ -2925,11 +3547,15 @@
 
       document.getElementById('calc-len').innerText = `${totalPathLength.toFixed(1)} m`;
       const elCalcLanesRows = document.getElementById('calc-lanes-rows');
-      if (elCalcLanesRows) elCalcLanesRows.innerText = `${nLanes} culoare = ${nRows} rânduri (${Math.max(0, nLanes - 1)} bucle U)`;
+      if (elCalcLanesRows) elCalcLanesRows.innerText = en
+        ? `${nLanes} lanes = ${nRows} lines (${Math.max(0, nLanes - 1)} U-loops)`
+        : `${nLanes} culoare = ${nRows} rânduri (${Math.max(0, nLanes - 1)} bucle U)`;
       const elCalcPerRow = document.getElementById('calc-per-row');
-      if (elCalcPerRow) elCalcPerRow.innerText = `${perRow} pers/șir \u00D7 ${nRows} rânduri = ${partCount} pers total`;
+      if (elCalcPerRow) elCalcPerRow.innerText = en
+        ? `${perRow} pers/line \u00D7 ${nRows} lines = ${partCount} total`
+        : `${perRow} pers/șir \u00D7 ${nRows} rânduri = ${partCount} pers total`;
       const pairs = Math.round(partCount / 2);
-      document.getElementById('calc-pairs').innerText = `${pairs} perechi`;
+      document.getElementById('calc-pairs').innerText = `${pairs} ${en ? 'pairs' : 'perechi'}`;
       const stepSize = pairs > 0 ? ((totalVirtualLength / pairs) * 100).toFixed(1) : '0';
       document.getElementById('calc-step-size').innerText = `${stepSize} cm`;
       updateLapTimeMetric();
@@ -2949,24 +3575,40 @@
           cBadge.style.background = 'rgba(239, 68, 68, 0.22)';
           cBadge.style.borderColor = '#ef4444';
           cBadge.style.color = '#fca5a5';
-          cText.innerHTML = `<span class="dot dot-red"></span>NEREAL · Problemă înghesuială: ${nTurns} Bucle Roșii (${(spaceInner*100).toFixed(1)} cm &lt; 46 cm umeri)`;
+          cText.innerHTML = en
+            ? `<span class="dot dot-red"></span>UNREAL · Congestion Issue: ${nTurns} Red Turns (${(spaceInner*100).toFixed(1)} cm &lt; 46 cm shoulders)`
+            : `<span class="dot dot-red"></span>NEREAL · Problemă înghesuială: ${nTurns} Bucle Roșii (${(spaceInner*100).toFixed(1)} cm &lt; 46 cm umeri)`;
         } else {
           cBadge.style.background = 'rgba(34, 197, 94, 0.20)';
           cBadge.style.borderColor = '#22c55e';
           cBadge.style.color = '#86efac';
-          let solMsg = `<span class="dot dot-green"></span>REAL (Zero Roșu): ${nTurns} Bucle Verzi`;
+          let solMsg = en
+            ? `<span class="dot dot-green"></span>VIABLE (Zero Red): ${nTurns} Green Loops`
+            : `<span class="dot dot-green"></span>REAL (Zero Roșu): ${nTurns} Bucle Verzi`;
           if (currentSolution800 === 'tapered') {
-            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 1 (Culoar 0.70m): ${(spaceInner*100).toFixed(1)} cm pe viraj &gt; 46cm umeri (Zero Roșu)`;
+            solMsg = en
+              ? `<span class="dot dot-green"></span>VIABLE · Solution 1 (0.70m Lane): ${(spaceInner*100).toFixed(1)} cm on turn &gt; 46cm shoulders (Zero Red)`
+              : `<span class="dot dot-green"></span>REAL · Soluția 1 (Culoar 0.70m): ${(spaceInner*100).toFixed(1)} cm pe viraj &gt; 46cm umeri (Zero Roșu)`;
           } else if (currentSolution800 === 'transit') {
-            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 2 (Tranzit Fluid): 66.1 cm pe linii drepte (Zero Roșu)`;
+            solMsg = en
+              ? `<span class="dot dot-green"></span>VIABLE · Solution 2 (Fluid Transit): 66.1 cm on straight lines (Zero Red)`
+              : `<span class="dot dot-green"></span>REAL · Soluția 2 (Tranzit Fluid): 66.1 cm pe linii drepte (Zero Roșu)`;
           } else if (currentSolution800 === 'staggered') {
-            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 3 (Dispunere în Șah): Decalaj 20cm (Fără contact umeri)`;
+            solMsg = en
+              ? `<span class="dot dot-green"></span>VIABLE · Solution 3 (Staggered Chess): 20cm offset (No shoulder contact)`
+              : `<span class="dot dot-green"></span>REAL · Soluția 3 (Dispunere în Șah): Decalaj 20cm (Fără contact umeri)`;
           } else if (currentSolution800 === 'recommended') {
-            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 6 (Recomandată): ${nLanes} culoare, ${(stepDist*100).toFixed(1)} cm/pers | ${nLanes - 1} întorcători`;
+            solMsg = en
+              ? `<span class="dot dot-green"></span>VIABLE · Solution 6 (Recommended): ${nLanes} lanes, ${(stepDist*100).toFixed(1)} cm/pers | ${nLanes - 1} turners`
+              : `<span class="dot dot-green"></span>REAL · Soluția 6 (Recomandată): ${nLanes} culoare, ${(stepDist*100).toFixed(1)} cm/pers | ${nLanes - 1} întorcători`;
           } else if (currentSolution800 === 'turners') {
-            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 5 (Întorcători): ${(stepDist*100).toFixed(1)} cm/pers pe drept (Zero Roșu)`;
+            solMsg = en
+              ? `<span class="dot dot-green"></span>VIABLE · Solution 5 (Turners): ${(stepDist*100).toFixed(1)} cm/pers on straight (Zero Red)`
+              : `<span class="dot dot-green"></span>REAL · Soluția 5 (Întorcători): ${(stepDist*100).toFixed(1)} cm/pers pe drept (Zero Roșu)`;
           } else if (currentSolution800 === 'max_path') {
-            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 4 (Traseu Maxim 305m): ${(spaceInner*100).toFixed(1)}cm viraj, 76cm drept (Zero Roșu)`;
+            solMsg = en
+              ? `<span class="dot dot-green"></span>VIABLE · Solution 4 (Max Route 305m): ${(spaceInner*100).toFixed(1)}cm turn, 76cm straight (Zero Red)`
+              : `<span class="dot dot-green"></span>REAL · Soluția 4 (Traseu Maxim 305m): ${(spaceInner*100).toFixed(1)}cm viraj, 76cm drept (Zero Roșu)`;
           }
           cText.innerHTML = solMsg;
         }
@@ -3273,7 +3915,9 @@
     function syncFastUI() {
       const b = document.getElementById('btn-fastsim');
       if (b) b.classList.toggle('ctl-primary', fastSim.active);
-      const lbl = document.getElementById('fastsim-label'); if (lbl) lbl.innerText = fastSim.active ? 'Oprește simularea' : 'Simulare rapidă';
+      const en = currentLang === 'en';
+      const lbl = document.getElementById('fastsim-label');
+      if (lbl) lbl.innerText = fastSim.active ? (en ? 'Stop simulation' : 'Oprește simularea') : (en ? 'Fast Sim' : 'Simulare rapidă');
       const t = document.getElementById('tool-fast'); if (t) t.classList.toggle('on', fastSim.active);
       const hf = document.getElementById('hdr-fast'); if (hf) hf.classList.toggle('on', fastSim.active);
     }
@@ -3299,12 +3943,24 @@
       updateStepProgressUI();
     }
 
+    function syncPlayButtonUI() {
+      const en = currentLang === 'en';
+      const b = document.getElementById('btn-flow-play');
+      if (b) {
+        b.innerHTML = `<span id="play-icon">${isFlowPlaying ? IC.pause : IC.play}</span> <span>${isFlowPlaying ? (en ? 'Pause' : 'Pauză') : (en ? 'Play' : 'Pornește')}</span>`;
+      }
+      const tp = document.getElementById('tool-play');
+      if (tp) tp.innerHTML = isFlowPlaying ? IC.pause : IC.play;
+      const cs = document.getElementById('circuit-status');
+      if (cs) {
+        cs.innerText = isFlowPlaying ? (en ? 'Running' : 'Rulează') : (en ? 'Paused' : 'În pauză');
+        cs.style.color = isFlowPlaying ? 'var(--accent-green)' : 'var(--accent-orange)';
+      }
+    }
+
     function toggleFlowPlay() {
       isFlowPlaying = !isFlowPlaying;
-      document.getElementById('btn-flow-play').innerHTML = `<span id="play-icon">${isFlowPlaying ? IC.pause : IC.play}</span> ${isFlowPlaying ? 'Pauză' : 'Pornește'}`;
-      const tp = document.getElementById('tool-play'); if (tp) tp.innerHTML = isFlowPlaying ? IC.pause : IC.play;
-      document.getElementById('circuit-status').innerText = isFlowPlaying ? 'Rulează' : 'În pauză';
-      document.getElementById('circuit-status').style.color = isFlowPlaying ? 'var(--accent-green)' : 'var(--accent-orange)';
+      syncPlayButtonUI();
     }
 
     function resetCircuit() {
@@ -3388,7 +4044,7 @@
         document.getElementById('hdr-step-num').innerText = '0 / 0';
         document.getElementById('hdr-progress').innerText = '0%';
         document.getElementById('circuit-progress-fill').style.width = '0%';
-        document.getElementById('lbl-lap-count').innerText = 'Circuitul #0';
+        document.getElementById('lbl-lap-count').innerText = currentLang === 'en' ? 'Circuit #0' : 'Circuitul #0';
         updateLapTimeMetric();
         return;
       }
@@ -3399,7 +4055,7 @@
       document.getElementById('hdr-step-num').innerText = `${normalizedStep} / ${pairs}`;
       document.getElementById('hdr-progress').innerText = `${pct}%`;
       document.getElementById('circuit-progress-fill').style.width = `${pct}%`;
-      document.getElementById('lbl-lap-count').innerText = `Circuitul #${laps}`;
+      document.getElementById('lbl-lap-count').innerText = currentLang === 'en' ? `Circuit #${laps}` : `Circuitul #${laps}`;
 
       updateLapTimeMetric();
     }
@@ -3624,14 +4280,15 @@
     }
 
     function updateSolutionPills() {
+      const en = currentLang === 'en';
       const pillMap = [
-        { id: 'sol-btn-tapered', mode: 'tapered', name: '1 · Culoar 0.70 m' },
-        { id: 'sol-btn-transit', mode: 'transit', name: '2 · Tranzit' },
-        { id: 'sol-btn-staggered', mode: 'staggered', name: '3 · Șah' },
-        { id: 'sol-btn-max', mode: 'max_path', name: '4 · Traseu 305 m' },
-        { id: 'sol-btn-turners', mode: 'turners', name: '5 · Întorcători' },
-        { id: 'sol-btn-recommended', mode: 'recommended', name: '6 · Recomandat' },
-        { id: 'sol-btn-none', mode: 'none', name: 'Problema' }
+        { id: 'sol-btn-tapered', mode: 'tapered', name: en ? '1 · Lane 0.70 m' : '1 · Culoar 0.70 m' },
+        { id: 'sol-btn-transit', mode: 'transit', name: en ? '2 · Transit' : '2 · Tranzit' },
+        { id: 'sol-btn-staggered', mode: 'staggered', name: en ? '3 · Staggered' : '3 · Șah' },
+        { id: 'sol-btn-max', mode: 'max_path', name: en ? '4 · Route 305 m' : '4 · Traseu 305 m' },
+        { id: 'sol-btn-turners', mode: 'turners', name: en ? '5 · Turners' : '5 · Întorcători' },
+        { id: 'sol-btn-recommended', mode: 'recommended', name: en ? '6 · Recommended' : '6 · Recomandat' },
+        { id: 'sol-btn-none', mode: 'none', name: en ? 'Problem' : 'Problema' }
       ];
       pillMap.forEach(item => {
         const isReal = isSolutionReal(item.mode);
@@ -3642,7 +4299,7 @@
           btn.classList.toggle('is-real', isReal);
           btn.classList.toggle('is-not-real', !isReal);
           const dotColor = isReal ? 'green' : 'red';
-          const realTag = isReal ? '' : ' (Nereal)';
+          const realTag = isReal ? '' : (en ? ' (Unreal)' : ' (Nereal)');
           btn.innerHTML = `<span class="dot dot-${dotColor}"></span>${item.name}${realTag}`;
           if (isActive) {
             btn.style.background = isReal ? '#059669' : '#dc2626';
@@ -3675,12 +4332,12 @@
           }
           cardBtn.style.color = '#fff';
           const dotColor = isReal ? 'green' : 'red';
-          const realLabel = isReal ? 'REAL' : 'NEREAL';
-          cardBtn.innerHTML = `<span class="dot dot-${dotColor}"></span>${isActive ? '✓ ACTIV: ' : ''}[${realLabel}] ${item.name}`;
+          const realLabel = isReal ? (en ? 'VIABLE' : 'REAL') : (en ? 'UNREAL' : 'NEREAL');
+          cardBtn.innerHTML = `<span class="dot dot-${dotColor}"></span>${isActive ? (en ? '✓ ACTIVE: ' : '✓ ACTIV: ') : ''}[${realLabel}] ${item.name}`;
         }
       });
       const isCurReal = isSolutionReal(currentSolution800);
-      const curShortName = { tapered: 'Sol. 1', transit: 'Sol. 2', staggered: 'Sol. 3', max_path: 'Sol. 4', turners: 'Sol. 5', recommended: 'Sol. 6', none: 'Problema' }[currentSolution800] || 'Soluție';
+      const curShortName = { tapered: 'Sol. 1', transit: 'Sol. 2', staggered: 'Sol. 3', max_path: 'Sol. 4', turners: 'Sol. 5', recommended: 'Sol. 6', none: (en ? 'Problem' : 'Problema') }[currentSolution800] || (en ? 'Solution' : 'Soluție');
       const hs = document.getElementById('hud-sol');
       if (hs) {
         hs.innerHTML = `<span class="dot dot-${isCurReal ? 'green' : 'red'}"></span><span>${curShortName}</span>`;
@@ -4595,10 +5252,11 @@
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 
       const dimX = -1.1;
-      drawDimensionLine(dimX, 0, dimX, ROOM_L, `≈ ${ROOM_L.toFixed(1).replace('.', ',')} m (LUNGIME)`);
+      const en = currentLang === 'en';
+      drawDimensionLine(dimX, 0, dimX, ROOM_L, en ? `≈ ${ROOM_L.toFixed(1)} m (LENGTH)` : `≈ ${ROOM_L.toFixed(1).replace('.', ',')} m (LUNGIME)`);
 
       const dimY = ROOM_L + 1.1;
-      drawDimensionLine(0, dimY, ROOM_W, dimY, `≈ ${ROOM_W.toFixed(1).replace('.', ',')} m (LĂȚIME)`);
+      drawDimensionLine(0, dimY, ROOM_W, dimY, en ? `≈ ${ROOM_W.toFixed(1)} m (WIDTH)` : `≈ ${ROOM_W.toFixed(1).replace('.', ',')} m (LĂȚIME)`);
 
       // COTE & DISTANȚE PÂNĂ LA PEREȚI
       const showWallDims = document.getElementById('chk-wall-dims')?.checked ?? true;
@@ -4607,20 +5265,20 @@
         // Distanță perete SUS
         const topTurnX = (nLanes > 2) ? (laneXs[1] + laneXs[2]) / 2 : (ROOM_W / 2);
         const actualTopMargin = Math.max(0.1, laneYTop - rTurn - halfW);
-        drawWallClearanceLine(topTurnX, 0, topTurnX, actualTopMargin, ` ${actualTopMargin.toFixed(2)} m (Perete Sus)`, '#38bdf8');
+        drawWallClearanceLine(topTurnX, 0, topTurnX, actualTopMargin, ` ${actualTopMargin.toFixed(2)} m ${en ? '(Top Wall)' : '(Perete Sus)'}`, '#38bdf8');
 
         // Distanță perete JOS
         const btmTurnX = (nLanes > 1) ? (laneXs[0] + laneXs[1]) / 2 : (laneXs[0] || (ROOM_W / 2));
         const actualBtmMargin = Math.max(0.1, ROOM_L - (laneYBottom + rTurn + halfW));
-        drawWallClearanceLine(btmTurnX, ROOM_L - actualBtmMargin, btmTurnX, ROOM_L, ` ${actualBtmMargin.toFixed(2)} m (Perete Jos)`, '#38bdf8');
+        drawWallClearanceLine(btmTurnX, ROOM_L - actualBtmMargin, btmTurnX, ROOM_L, ` ${actualBtmMargin.toFixed(2)} m ${en ? '(Bottom Wall)' : '(Perete Jos)'}`, '#38bdf8');
 
         // Distanță perete STÂNGA
         const actualSideLeft = Math.max(0.1, laneXs[0] - halfW);
-        drawWallClearanceLine(0, ROOM_L / 2, actualSideLeft, ROOM_L / 2, ` ${actualSideLeft.toFixed(2)} m (Perete Stânga)`, '#a855f7');
+        drawWallClearanceLine(0, ROOM_L / 2, actualSideLeft, ROOM_L / 2, ` ${actualSideLeft.toFixed(2)} m ${en ? '(Left Wall)' : '(Perete Stânga)'}`, '#a855f7');
 
         // Distanță perete DREAPTA
         const actualSideRight = Math.max(0.1, ROOM_W - (laneXs[laneXs.length - 1] + halfW));
-        drawWallClearanceLine(ROOM_W - actualSideRight, ROOM_L / 2, ROOM_W, ROOM_L / 2, ` ${actualSideRight.toFixed(2)} m (Perete Dreapta)`, '#a855f7');
+        drawWallClearanceLine(ROOM_W - actualSideRight, ROOM_L / 2, ROOM_W, ROOM_L / 2, ` ${actualSideRight.toFixed(2)} m ${en ? '(Right Wall)' : '(Perete Dreapta)'}`, '#a855f7');
 
         // Dacă este compact, afișăm și dimensiunea totală a amprentei ocupate:
         if (compactCorridors && partCount < 700) {
@@ -4630,7 +5288,7 @@
           ctx.font = 'bold 0.42px Inter, system-ui, sans-serif';
           ctx.fillStyle = '#22c55e';
           ctx.textAlign = 'center';
-          ctx.fillText(`Amprentă grup: \u2248 ${circuitW.toFixed(1)} m \u00D7 ${circuitL.toFixed(1)} m`, ROOM_W / 2, laneYBottom + rTurn + halfW + 0.8);
+          ctx.fillText(`${en ? 'Group footprint:' : 'Amprentă grup:'} \u2248 ${circuitW.toFixed(1)} m \u00D7 ${circuitL.toFixed(1)} m`, ROOM_W / 2, laneYBottom + rTurn + halfW + 0.8);
           ctx.restore();
         }
       }
@@ -4957,7 +5615,8 @@
     function renderReportHTML() {
       const el = document.getElementById('calc-report');
       if (!el) return;
-      const r = computeReport();
+      const en = currentLang === 'en';
+      const r = computeReport(currentLang);
       const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
       let h = `<div class="rep-title">${esc(r.title)}</div>`;
       for (const sec of r.sections) {
@@ -4965,8 +5624,8 @@
         for (const [a, b, c] of sec.rows) h += `<tr><td>${esc(a)}</td><td class="rep-val">${esc(b)}</td></tr>`;
         h += '</table>';
       }
-      h += `<div class="rep-sec">Formule</div><ul class="rep-list">${r.formulas.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
-      h += `<div class="rep-sec">Sugestii</div><ul class="rep-list">${r.sug.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
+      h += `<div class="rep-sec">${en ? 'Formulas' : 'Formule'}</div><ul class="rep-list">${r.formulas.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
+      h += `<div class="rep-sec">${en ? 'Suggestions' : 'Sugestii'}</div><ul class="rep-list">${r.sug.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
       el.innerHTML = h;
     }
 
@@ -5938,6 +6597,8 @@
     loadSavedState();   // setările salvate (parametri, soluție, vedere); parametrii din URL le suprascriu
     refreshNamedConfigsUI();
     const urlParams = new URLSearchParams(window.location.search);
+    const pLang = urlParams.get('lang') || localStorage.getItem('fata-in-fata-lang') || 'ro';
+    setLanguage(pLang, false);
     const pParts = urlParams.get('parts');
     if (pParts) {
       partCount = parseInt(pParts);
