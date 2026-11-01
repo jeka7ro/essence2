@@ -1472,25 +1472,50 @@
         <!-- Slider Participanți -->
         <div class="param-box">
           <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="param-name">👥 Total Participanți:</span>
+            <span class="param-name">👥 Total Participanți în sală:</span>
             <div style="display:flex; align-items:center; gap:6px;">
-              <input type="number" id="inp-part-num" min="4" max="1500" step="2" value="800" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPartNumInput(this.value)">
+              <input type="number" id="inp-part-num" min="0" max="1500" step="2" value="800" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPartNumInput(this.value)">
               <span class="param-val" id="disp-part" style="min-width:54px; text-align:right;">800 pers</span>
             </div>
           </div>
-          <input type="range" class="param-slider" id="rng-part" min="4" max="1200" step="2" value="800" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-part" min="0" max="1200" step="2" value="800" oninput="onParamChange()">
           <div class="param-sub">
-            <span>4 pers</span>
+            <span>0 pers</span>
             <span id="disp-part-split" style="color:var(--accent-blue); font-weight:700;">400 Stg vs 400 Dr (Față în Față)</span>
             <span>1200 pers</span>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(20)">20p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(50)">50p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(80)">80p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(100)">100p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(400)">400p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:48px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(800)">800p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(0)">0p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(20)">20p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(50)">50p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(100)">100p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(400)">400p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(800)">800p</button>
+          </div>
+        </div>
+
+        <!-- Control Participanți pe Rând (Șir) -->
+        <div class="param-box" style="border-left:3px solid #38bdf8;">
+          <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="param-name">👤 Participanți pe un rând (șir):</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="number" id="inp-part-per-row" min="0" max="80" step="1" value="44" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPerRowChange(this.value)">
+              <span class="param-val" id="disp-part-per-row" style="min-width:65px; text-align:right;">44 pers/șir</span>
+            </div>
+          </div>
+          <input type="range" class="param-slider" id="rng-part-per-row" min="0" max="80" step="1" value="44" oninput="onPerRowChange(this.value)">
+          <div class="param-sub">
+            <span>0 pers</span>
+            <span id="disp-part-per-row-sub" style="color:#38bdf8; font-weight:700;">88 pers/culoar · Max: 64</span>
+            <span id="disp-max-per-row">Max: 64</span>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-top:8px;">
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(0)">0 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(10)">10 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(20)">20 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(30)">30 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(44)">44 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactPerRow('max')">Max Posibil</button>
           </div>
         </div>
 
@@ -1500,9 +1525,9 @@
             <span class="param-name"><span class="dot dot-orange"></span>Asistenți pe Culoare (Buline):</span>
             <span class="param-val" id="disp-assist">40 asistenți</span>
           </div>
-          <input type="range" class="param-slider" id="rng-assist" min="2" max="80" step="2" value="40" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-assist" min="0" max="80" step="2" value="40" oninput="onParamChange()">
           <div class="param-sub">
-            <span>2</span>
+            <span>0</span>
             <span id="disp-assist-dist" style="color:var(--accent-orange); font-weight:700;">A1 - A40 (conform slide)</span>
             <span>80</span>
           </div>
@@ -1525,15 +1550,23 @@
 
         <!-- Slider Bucle / Culoare -->
         <div class="param-box">
-          <div class="param-header">
-            <span class="param-name"> Număr Culoare (Lanes / Bucle):</span>
+          <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="param-name">📐 Număr Culoare (Lanes / Bucle):</span>
             <span class="param-val" id="disp-lanes">9 Culoare (8 Bucle U)</span>
           </div>
-          <input type="range" class="param-slider" id="rng-lanes" min="4" max="12" step="1" value="9" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-lanes" min="1" max="14" step="1" value="9" oninput="onParamChange()">
           <div class="param-sub">
-            <span>4 Culoare</span>
+            <span>1 Culoar (0 Bucle)</span>
             <span id="disp-pitch" style="color:var(--accent-purple); font-weight:700;">Pas între axe: 2.30 m</span>
-            <span>12 Culoare</span>
+            <span>14 Culoare</span>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-top:8px;">
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(1)">1 Cul (0 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(2)">2 Cul (1 Buclă)</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(4)">4 Cul (3 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(6)">6 Cul (5 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(9)">9 Cul (8 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(10)">10 Cul (9 Bucle)</button>
           </div>
         </div>
 
@@ -2282,6 +2315,7 @@
       computeStarPlan();
       resetStars();
       updateMetrics();
+      updateStepProgressUI();
       redraw();
     }
 
@@ -2400,7 +2434,7 @@
       const laneSegs = pathSegments.filter(sg => sg.type === 'line');
       const pairs = Math.round(partCount / 2);
       const halfW = corridorW / 2;
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
       const sumLaneLen = laneSegs.reduce((u, sg) => u + sg.length, 0) || 1;
       const rows = [];
       const aisles = [];          // pentru fiecare alee: {name, free, ok, persons}
@@ -2581,25 +2615,57 @@
       if (numIn && document.activeElement !== numIn) numIn.value = partCount;
       document.getElementById('disp-part-split').innerText = `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
       document.getElementById('disp-assist').innerText = `${assistCount} asistenți`;
-      document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) ? 'A1 - A40 (conform slide)' : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`;
-      document.getElementById('disp-lanes').innerText = `${nLanes} Culoare (${nLanes-1} Bucle U)`;
+      document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) ? 'A1 - A40 (conform slide)' : (assistCount > 0 ? `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m` : 'Fără asistenți');
+      const bucleText = (nLanes - 1) === 1 ? '1 Buclă U' : `${Math.max(0, nLanes - 1)} Bucle U`;
+      const laneText = nLanes === 1 ? '1 Culoar' : `${nLanes} Culoare`;
+      document.getElementById('disp-lanes').innerText = `${laneText} (${bucleText})`;
       document.getElementById('disp-pitch').innerText = `Pas între axe: ${(corridorW + assistGap).toFixed(2)} / ${(corridorW + backGap).toFixed(2)} m`;
       document.getElementById('disp-dist-face').innerText = `${corridorW.toFixed(2)} m`;
+
+      // Update Participanți pe Rând metrics
+      const nRows = 2 * nLanes;
+      const perRow = nRows > 0 ? Math.round(partCount / nRows) : 0;
+      const perLane = nLanes > 0 ? Math.round(partCount / nLanes) : 0;
+      const straightLen = Math.max(0, laneYBottom - laneYTop);
+      const maxPerRow = Math.max(1, Math.floor(straightLen / SHOULDER));
+
+      const rngRow = document.getElementById('rng-part-per-row');
+      if (rngRow) {
+        rngRow.max = Math.max(80, maxPerRow + 10);
+        rngRow.value = perRow;
+      }
+      const inpRow = document.getElementById('inp-part-per-row');
+      if (inpRow && document.activeElement !== inpRow) {
+        inpRow.value = perRow;
+        inpRow.max = Math.max(80, maxPerRow + 10);
+      }
+      const dispRow = document.getElementById('disp-part-per-row');
+      if (dispRow) {
+        dispRow.innerText = `${perRow} pers/șir`;
+      }
+      const dispRowSub = document.getElementById('disp-part-per-row-sub');
+      if (dispRowSub) {
+        dispRowSub.innerText = `${perLane} pers/culoar · Max fizic pe drept: ${maxPerRow} pers/șir`;
+      }
+      const dispMaxRow = document.getElementById('disp-max-per-row');
+      if (dispMaxRow) {
+        dispMaxRow.innerText = `Max: ${maxPerRow} pers`;
+      }
 
       document.getElementById('calc-len').innerText = `${totalPathLength.toFixed(1)} m`;
       const pairs = Math.round(partCount / 2);
       document.getElementById('calc-pairs').innerText = `${pairs} perechi`;
-      const stepSize = ((totalVirtualLength / pairs) * 100).toFixed(1);
+      const stepSize = pairs > 0 ? ((totalVirtualLength / pairs) * 100).toFixed(1) : '0';
       document.getElementById('calc-step-size').innerText = `${stepSize} cm`;
       updateLapTimeMetric();
 
       // Update Live Congestion Status
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? totalVirtualLength / pairs : 0;
       const wTurn = (corridorWTurn ? corridorWTurn : corridorW);
       const rInner = Math.max(0.05, rTurn - wTurn / 2);
-      const spaceInner = stepDist * (rInner / rTurn);
-      const nTurns = nLanes - 1;
-      const isRed = checksCongestion() && (spaceInner < 0.46);
+      const spaceInner = (rTurn > 0 && pairs > 0) ? stepDist * (rInner / rTurn) : 0;
+      const nTurns = Math.max(0, nLanes - 1);
+      const isRed = pairs > 0 && checksCongestion() && (spaceInner < 0.46);
 
       const cBadge = document.getElementById('overlay-congestion-badge');
       const cText = document.getElementById('overlay-congestion-text');
@@ -2656,7 +2722,9 @@
     // ===================== STELUTE IN SIMULARE =====================
     // In pauza dintre pasi, asistentii se opresc la participantii din dreptul lor si le dau steluta.
     function participantsAt(shift) {
-      const pairs = Math.round(partCount / 2), step = totalVirtualLength / pairs, halfW = corridorW / 2;
+      const pairs = Math.round(partCount / 2);
+      if (pairs <= 0) return [];
+      const step = totalVirtualLength / pairs, halfW = corridorW / 2;
       const out = [];
       for (let i = 0; i < pairs; i++) {
         for (const sgn of [1, -1]) {
@@ -2924,7 +2992,7 @@
 
     function triggerContrasensStep() {
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
 
       targetShift += stepDist / 2;
       currentStepNumber++;
@@ -2935,7 +3003,7 @@
 
     function triggerContrasensStepBack() {
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
 
       targetShift -= stepDist / 2;
       currentStepNumber = Math.max(1, currentStepNumber - 1);
@@ -3028,6 +3096,14 @@
 
     function updateStepProgressUI() {
       const pairs = Math.round(partCount / 2);
+      if (pairs <= 0) {
+        document.getElementById('hdr-step-num').innerText = '0 / 0';
+        document.getElementById('hdr-progress').innerText = '0%';
+        document.getElementById('circuit-progress-fill').style.width = '0%';
+        document.getElementById('lbl-lap-count').innerText = 'Circuitul #0';
+        updateLapTimeMetric();
+        return;
+      }
       const normalizedStep = ((currentStepNumber - 1) % pairs) + 1;
       const pct = (((normalizedStep - 1) / pairs) * 100).toFixed(1);
       const laps = Math.floor((currentStepNumber - 1) / pairs) + 1;
@@ -3058,11 +3134,11 @@
 
     function onPartNumInput(val) {
       let n = parseInt(val, 10);
-      if (isNaN(n) || n < 2) return;
+      if (isNaN(n) || n < 0) return;
       if (n % 2 !== 0) n += 1;
       partCount = n;
       const rng = document.getElementById('rng-part');
-      if (rng) rng.value = Math.min(1200, Math.max(4, n));
+      if (rng) rng.value = Math.min(1200, Math.max(0, n));
       recalculateAll();
       redraw();
     }
@@ -3076,6 +3152,41 @@
       recalculateAll();
       redraw();
       showToast(`S-a setat la ${n} participanți (${Math.round(n/2)} perechi)`, '#38bdf8');
+    }
+
+    function onPerRowChange(val) {
+      let perRow = parseInt(val, 10);
+      if (isNaN(perRow) || perRow < 0) perRow = 0;
+      const nRows = 2 * nLanes;
+      partCount = perRow * nRows;
+
+      const rngPart = document.getElementById('rng-part');
+      if (rngPart) rngPart.value = Math.min(1200, partCount);
+      const numPart = document.getElementById('inp-part-num');
+      if (numPart) numPart.value = partCount;
+
+      recalculateAll();
+      redraw();
+    }
+
+    function setExactPerRow(n) {
+      if (n === 'max') {
+        const straightLen = Math.max(0, laneYBottom - laneYTop);
+        n = Math.max(1, Math.floor(straightLen / SHOULDER));
+      }
+      onPerRowChange(n);
+      showToast(`S-a setat la ${n} pers/șir (Total: ${partCount} participanți)`, '#38bdf8');
+    }
+
+    function setExactLanes(n) {
+      nLanes = n;
+      const rngLanes = document.getElementById('rng-lanes');
+      if (rngLanes) rngLanes.value = n;
+      recalculateAll();
+      redraw();
+      const bText = (n - 1) === 1 ? '1 buclă U' : `${Math.max(0, n - 1)} bucle U`;
+      const lText = n === 1 ? '1 culoar' : `${n} culoare`;
+      showToast(`S-au setat ${lText} (${bText})`, '#38bdf8');
     }
 
     function setWallEndPreset(dist) {
@@ -3578,14 +3689,14 @@
 
       // Highlight Congestion Zones or Resolved Solutions on U-Turns
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
 
       for (let i = 0; i < pathSegments.length; i++) {
         const seg = pathSegments[i];
         if (seg.type === 'arc') {
           const rInner = Math.max(0.05, seg.r - halfWTurn);
-          const spaceInner = stepDist * (rInner / seg.r);
-          const isCongestedTurn = checksCongestion() && (spaceInner < 0.46);
+          const spaceInner = (seg.r > 0 && pairs > 0) ? stepDist * (rInner / seg.r) : 0;
+          const isCongestedTurn = pairs > 0 && checksCongestion() && (spaceInner < 0.46);
 
           if (isCongestedTurn) {
             // Fill inner half of U-turn with striking RED
@@ -3798,8 +3909,9 @@
 
     // DRAW THE PARTICIPANTS: MOVING IN CONTRASENS (ONE TO HIS RIGHT, THE OTHER TO HIS RIGHT)
     function drawContrasensParticipants() {
-      const pairs = Math.round(partCount / 2); // 400 pairs
-      const stepDist = totalVirtualLength / pairs; // ~66 cm
+      const pairs = Math.round(partCount / 2);
+      if (pairs <= 0) return;
+      const stepDist = totalVirtualLength / pairs;
       const halfW = corridorW / 2;
       const showGaze = document.getElementById('chk-gaze').checked;
       const showLead = document.getElementById('chk-lead-marker').checked;
@@ -4275,9 +4387,9 @@
       const laneSegs = pathSegments.filter(sg => sg.type === 'line');
       const laneLen = laneSegs.length ? laneSegs[0].length : 0;
       const sumLane = laneSegs.reduce((a, sg) => a + sg.length, 0);
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
       const rInner = Math.max(0.05, rTurn - wTurn / 2);
-      const spaceInner = stepDist * (rInner / rTurn);
+      const spaceInner = (rTurn > 0 && pairs > 0) ? stepDist * (rInner / rTurn) : 0;
       const freeAisle = Math.max(0, assistGap - TORSO_DEPTH);
       const totalSec = pairs * stepIntervalSec;
       const turnerAssist = turnerMode ? (nLanes - 1) : 0;
@@ -4390,7 +4502,7 @@
       }
       if (possLanes > nLanes) sug.push(L(`Cu aceste distanțe ar încăpea ${possLanes} culoare (acum ${nLanes}), cu pereții laterali la 1,0 m. Mai multe culoare înseamnă culoare mai scurte sau mai mult spațiu pe persoană.`,
                                          `With these distances ${possLanes} lanes would fit (now ${nLanes}), with the side walls at 1.0 m. More lanes mean shorter lanes or more space per person.`));
-      const secFor30 = 1800 / pairs;
+      const secFor30 = pairs > 0 ? (1800 / pairs) : 0;
       if (totalSec > 1800) sug.push(L(`Pentru un tur sub 30 de minute pauza trebuie să fie de cel mult ${f(secFor30, 1)} s pe pas (acum ${f(stepIntervalSec, 1)} s).`,
                                       `For a tour under 30 minutes the pause must be at most ${f(secFor30, 1)} s per step (now ${f(stepIntervalSec, 1)} s).`));
       const zoneSec = Math.round(pairs / 3) * stepIntervalSec;
@@ -5257,7 +5369,7 @@
       const fps = 10;
       const totalFrames = durSec * fps;
       const pairs = Math.round(partCount / 2);
-      const stepDist = totalVirtualLength / pairs;
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
 
       let frameIdx = 0;
       const batchSize = 6;
