@@ -1089,6 +1089,65 @@
       border-color: #38bdf8 !important;
     }
 
+    /* Comutator modern rotunjit (iOS style toggle) */
+    .ui-switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      vertical-align: middle;
+      padding: 2px 0;
+    }
+    .ui-switch input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      margin: 0;
+      pointer-events: none;
+    }
+    .ui-switch-slider {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      box-sizing: border-box;
+      background: #334155;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 9999px;
+      transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      display: inline-block;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    .ui-switch-slider::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      top: 2px;
+      background: #f1f5f9;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.22s ease;
+    }
+    .ui-switch input:checked + .ui-switch-slider {
+      background: #eab308;
+      border-color: #facc15;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.35);
+    }
+    .ui-switch input:checked + .ui-switch-slider::before {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+    .ui-switch:focus-within .ui-switch-slider {
+      outline: 2px solid #38bdf8;
+      outline-offset: 2px;
+    }
+
     /* Modal export GIF & Configurații */
     .app-modal-backdrop {
       position: fixed; inset: 0; background: rgba(2, 6, 23, 0.78); backdrop-filter: blur(6px);
@@ -1414,6 +1473,15 @@
             <input type="checkbox" id="chk-reach" onchange="redraw()">
             <span style="color:#facc15;">Marchează cu punct roșu participanții la care asistenții nu ajung</span>
           </label>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
+            <label for="chk-enable-stars-circuit" style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:#facc15; font-weight:600; margin:0;">
+              <span>⭐</span> Opțiune Exercițiu Steluțe
+            </label>
+            <label class="ui-switch" title="Comută activarea exercițiului cu steluțe">
+              <input type="checkbox" id="chk-enable-stars-circuit" checked onchange="toggleStarsFeature(this.checked)">
+              <span class="ui-switch-slider"></span>
+            </label>
+          </div>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-wall-dims" checked onchange="redraw()">
             <span style="color:#38bdf8;"> Cote & Distanțe față de Pereți (Sus, Jos, Laterale)</span>
@@ -1594,18 +1662,42 @@
         </div>
 
         <!-- Steluțe: acces + necesar asistenți -->
-        <div class="param-box" style="border-left:3px solid #facc15;">
-          <div class="param-header">
-            <span class="param-name">Steluțe: timp pe participant</span>
-            <span class="param-val" id="disp-starsec">5 s</span>
+        <div class="param-box" id="box-stars" style="border-left:3px solid #facc15; transition:border-color 0.25s ease;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px; line-height:1;">⭐</span>
+              <div>
+                <div style="font-weight:700; color:#f8fafc; font-size:13px; display:flex; align-items:center; gap:6px;">
+                  <span>Opțiune Steluțe</span>
+                  <span id="disp-stars-badge" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:12px; background:rgba(234,179,8,0.2); color:#facc15; border:1px solid rgba(250,204,21,0.3);">ACTIV</span>
+                </div>
+                <div style="font-size:11px; color:#94a3b8;">Distribuire steluțe de către asistenți</div>
+              </div>
+            </div>
+            <label class="ui-switch" title="Activează / Dezactivează exercițiul cu steluțe">
+              <input type="checkbox" id="chk-enable-stars" checked onchange="toggleStarsFeature(this.checked)">
+              <span class="ui-switch-slider"></span>
+            </label>
           </div>
-          <input type="range" class="param-slider" id="rng-starsec" min="2" max="20" step="1" value="5" oninput="onStarChange()">
-          <div class="param-header" style="margin-top:12px;">
-            <span class="param-name">Steluțe: timp maxim de distribuire</span>
-            <span class="param-val" id="disp-distrib">10 min</span>
+
+          <div id="stars-controls-wrapper">
+            <div class="param-header">
+              <span class="param-name">Steluțe: timp pe participant</span>
+              <span class="param-val" id="disp-starsec">5 s</span>
+            </div>
+            <input type="range" class="param-slider" id="rng-starsec" min="2" max="20" step="1" value="5" oninput="onStarChange()">
+            <div class="param-header" style="margin-top:12px;">
+              <span class="param-name">Steluțe: timp maxim de distribuire</span>
+              <span class="param-val" id="disp-distrib">10 min</span>
+            </div>
+            <input type="range" class="param-slider" id="rng-distrib" min="2" max="90" step="1" value="10" oninput="onStarChange()">
+            <div id="star-out" class="star-out"></div>
           </div>
-          <input type="range" class="param-slider" id="rng-distrib" min="2" max="90" step="1" value="10" oninput="onStarChange()">
-          <div id="star-out" class="star-out"></div>
+          <div id="stars-disabled-notice" style="display:none; font-size:12px; color:#94a3b8; background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; padding:12px; text-align:center; line-height:1.45;">
+            <div style="font-size:18px; margin-bottom:4px; opacity:0.7;">⭐</div>
+            <b style="color:#cbd5e1;">Exercițiul cu steluțe este dezactivat</b><br>
+            <span style="font-size:11px; color:#64748b;">Comutați toggle-ul de mai sus pentru a activa calculul asistenților și distribuirea steluțelor.</span>
+          </div>
         </div>
 
         <!-- Slider Bucle / Culoare -->
@@ -2032,8 +2124,8 @@
           <b id="ovl-total-time" class="hud-val">66 min 40s</b>
           <span id="ovl-total-sub" class="hud-sub">(400 pași la 10s)</span>
         </div>
-        <span class="hud-sep"></span>
-        <div class="hud-stat">
+        <span class="hud-sep" id="hud-stars-sep"></span>
+        <div class="hud-stat" id="hud-stat-stars">
           <svg class="ic" style="width:16px;height:16px;color:#facc15;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 6.5 7 .9-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.9z"/></svg>
           <span class="hud-label">Steluțe</span>
           <b id="hud-stars" class="hud-val">0 / 800</b>
@@ -2302,6 +2394,7 @@
     let backGap = 1.10;       // spate in spate la sirurile ALBASTRE (fara asistenti), min 0.10 m
     let assistGap = 1.10;     // spate in spate la sirurile ROZ, unde stau asistentii (zona portocalie)
     let laneXs = [];          // pozitiile X ale axelor culoarelor
+    let enableStars = true;   // activare / dezactivare exercitiu stelute (toggle rotunjit)
     let starSec = 5;          // secunde pe steluta (oprire la fiecare participant)
     let distribMin = 10;      // in cate minute trebuie distribuite toate steluțele
     let starRowOk = [];
@@ -2647,11 +2740,101 @@
       syncStarUI();
       renderReportHTML();
     }
+    function toggleStarsFeature(enabled, save = true) {
+      enableStars = !!enabled;
+
+      // Sincronizare ambele comutatoare rotunjite (Tab Parametri și Tab Circuit)
+      const chk1 = document.getElementById('chk-enable-stars');
+      if (chk1 && chk1.checked !== enableStars) chk1.checked = enableStars;
+      const chk2 = document.getElementById('chk-enable-stars-circuit');
+      if (chk2 && chk2.checked !== enableStars) chk2.checked = enableStars;
+
+      // Indicator Steluțe din bara superioară HUD
+      const hudStat = document.getElementById('hud-stat-stars');
+      const hudSep = document.getElementById('hud-stars-sep');
+      if (hudStat) hudStat.style.display = enableStars ? 'flex' : 'none';
+      if (hudSep) hudSep.style.display = enableStars ? 'block' : 'none';
+
+      // Badge status & caseta Steluțe din Panou Parametri
+      const badge = document.getElementById('disp-stars-badge');
+      const box = document.getElementById('box-stars');
+      const wrapper = document.getElementById('stars-controls-wrapper');
+      const notice = document.getElementById('stars-disabled-notice');
+
+      if (badge) {
+        if (enableStars) {
+          badge.innerText = 'ACTIV';
+          badge.style.background = 'rgba(234, 179, 8, 0.2)';
+          badge.style.color = '#facc15';
+          badge.style.borderColor = 'rgba(250, 204, 21, 0.3)';
+        } else {
+          badge.innerText = 'OPRIT';
+          badge.style.background = 'rgba(148, 163, 184, 0.15)';
+          badge.style.color = '#94a3b8';
+          badge.style.borderColor = 'rgba(148, 163, 184, 0.25)';
+        }
+      }
+
+      if (box) box.style.borderLeftColor = enableStars ? '#facc15' : '#475569';
+      if (wrapper) wrapper.style.display = enableStars ? 'block' : 'none';
+      if (notice) notice.style.display = enableStars ? 'none' : 'block';
+
+      // Dacă s-a dezactivat, curățăm steluțele existente și oprim distribuirea dacă rula
+      if (!enableStars) {
+        starred.clear();
+        starPop.clear();
+        starEvents = [];
+        if (phase === 'distributing') {
+          phase = 'done';
+          endFastSim(false);
+        }
+      }
+
+      syncStarUI();
+      renderReportHTML();
+      redraw();
+      if (save) saveState();
+    }
     function syncStarUI() {
+      // Asiguram starea comutatoarelor rotunjite
+      const chk1 = document.getElementById('chk-enable-stars');
+      if (chk1 && chk1.checked !== enableStars) chk1.checked = enableStars;
+      const chk2 = document.getElementById('chk-enable-stars-circuit');
+      if (chk2 && chk2.checked !== enableStars) chk2.checked = enableStars;
+
       const a = document.getElementById('disp-starsec'); if (a) a.innerText = starSec + ' s';
       const b = document.getElementById('disp-distrib'); if (b) b.innerText = distribMin + ' min';
       const sa = document.getElementById('rng-starsec'); if (sa) sa.value = starSec;
       const sb = document.getElementById('rng-distrib'); if (sb) sb.value = distribMin;
+
+      const badge = document.getElementById('disp-stars-badge');
+      const box = document.getElementById('box-stars');
+      const wrapper = document.getElementById('stars-controls-wrapper');
+      const notice = document.getElementById('stars-disabled-notice');
+      const hudStat = document.getElementById('hud-stat-stars');
+      const hudSep = document.getElementById('hud-stars-sep');
+
+      if (badge) {
+        if (enableStars) {
+          badge.innerText = 'ACTIV';
+          badge.style.background = 'rgba(234, 179, 8, 0.2)';
+          badge.style.color = '#facc15';
+          badge.style.borderColor = 'rgba(250, 204, 21, 0.3)';
+        } else {
+          badge.innerText = 'OPRIT';
+          badge.style.background = 'rgba(148, 163, 184, 0.15)';
+          badge.style.color = '#94a3b8';
+          badge.style.borderColor = 'rgba(148, 163, 184, 0.25)';
+        }
+      }
+      if (box) box.style.borderLeftColor = enableStars ? '#facc15' : '#475569';
+      if (wrapper) wrapper.style.display = enableStars ? 'block' : 'none';
+      if (notice) notice.style.display = enableStars ? 'none' : 'block';
+      if (hudStat) hudStat.style.display = enableStars ? 'flex' : 'none';
+      if (hudSep) hudSep.style.display = enableStars ? 'block' : 'none';
+
+      if (!enableStars) return;
+
       const out = document.getElementById('star-out');
       if (!out) return;
       const sp = computeStarPlan();
@@ -2843,7 +3026,7 @@
     // si merge pe culoarul dintre cele doua siruri; de acolo da steluta ambelor siruri (roz si albastru).
     // Fiecare asistent serveste culoarele vecine aleii lui (aleea k margineste culoarele k si k+1).
     function startDistribution(targetSec) {
-      if (phase === 'distributing' || !assistants.length) return;
+      if (!enableStars || phase === 'distributing' || !assistants.length) return;
       const P = participantsAt(targetShift).filter(p => !starred.has(p.key));
       const stations = assistants.map(a => ({ a, list: [], stops: [], i: 0, mode: 'walk', t: 0, k: 0 }));
       const lanesOf = (k) => [k, k + 1].filter(L => L >= 0 && L < nLanes);
@@ -2952,7 +3135,11 @@
       if (fastSim.active) return;
       const out = document.getElementById('fastsim-out');
       if (!out) return;
-      out.innerHTML = `Turul s-a terminat, iar asistenții au dat steluțele: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
+      if (enableStars) {
+        out.innerHTML = `Turul s-a terminat, iar asistenții au dat steluțele: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
+      } else {
+        out.innerHTML = `Turul s-a terminat cu succes. Toți cei <b>${partCount}</b> participanți au parcurs circuitul complet.`;
+      }
     }
 
     function resetStars() {
@@ -2964,9 +3151,13 @@
     function updateStarHUD() {
       const el = document.getElementById('hud-stars');
       if (el) el.innerText = `${starred.size} / ${partCount}`;
+      const hudStat = document.getElementById('hud-stat-stars');
+      const hudSep = document.getElementById('hud-stars-sep');
+      if (hudStat) hudStat.style.display = enableStars ? 'flex' : 'none';
+      if (hudSep) hudSep.style.display = enableStars ? 'block' : 'none';
     }
     function drawStarEvents() {
-      if (phase !== 'distributing') return;
+      if (!enableStars || phase !== 'distributing') return;
       for (const a of assistants) {
         const p = a.serving;
         if (!p) continue;
@@ -2984,7 +3175,7 @@
     }
     // steluta primita: lipita pe participant (vizibila si cand vezi toata sala), cu animatie de aparitie
     function drawStarredMarker(px, py, pt, key) {
-      if (!starred.has(key) || !pt) return;
+      if (!enableStars || !starred.has(key) || !pt) return;
       const t0 = starPop.get(key);
       const pop = t0 ? Math.max(0, 1 - (performance.now() - t0) / 450) : 0;
       const r = Math.max(0.15, 5 / scale) * (1 + 0.9 * pop);      // cand vezi toata sala steluta ramane vizibila (min. ~3 px)
@@ -3033,7 +3224,7 @@
     function drawRecordingOverlay() {
       if (!recorder) return;
       const pairs = Math.round(partCount / 2);
-      const txt = phase === 'distributing' ? `Distribuire steluțe: ${starred.size} / ${partCount}` : `Pasul ${Math.min(pairs, currentStepNumber)} / ${pairs}   |   Steluțe: ${starred.size} / ${partCount}`;
+      const txt = phase === 'distributing' ? `Distribuire steluțe: ${starred.size} / ${partCount}` : (enableStars ? `Pasul ${Math.min(pairs, currentStepNumber)} / ${pairs}   |   Steluțe: ${starred.size} / ${partCount}` : `Pasul ${Math.min(pairs, currentStepNumber)} / ${pairs}`);
       const vp = document.getElementById('viewport');
       ctx.save();
       ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
@@ -3071,7 +3262,11 @@
       const out = document.getElementById('fastsim-out');
       if (out) {
         const real = fmtDur(pairs * stepIntervalSec);
-        out.innerHTML = `${stopped ? 'Oprită la' : 'Gata:'} pasul <b>${Math.min(pairs, currentStepNumber)} din ${pairs}</b>, în ${fastDur} s (în realitate ${real}).<br>Steluțe date: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>') + (wasRec ? '<br>Videoclipul se descarcă automat (.webm).' : '');
+        if (enableStars) {
+          out.innerHTML = `${stopped ? 'Oprită la' : 'Gata:'} pasul <b>${Math.min(pairs, currentStepNumber)} din ${pairs}</b>, în ${fastDur} s (în realitate ${real}).<br>Steluțe date: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>') + (wasRec ? '<br>Videoclipul se descarcă automat (.webm).' : '');
+        } else {
+          out.innerHTML = `${stopped ? 'Oprită la' : 'Gata:'} pasul <b>${Math.min(pairs, currentStepNumber)} din ${pairs}</b>, în ${fastDur} s (în realitate ${real}).` + (wasRec ? '<br>Videoclipul se descarcă automat (.webm).' : '');
+        }
       }
       syncFastUI();
     }
@@ -3682,15 +3877,22 @@
       if (dt > 0 && dt < 0.1) {
         if (phase === 'distributing') updateDistribution(dt);
         if (fastSim.active) {
-          // simulare rapida: tot turul (60% din timp), apoi distribuirea steluțelor (restul)
+          // simulare rapida: tot turul (60% din timp dacă sunt steluțe, 100% dacă nu), apoi distribuirea steluțelor (restul)
           const pairs = Math.round(partCount / 2);
-          const stepsDur = fastSim.dur * 0.6;
+          const stepsDur = enableStars ? (fastSim.dur * 0.6) : fastSim.dur;
           const elapsed = (currentTime - fastSim.t0) / 1000;
           if (phase === 'running') {
             const want = Math.min(pairs - 1, Math.floor(elapsed / stepsDur * (pairs - 1)));
             while (fastSim.done < want) { triggerContrasensStep(); fastSim.done++; }
             animShift = targetShift;
-            if (fastSim.done >= pairs - 1 && elapsed >= stepsDur) startDistribution(fastSim.dur * 0.4);
+            if (fastSim.done >= pairs - 1 && elapsed >= stepsDur) {
+              if (enableStars) {
+                startDistribution(fastSim.dur * 0.4);
+              } else {
+                phase = 'done';
+                endFastSim(false);
+              }
+            }
           } else if (phase === 'done') {
             endFastSim(false);
           }
@@ -3703,7 +3905,16 @@
             if (stepTimer >= stepIntervalSec) {
               stepTimer = 0;
               const pairsN = Math.round(partCount / 2);
-              if (currentStepNumber >= pairsN) startDistribution();      // tot grupul a terminat turul: urmeaza steluțele
+              if (currentStepNumber >= pairsN) {
+                if (enableStars) {
+                  startDistribution();      // tot grupul a terminat turul: urmeaza steluțele
+                } else {
+                  phase = 'done';
+                  isFlowPlaying = false;
+                  updatePlayPauseButton();
+                  showStarSummary();
+                }
+              }
               else triggerContrasensStep();
             }
           }
@@ -4651,18 +4862,20 @@
         ]},
       ];
 
-      const sp = computeStarPlan();
-      const cm2 = (v) => cm(Math.max(0, v));
-      sections.push({ title: L('Steluțe: acces și asistenți', 'Stars: access and assistants'), rows: [
-        [L('Cum se dau steluțele', 'How the stars are handed out'), L('de pe culoar', 'from the lane'), L('asistentul intră între cele două șiruri și servește ambele', 'the assistant steps between the two rows and serves both')],
-        [L('Loc liber pe culoar', 'Free space in the lane'), cm2(sp.corridorFree), L(`necesar ${(WALK_W * 100).toFixed(0)} cm ca asistentul să meargă și să se oprească`, `${(WALK_W * 100).toFixed(0)} cm needed so an assistant can walk and stop`)],
-        [L('Spațiu între doi participanți', 'Gap between two participants'), cm2(sp.gapBetween), L('asistentul trece lateral: necesar 24 cm', 'the assistant passes sideways: 24 cm needed')],
-        [L('Participanți la care ajung asistenții', 'Participants reached by assistants'), `${sp.reachable} ${L('din', 'of')} ${sp.total}`, `${L('roz', 'pink')} ${sp.pinkOk}/${sp.pinkAll}, ${L('albastru', 'blue')} ${sp.blueOk}/${sp.blueAll}`],
-        [L('Timp pe participant (steluță)', 'Time per participant (star)'), `${starSec} s`, L('setat în aplicație', 'set in the app')],
-        [L('Timp maxim de distribuire', 'Maximum distribution time'), `${distribMin} min`, L('setat în aplicație', 'set in the app')],
-        [L('Asistenți necesari', 'Assistants needed'), `${sp.needed}`, L('timp de lucru total / timp maxim', 'total work time / maximum time')],
-        [L('Asistenți disponibili', 'Assistants available'), `${assistCount}`, `${L('durata cu ei', 'duration with them')}: ${fmtDur(sp.haveSec)}`],
-      ]});
+      if (enableStars) {
+        const sp = computeStarPlan();
+        const cm2 = (v) => cm(Math.max(0, v));
+        sections.push({ title: L('Steluțe: acces și asistenți', 'Stars: access and assistants'), rows: [
+          [L('Cum se dau steluțele', 'How the stars are handed out'), L('de pe culoar', 'from the lane'), L('asistentul intră între cele două șiruri și servește ambele', 'the assistant steps between the two rows and serves both')],
+          [L('Loc liber pe culoar', 'Free space in the lane'), cm2(sp.corridorFree), L(`necesar ${(WALK_W * 100).toFixed(0)} cm ca asistentul să meargă și să se oprească`, `${(WALK_W * 100).toFixed(0)} cm needed so an assistant can walk and stop`)],
+          [L('Spațiu între doi participanți', 'Gap between two participants'), cm2(sp.gapBetween), L('asistentul trece lateral: necesar 24 cm', 'the assistant passes sideways: 24 cm needed')],
+          [L('Participanți la care ajung asistenții', 'Participants reached by assistants'), `${sp.reachable} ${L('din', 'of')} ${sp.total}`, `${L('roz', 'pink')} ${sp.pinkOk}/${sp.pinkAll}, ${L('albastru', 'blue')} ${sp.blueOk}/${sp.blueAll}`],
+          [L('Timp pe participant (steluță)', 'Time per participant (star)'), `${starSec} s`, L('setat în aplicație', 'set in the app')],
+          [L('Timp maxim de distribuire', 'Maximum distribution time'), `${distribMin} min`, L('setat în aplicație', 'set in the app')],
+          [L('Asistenți necesari', 'Assistants needed'), `${sp.needed}`, L('timp de lucru total / timp maxim', 'total work time / maximum time')],
+          [L('Asistenți disponibili', 'Assistants available'), `${assistCount}`, `${L('durata cu ei', 'duration with them')}: ${fmtDur(sp.haveSec)}`],
+        ]});
+      }
 
       const formulas = [
         L('Spațiu pe persoană = lungime traseu / număr de perechi', 'Space per person = route length / number of pairs'),
@@ -4671,9 +4884,13 @@
         L('Lățime liberă între spate = distanță spate în spate - 0,24 m (adâncimea pieptului)', 'Free width between backs = back-to-back distance - 0.24 m (chest depth)'),
         L('Pas între axe = lățime culoar + spate în spate (alternativ: roz cu asistenți, albastru fără)', 'Lane pitch = lane width + back to back (alternating: pink with assistants, blue without)'),
         L('Durată tur = număr de perechi x secunde pe pas', 'Tour duration = number of pairs x seconds per step'),
-        L('Timp de lucru steluțe = participanți x secunde pe steluță + opriri x (distanța dintre ei / 1 m/s)', 'Star work time = participants x seconds per star + stops x (distance between them / 1 m/s)'),
-        L('Asistenți necesari = timp de lucru steluțe / timp maxim de distribuire', 'Assistants needed = star work time / maximum distribution time'),
       ];
+      if (enableStars) {
+        formulas.push(
+          L('Timp de lucru steluțe = participanți x secunde pe steluță + opriri x (distanța dintre ei / 1 m/s)', 'Star work time = participants x seconds per star + stops x (distance between them / 1 m/s)'),
+          L('Asistenți necesari = timp de lucru steluțe / timp maxim de distribuire', 'Assistants needed = star work time / maximum distribution time')
+        );
+      }
 
       const sug = [];
       const minSpace = SHOULDER;
@@ -4718,17 +4935,21 @@
                  `If the room is split into the 3 sections (C1, C2, C3) with a separate circuit in each, the tour drops to about ${fmtDur(zoneSec)} at the same pause, but each participant meets only a third of the partners.`));
       if (!hasProblem) sug.unshift(L('Configurația curentă respectă 46 cm pe persoană, atât pe culoar cât și la capete.', 'The current configuration keeps 46 cm per person, both on the lanes and at the ends.'));
 
-      if (sp.reachable < sp.total) {
-        const bgNeed = WALK_W + TORSO_DEPTH;
-        let t = L(`Asistenții nu pot intra pe culoar ca să dea steluțele.`, `Assistants cannot enter the lane to hand out the stars.`);
-        if (sp.corridorFree < WALK_W) t += L(` Pe culoar rămân doar ${cm2(sp.corridorFree)} liberi; măriți distanța față în față la cel puțin ${f(WALK_W + TORSO_DEPTH)} m.`, ` Only ${cm2(sp.corridorFree)} remain free in the lane; increase the face-to-face distance to at least ${f(WALK_W + TORSO_DEPTH)} m.`);
-        if (sp.gapBetween < TORSO_DEPTH) t += L(` Între participanți sunt doar ${cm2(sp.gapBetween)} (necesar 24 cm ca asistentul să treacă lateral); reduceți numărul de participanți sau lungiți traseul.`, ` There are only ${cm2(sp.gapBetween)} between participants (24 cm needed for the assistant to pass sideways); reduce the number of participants or lengthen the route.`);
-        sug.unshift(t);
+      if (enableStars) {
+        const sp = computeStarPlan();
+        const cm2 = (v) => cm(Math.max(0, v));
+        if (sp.reachable < sp.total) {
+          const bgNeed = WALK_W + TORSO_DEPTH;
+          let t = L(`Asistenții nu pot intra pe culoar ca să dea steluțele.`, `Assistants cannot enter the lane to hand out the stars.`);
+          if (sp.corridorFree < WALK_W) t += L(` Pe culoar rămân doar ${cm2(sp.corridorFree)} liberi; măriți distanța față în față la cel puțin ${f(WALK_W + TORSO_DEPTH)} m.`, ` Only ${cm2(sp.corridorFree)} remain free in the lane; increase the face-to-face distance to at least ${f(WALK_W + TORSO_DEPTH)} m.`);
+          if (sp.gapBetween < TORSO_DEPTH) t += L(` Între participanți sunt doar ${cm2(sp.gapBetween)} (necesar 24 cm ca asistentul să treacă lateral); reduceți numărul de participanți sau lungiți traseul.`, ` There are only ${cm2(sp.gapBetween)} between participants (24 cm needed for the assistant to pass sideways); reduce the number of participants or lengthen the route.`);
+          sug.unshift(t);
+        }
+        if (sp.needed > assistCount) sug.push(L(`Pentru a distribui toate steluțele în ${distribMin} min sunt necesari ${sp.needed} asistenți (acum ${assistCount}), sau măriți timpul la ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`,
+                                                `To hand out all the stars in ${distribMin} min, ${sp.needed} assistants are needed (now ${assistCount}), or increase the time to ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`));
+        else sug.push(L(`Pentru ${distribMin} min ajung ${sp.needed} asistenți; cei ${assistCount} disponibili termină în ${fmtDur(sp.haveSec)}.`,
+                        `${sp.needed} assistants are enough for ${distribMin} min; the ${assistCount} available finish in ${fmtDur(sp.haveSec)}.`));
       }
-      if (sp.needed > assistCount) sug.push(L(`Pentru a distribui toate steluțele în ${distribMin} min sunt necesari ${sp.needed} asistenți (acum ${assistCount}), sau măriți timpul la ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`,
-                                              `To hand out all the stars in ${distribMin} min, ${sp.needed} assistants are needed (now ${assistCount}), or increase the time to ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`));
-      else sug.push(L(`Pentru ${distribMin} min ajung ${sp.needed} asistenți; cei ${assistCount} disponibili termină în ${fmtDur(sp.haveSec)}.`,
-                      `${sp.needed} assistants are enough for ${distribMin} min; the ${assistCount} available finish in ${fmtDur(sp.haveSec)}.`));
 
       return { sections, formulas, sug, title: solNames[currentSolution800] || '' };
     }
@@ -5138,7 +5359,7 @@
       CHK_IDS.forEach(id => { const el = document.getElementById(id); if (el) chk[id] = el.checked; });
       return {
         v: 1, roomW: ROOM_W, roomL: ROOM_L, partCount, assistCount, nLanes, corridorW, corridorWTurn, wallDistEnd, wallDistSide,
-        backGap, backGapAuto, assistGap, starSec, distribMin, fastDur, assistBlue, sol: currentSolution800, stepIntervalSec, stepGlideSec,
+        backGap, backGapAuto, assistGap, enableStars: !!enableStars, starSec, distribMin, fastDur, assistBlue, sol: currentSolution800, stepIntervalSec, stepGlideSec,
         compactCorridors: !!compactCorridors, equalLoops: !!equalLoops,
         viewRot, cam: (camMode === 'free' ? lastCamMode : camMode), tab: TAB_IDS[Math.max(0, activeTabIdx)], chk,
         sidebarCollapsed: !!(sb && sb.classList.contains('collapsed')), hudMin: !!(hud && hud.classList.contains('hud-min'))
@@ -5171,10 +5392,12 @@
       backGap = num(st.backGap, backGap);
       backGapAuto = (typeof st.backGapAuto === 'boolean') ? st.backGapAuto : backGapAuto;
       assistGap = num(st.assistGap, assistGap);
+      if (typeof st.enableStars === 'boolean') enableStars = st.enableStars;
       starSec = num(st.starSec, starSec);
       distribMin = num(st.distribMin, distribMin);
       fastDur = num(st.fastDur, fastDur);
       assistBlue = false;
+      toggleStarsFeature(enableStars, false);
       { const ab = document.getElementById('chk-assist-blue'); if (ab) ab.checked = assistBlue; const fd = document.getElementById('rng-fastdur'); if (fd) fd.value = fastDur; updateFastDur(fastDur); }
       if (['none', 'tapered', 'transit', 'staggered', 'max_path', 'turners', 'recommended'].includes(st.sol)) currentSolution800 = st.sol;
       viewRot = num(st.viewRot, 0);
@@ -5745,6 +5968,11 @@
     } else {
       updateSolutionPills();
     }
+    const pStars = urlParams.get('stars');
+    if (pStars !== null) {
+      enableStars = (pStars === '1' || pStars === 'true');
+    }
+    toggleStarsFeature(enableStars, false);
     recalculateAll();
     const initCam = urlParams.get('cam') || 'full'; // Mod plan intreg al salii mereu implicit
     setCamMode(initCam);
