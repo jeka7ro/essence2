@@ -831,6 +831,9 @@
     .fast-box { margin-bottom: 14px; }
     .ctl-wide { width: 100%; }
     .tool-btn.on { background: #0284c7; border-color: #38bdf8; color: #fff; }
+
+    /* canvas-ul nu influenteaza marimea zonei in care sta */
+    .viewport > canvas { position: absolute; left: 0; top: 0; }
   </style>
 </head>
 <body>
@@ -2562,7 +2565,6 @@
       }
 
       redraw();
-      new ResizeObserver(() => window.dispatchEvent(new Event('resize'))).observe(document.getElementById('viewport'));
     requestAnimationFrame(animate);
     }
 
@@ -3937,6 +3939,17 @@
     setCamMode(initCam);
     const initTab = urlParams.get('tab');
     if (initTab) switchTab('tab-' + initTab); else if (savedTab) switchTab(savedTab);
+    // refacem canvas-ul doar cand marimea zonei chiar se schimba (altfel pozitia planului se reseteaza)
+    {
+      let lastVpW = -1, lastVpH = -1;
+      new ResizeObserver(() => {
+        const v = document.getElementById('viewport');
+        if (v.clientWidth !== lastVpW || v.clientHeight !== lastVpH) {
+          lastVpW = v.clientWidth; lastVpH = v.clientHeight;
+          window.dispatchEvent(new Event('resize'));
+        }
+      }).observe(document.getElementById('viewport'));
+    }
     requestAnimationFrame(animate);
 
   </script>
