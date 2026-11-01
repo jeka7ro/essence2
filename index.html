@@ -835,7 +835,8 @@
 
     /* ===== rotire + ecran complet ===== */
     .sidebar.collapsed { display: none !important; }
-    body.fs .sidebar { display: none !important; }
+    body.fs .sidebar.collapsed { display: none !important; }
+    body.fs .sidebar:not(.collapsed) { display: flex !important; }
     body.fs .mobile-nav-bar { display: none !important; }
     body.fs .stage { display: flex !important; flex: 1 !important; }
     body.fs .tool-sidebar { display: none; }
@@ -1328,6 +1329,15 @@
     .mob-cams, .hud-sol { display: none; }
     @media (max-width: 900px) {
       header { display: none !important; }
+      body.fs header { display: flex !important; }
+      body.fs .sb-toggle { display: inline-flex !important; }
+      body.fs .sidebar:not(.collapsed) {
+        display: flex !important;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100% !important; height: 100% !important;
+        z-index: 500;
+      }
       .stage > .canvas-overlay-info {
         padding: 6px 10px !important;
         gap: 6px !important;
@@ -4505,13 +4515,32 @@
     }
 
     // --- Ecran complet (fără sidebar) ---
+    let preFsCollapsed = false;
     function setFullscreen(on) {
+      const sb = document.querySelector('.sidebar');
+      if (on) {
+        preFsCollapsed = sb ? sb.classList.contains('collapsed') : false;
+        if (sb && !sb.classList.contains('collapsed')) {
+          sb.classList.add('collapsed');
+          applySidebarState();
+        }
+        try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {}
+      } else {
+        if (!preFsCollapsed && sb && sb.classList.contains('collapsed')) {
+          sb.classList.remove('collapsed');
+          applySidebarState();
+        }
+        try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) {}
+      }
       document.body.classList.toggle('fs', on);
       const btn = document.getElementById('tool-fs');
       if (btn) btn.innerHTML = on ? IC.exitfull : IC.full;
-      if (btn) btn.title = on ? 'Ieși din ecran complet' : 'Ecran complet (fără meniu lateral)';
-      if (on) { try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {} }
-      else if (document.fullscreenElement) { try { document.exitFullscreen().catch(() => {}); } catch (e) {} }
+      if (btn) {
+        const isRo = (typeof currentLang === 'undefined' || currentLang === 'ro');
+        btn.title = on
+          ? (isRo ? 'Ieși din ecran complet' : 'Exit fullscreen')
+          : (isRo ? 'Ecran complet (fără meniu lateral)' : 'Fullscreen (without sidebar)');
+      }
       setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
     }
     function toggleFullscreen() { setFullscreen(!document.body.classList.contains('fs')); }
