@@ -1521,12 +1521,13 @@
             <span>1200 pers</span>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(0)">0p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(20)">20p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(50)">50p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(100)">100p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(400)">400p</button>
-            <button class="ui-preset-btn" style="flex:1; min-width:44px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(800)">800p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(0)">0p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(20)">20p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactParticipants(50)">50p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(60)">60p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(100)">100p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(400)">400p</button>
+            <button class="ui-preset-btn" style="flex:1; min-width:40px; padding:5px 2px; font-size:11px;" onclick="setExactParticipants(800)">800p</button>
           </div>
         </div>
 
@@ -1545,13 +1546,15 @@
             <span id="disp-part-per-row-sub" style="color:#38bdf8; font-weight:700;">88 pers/culoar · Max: 64</span>
             <span id="disp-max-per-row">Max: 64</span>
           </div>
-          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-top:8px;">
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:8px;">
             <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(0)">0 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactPerRow(5)">5 / rând</button>
             <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(10)">10 / rând</button>
             <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(20)">20 / rând</button>
             <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(30)">30 / rând</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(40)">40 / rând</button>
             <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactPerRow(44)">44 / rând</button>
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactPerRow('max')">Max Posibil</button>
+            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactPerRow('max')">Max</button>
           </div>
         </div>
 
@@ -1596,13 +1599,15 @@
             <span id="disp-pitch" style="color:var(--accent-purple); font-weight:700;">Pas între axe: 2.30 m</span>
             <span>14 Culoare</span>
           </div>
-          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-top:8px;">
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(1)">1 Cul (0 Bucle)</button>
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(2)">2 Cul (1 Buclă)</button>
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(4)">4 Cul (3 Bucle)</button>
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(6)">6 Cul (5 Bucle)</button>
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(9)">9 Cul (8 Bucle)</button>
-            <button class="ui-preset-btn" style="padding:5px 2px; font-size:11px;" onclick="setExactLanes(10)">10 Cul (9 Bucle)</button>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:8px;">
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px;" onclick="setExactLanes(1)">1 Culoar (0 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px;" onclick="setExactLanes(2)">2 Culoare (1 Buclă)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px;" onclick="setExactLanes(4)">4 Culoare (3 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactLanes(5)">5 Culoare (4 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px; color:#38bdf8; font-weight:700;" onclick="setExactLanes(6)">6 Culoare (5 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px;" onclick="setExactLanes(8)">8 Culoare (7 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px;" onclick="setExactLanes(9)">9 Culoare (8 Bucle)</button>
+            <button class="ui-preset-btn" style="padding:5px 4px; font-size:11px;" onclick="setExactLanes(10)">10 Culoare (9 Bucle)</button>
           </div>
         </div>
 
@@ -1707,6 +1712,8 @@
         <div style="background:#1e293b; border-radius:8px; padding:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
           <p><b>Suprafață Sală:</b> <span id="calc-room">35,3 m × 21,6 m = <b>762,48 m²</b></span>.</p>
           <p style="margin-top:6px;"><b>Lungime Totală Traseu:</b> <span id="calc-len">264,1 m</span>.</p>
+          <p style="margin-top:6px;"><b>Culoare & Bucle:</b> <span id="calc-lanes-rows">9 culoare = 18 rânduri (8 bucle U)</span>.</p>
+          <p style="margin-top:6px;"><b>Participanți pe Rând:</b> <span id="calc-per-row">44 pers/șir &times; 18 rânduri = 800 pers</span>.</p>
           <p style="margin-top:6px;"><b>Număr Perechi Față în Față:</b> <span id="calc-pairs">400 perechi</span>.</p>
           <p style="margin-top:6px;"><b>Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> per pas la dreapta.</p>
           <p style="margin-top:6px;"><b>Distanță Viraje U față de Pereți (Sus/Jos):</b> <b style="color:#38bdf8;" id="calc-wall-end">1.20 m</b>.</p>
@@ -2681,7 +2688,7 @@
       }
       const dispRowSub = document.getElementById('disp-part-per-row-sub');
       if (dispRowSub) {
-        dispRowSub.innerText = `${perLane} pers/culoar · Max fizic pe drept: ${maxPerRow} pers/șir`;
+        dispRowSub.innerHTML = `<b>${nLanes} cul (${nRows} rânduri) &times; ${perRow} pers/șir = ${perRow * nRows} pers</b> (Max: ${maxPerRow})`;
       }
       const dispMaxRow = document.getElementById('disp-max-per-row');
       if (dispMaxRow) {
@@ -2689,6 +2696,10 @@
       }
 
       document.getElementById('calc-len').innerText = `${totalPathLength.toFixed(1)} m`;
+      const elCalcLanesRows = document.getElementById('calc-lanes-rows');
+      if (elCalcLanesRows) elCalcLanesRows.innerText = `${nLanes} culoare = ${nRows} rânduri (${Math.max(0, nLanes - 1)} bucle U)`;
+      const elCalcPerRow = document.getElementById('calc-per-row');
+      if (elCalcPerRow) elCalcPerRow.innerText = `${perRow} pers/șir \u00D7 ${nRows} rânduri = ${partCount} pers total`;
       const pairs = Math.round(partCount / 2);
       document.getElementById('calc-pairs').innerText = `${pairs} perechi`;
       const stepSize = pairs > 0 ? ((totalVirtualLength / pairs) * 100).toFixed(1) : '0';
