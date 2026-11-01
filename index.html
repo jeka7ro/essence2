@@ -142,6 +142,9 @@
     /* Sidebar */
     .sidebar {
       width: 430px;
+      min-width: 430px;
+      max-width: 430px;
+      box-sizing: border-box;
       background: var(--panel-bg);
       backdrop-filter: blur(16px);
       border-right: 1px solid var(--card-border);
@@ -149,13 +152,24 @@
       flex-direction: column;
       z-index: 10;
       overflow-y: auto;
+      overflow-x: hidden;
       box-shadow: 6px 0 30px rgba(0,0,0,0.6);
+      transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+                  min-width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+                  max-width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.2s ease,
+                  transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: width, transform;
     }
 
     .tab-nav {
+      position: sticky;
+      top: 0;
+      z-index: 30;
       display: flex;
       border-bottom: 1px solid var(--card-border);
       background: #0f172a;
+      flex-shrink: 0;
     }
 
     .tab-btn {
@@ -652,9 +666,18 @@
       }
       .sidebar {
         width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
         flex: 1 !important;
         max-height: none !important;
         border-right: none;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
       }
       body.mob-view-plan .sidebar {
         display: none !important;
@@ -833,10 +856,54 @@
     }
     .t-row.highlight { border-radius: 10px; }
 
-    /* ===== rotire + ecran complet ===== */
-    .sidebar.collapsed { display: none !important; }
-    body.fs .sidebar.collapsed { display: none !important; }
-    body.fs .sidebar:not(.collapsed) { display: flex !important; }
+    /* ===== rotire + ecran complet & tranzitie lina meniu lateral ===== */
+    .sidebar.collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      max-width: 0 !important;
+      border-right: none !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transform: translateX(-30px);
+    }
+    body.fs .sidebar:not(.collapsed) {
+      display: flex !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 430px !important;
+      min-width: 430px !important;
+      max-width: 430px !important;
+      z-index: 1000;
+      box-shadow: 12px 0 40px rgba(0,0,0,0.85);
+      border-right: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(24px);
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transform: translateX(0);
+    }
+    body.fs .sidebar.collapsed {
+      display: flex !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 430px !important;
+      min-width: 430px !important;
+      max-width: 430px !important;
+      transform: translateX(-100%) !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      box-shadow: none !important;
+      border-right: none !important;
+    }
     body.fs .mobile-nav-bar { display: none !important; }
     body.fs .stage { display: flex !important; flex: 1 !important; }
     body.fs .tool-sidebar { display: none; }
@@ -1661,6 +1728,39 @@
 
       <!-- TAB 2: PARAMETRI SALĂ -->
       <div id="tab-params" class="tab-content">
+        <!-- CONFIGURAȚII CU NUME (Salvare / Încărcare) -->
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span data-i18n="sec_hall_configs">Configurații Sală</span>
+          <span style="font-size:11px; font-weight:normal; color:#94a3b8;" data-i18n="sec_save_load">Salvare & Încărcare</span>
+        </div>
+        <div class="param-box" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Salveaza configuratia curenta -->
+          <div class="ui-row">
+            <input type="text" id="inp-conf-name" class="ui-input" placeholder="Nume configurație nouă..." data-i18n-placeholder="ph_new_conf_name">
+            <button class="ui-btn ui-btn-primary" onclick="saveNamedConfig()" title="Salvează setările curente cu acest nume" data-i18n-title="btn_save_current_title">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <span data-i18n="btn_save">Salvează</span>
+            </button>
+          </div>
+
+          <!-- Incarca / Sterge configuratie salvata -->
+          <div class="ui-row">
+            <select id="sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
+              <option value="" data-i18n="opt_choose_saved_conf">-- Alege configurație salvată --</option>
+            </select>
+            <button id="btn-load-conf" class="ui-btn ui-btn-primary" onclick="loadSelectedNamedConfig()" title="Încarcă configurația selectată" data-i18n-title="btn_load_selected_title">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="btn_load">Încarcă</span>
+            </button>
+            <button id="btn-del-conf" class="ui-btn ui-btn-danger" onclick="deleteSelectedNamedConfig()" title="Șterge configurația selectată" data-i18n-title="btn_del_selected_title">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span data-i18n="btn_delete">Șterge</span>
+            </button>
+          </div>
+
+          <div id="conf-status-note" style="font-size:12px; color:#38bdf8; min-height:14px;"></div>
+        </div>
+
         <div class="section-title" data-i18n="sec_room_dims">Dimensiunile sălii</div>
         <div class="param-box">
           <div class="room-grid">
@@ -1749,7 +1849,7 @@
           </div>
           <input type="range" class="param-slider" id="rng-part-per-row" min="0" max="80" step="1" value="44" oninput="onPerRowChange(this.value)">
           <div class="param-sub">
-            <span>0 pers</span>
+            <span data-i18n="lbl_min_pers">0 pers</span>
             <span id="disp-part-per-row-sub" style="color:#38bdf8; font-weight:700;">88 pers/culoar · Max: 64</span>
             <span id="disp-max-per-row">Max: 64</span>
           </div>
@@ -1816,9 +1916,9 @@
           </div>
           <input type="range" class="param-slider" id="rng-lanes" min="1" max="14" step="1" value="9" oninput="onParamChange()">
           <div class="param-sub">
-            <span>1 Culoar (0 Bucle)</span>
+            <span data-i18n="lbl_min_lanes">1 Culoar (0 Bucle)</span>
             <span id="disp-pitch" style="color:var(--accent-purple); font-weight:700;">Pas între axe: 2.30 m</span>
-            <span>14 Culoare</span>
+            <span data-i18n="lbl_max_lanes">14 Culoare</span>
           </div>
         </div>
 
@@ -1926,7 +2026,7 @@
           <p style="margin-top:6px;"><b data-i18n="calc_lanes_lbl">Culoare & Bucle:</b> <span id="calc-lanes-rows">9 culoare = 18 rânduri (8 bucle U)</span>.</p>
           <p style="margin-top:6px;"><b data-i18n="calc_per_row_lbl">Participanți pe Rând:</b> <span id="calc-per-row">44 pers/șir &times; 18 rânduri = 800 pers</span>.</p>
           <p style="margin-top:6px;"><b data-i18n="calc_pairs_lbl">Număr Perechi Față în Față:</b> <span id="calc-pairs">400 perechi</span>.</p>
-          <p style="margin-top:6px;"><b data-i18n="calc_step_lbl">Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> <span id="calc-step-dir">per pas la dreapta</span>.</p>
+          <p style="margin-top:6px;"><b data-i18n="calc_step_lbl">Mărimea Pasului:</b> <b style="color:var(--accent-green);"><span id="calc-step-size">66,0 cm</span></b> <span id="calc-step-dir" data-i18n="lbl_per_step_right">per pas la dreapta</span>.</p>
           <p style="margin-top:6px;"><b data-i18n="calc_wall_end_lbl">Distanță Viraje U față de Pereți (Sus/Jos):</b> <b style="color:#38bdf8;" id="calc-wall-end">1.20 m</b>.</p>
           <p style="margin-top:6px;"><b data-i18n="calc_wall_side_lbl">Distanță Culoare față de Pereți (Laterale):</b> <b style="color:#a855f7;" id="calc-wall-side">1.00 m</b>.</p>
           <p style="margin-top:6px;"><b data-i18n="calc_rel_speed_lbl">Viteză Relativă:</b> <span id="calc-rel-speed-txt" data-i18n-html="calc_rel_speed_txt">Deoarece ambele șiruri fac un pas la dreapta în sensuri opuse, avansul relativ este de <b>2 poziții per pas</b>!</span></p>
@@ -1943,9 +2043,11 @@
         <!-- Diagnostic Box -->
         <div id="box-congestion-diag" style="background:rgba(15, 23, 42, 0.85); border:1px solid #334155; border-radius:8px; padding:12px; margin-bottom:12px; font-size:12px; line-height:1.55; color:#cbd5e1;">
           <b style="color:#f87171; font-size:13px;" data-i18n="sol_why_title">DE CE APARE PROBLEMA LA 800 OAMENI PE SCHEMA STANDARD:</b><br>
-          • <b>Pe linia dreaptă</b>: Există <b>73.4 cm</b> per persoană → foarte lejer (&gt; 46 cm umeri).<br>
-          • <b>Pe interiorul celor 8 viraje U (la 1.20m lățime)</b>: Curbura strânsă comprimă rândul interior la <b style="color:#f87171; font-variant-numeric: tabular-nums;">35.1 cm</b> (&lt; 46 cm umeri = suprapunere -10.9 cm).<br>
-          • <b style="color:#38bdf8;">Pentru a păstra toți cei 800 de oameni</b>, apasă pe oricare din cele 4 soluții de mai jos pentru a o vedea live în animație:
+          <div data-i18n-html="sol_diag_desc">
+            • <b>Pe linia dreaptă</b>: Există <b>73.4 cm</b> per persoană → foarte lejer (&gt; 46 cm umeri).<br>
+            • <b>Pe interiorul celor 8 viraje U (la 1.20m lățime)</b>: Curbura strânsă comprimă rândul interior la <b style="color:#f87171; font-variant-numeric: tabular-nums;">35.1 cm</b> (&lt; 46 cm umeri = suprapunere -10.9 cm).<br>
+            • <b style="color:#38bdf8;">Pentru a păstra toți cei 800 de oameni</b>, apasă pe oricare din cele 4 soluții de mai jos pentru a o vedea live în animație:
+          </div>
         </div>
 
         <!-- Soluția 1 -->
@@ -1953,7 +2055,7 @@
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_1_title">
             PROPUNEREA 1 [REAL]: Culoar Conic / 0.70m pe Viraj
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_1_desc">
             • Pe liniile drepte păstrezi <b>1.20 m</b> lățime pentru contactul vizual față în față.<br>
             • Pe virajele U culoarul se îngustează la <b>0.70 m</b> (la pas de rotație nu e nevoie de 1.2m).<br>
             • Raza interioară crește de la 0.55m la <b>0.80 m</b>.<br>
@@ -1974,7 +2076,7 @@
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_2_title">
             PROPUNEREA 2 [REAL]: Viraje de Tranzit Fluid (Staționare doar pe Drept)
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_2_desc">
             • În exercițiul de 10s privire față în față, oamenii nu se opresc pe o curbă la 180°.<br>
             • Toate cele <b>400 de perechi (800 oameni)</b> stau față în față <b>exclusiv pe cele 9 culoare drepte</b>, unde au <b style="color:#22c55e; font-weight: 700;">66.1 cm</b> per om (+20 cm liber între umeri).<br>
             • Virajele U sunt <b>Zone de Rotație Continuă</b> (tranzit fluid fără oprire umăr la umăr).<br>
@@ -1990,7 +2092,7 @@
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_3_title">
             PROPUNEREA 3 [REAL]: Dispunere în Șah (Decalaj 20 cm pe Viraj)
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_3_desc">
             • Participanții de pe rândul interior sunt decalați cu o jumătate de pas (20 cm).<br>
             • Grosimea corpului din profil este de doar <b>24 cm</b> (față de 46 cm lățimea umerilor).<br>
             • Umerii nu se mai ciocnesc lateral, ci se suprapun liber în spațiul toracic decalat.<br>
@@ -2006,7 +2108,7 @@
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_4_title">
             PROPUNEREA 4 [REAL]: Maximizare Traseu la Pereți (0.60m) + Viraj 0.75m
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_4_desc">
             • Traseul se apropie la <b>0.60 m</b> de pereții de capăt și 0.80 m lateral.<br>
             • Lungimea totală a circuitului crește la <b style="color:#22c55e; font-weight: 700;">304.5 metri</b>.<br>
             • Spațiu foarte generos: <b>76.1 cm</b> pe liniile drepte și <b>51.8 cm</b> pe viraje.<br>
@@ -2022,7 +2124,7 @@
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_5_title">
             PROPUNEREA 5 [REAL]: Întorcător în centrul fiecărei curbe
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_5_desc">
             • În centrul fiecărei curbe stă <b>un singur asistent (om portocaliu)</b>: participanții trec în curbă strânsă în jurul lui, fără să se oprească, iar el îi întoarce de pe un culoar pe următorul.<br>• Pe curbă nu se stă față în față, ci doar se trece (circa 1 m din traseu pe curbă), deci nu mai există zonă de înghesuială.<br>
             • Culoarele au <b style="color:#22c55e;">30.8 m</b> (capetele la 0.50 m de perete).<br>
             • Distanța între persoane pe culoar: <b style="color:#22c55e;">71.3 cm</b> (umeri 46 cm, deci rămân 25 cm liberi).<br>
@@ -2039,7 +2141,7 @@
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;" data-i18n="sol_6_title">
             PROPUNEREA 6 [REAL - RECOMANDAT]: Întorcători în curbe + 10 culoare
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_6_desc">
             Combină tot ce ai cerut într-o singură configurație:<br>
             • <b>Câte un întorcător în centrul fiecărei curbe</b> (om portocaliu): participanții trec în jurul lui, fără oprire, deci nu există înghesuială.<br>
             • <b>Șirurile albastre fără asistenți fixi în spate</b>, la <b>85 cm</b> spate în spate: destul cât un asistent să treacă și să se oprească la ei (minim 60 cm liberi; cu întorcători nu poți coborî sub 50 cm).<br>
@@ -2060,7 +2162,7 @@
           <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;" data-i18n="sol_none_title">
             COMPARAȚIE [NEREAL - PROBLEMĂ]: Configurația Inițială cu Blocaje Roșii
           </div>
-          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
+          <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;" data-i18n-html="sol_none_desc">
             Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje (&lt; 46cm umeri = coliziune garantată).
           </div>
           <button class="ctrl-btn" id="card-sol-btn-none" style="background:#dc2626; border-color:#ef4444; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('none')">
@@ -2072,7 +2174,7 @@
         <div class="section-title" style="color:#f59e0b; font-size:12.5px; margin-top:16px;" data-i18n="sec_why_tapered">
            Ce înseamnă exact „Culoar 0.70m pe Viraj”?
         </div>
-        <div style="background:rgba(15, 23, 42, 0.9); border:1.5px solid #f59e0b; border-radius:8px; padding:12px; font-size:11.5px; line-height:1.55; color:#cbd5e1; margin-bottom:14px;">
+        <div style="background:rgba(15, 23, 42, 0.9); border:1.5px solid #f59e0b; border-radius:8px; padding:12px; font-size:11.5px; line-height:1.55; color:#cbd5e1; margin-bottom:14px;" data-i18n-html="why_tapered_desc">
           <b style="color:#fbbf24; font-size:12px;">NU se îngustează spațiul de trecere al omului!</b><br>
           • <b>Lățimea umerilor</b> unui om este de <b>46 cm</b>.<br>
           • Când pe linia dreaptă culoarul este de <b>1.20 m</b>, înseamnă că cei doi oameni care stau față în față privesc unul la altul de la <b>1.20 m distanță (piept-în-piept)</b>. În acest timp, pe lateral au <b>73.4 cm între umeri</b> (foarte lejer!).<br>
@@ -2087,7 +2189,7 @@
         </div>
         
         <!-- Analiză Forme Alternative -->
-        <div style="background:rgba(15, 23, 42, 0.9); border:1px solid #334155; border-radius:8px; padding:12px; font-size:11.5px; line-height:1.55; color:#cbd5e1; margin-bottom:12px;">
+        <div style="background:rgba(15, 23, 42, 0.9); border:1px solid #334155; border-radius:8px; padding:12px; font-size:11.5px; line-height:1.55; color:#cbd5e1; margin-bottom:12px;" data-i18n-html="why_not_diag_desc">
           
           <div style="margin-bottom:10px;">
             <b style="color:#f87171; font-size:12px;">1. VARIANTA ORIZONTALĂ (Transversală pe lățimea de 21.6m):</b><br>
@@ -2168,11 +2270,11 @@
         <div class="section-title" data-i18n="sec_quick_presets">Preset-uri rapide de bază</div>
         <div class="param-box">
           <div class="ui-preset-grid">
-            <button class="ui-preset-btn" onclick="applyQuickConfig('std800')">800p · Standard (0.70m)</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('transit800')">800p · Culoar Tranzit</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800')">800p · Decalat (Șah)</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('room600')">600p · Sală 30×20m</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('small50')">50p · Sală mică 16×12m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('std800')" data-i18n="preset_std800">800p · Standard (0.70m)</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('transit800')" data-i18n="preset_transit800">800p · Culoar Tranzit</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800')" data-i18n="preset_stagger800">800p · Decalat (Șah)</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('room600')" data-i18n="preset_room600">600p · Sală 30×20m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('small50')" data-i18n="preset_small50">50p · Sală mică 16×12m</button>
           </div>
         </div>
 
@@ -2353,11 +2455,11 @@
         <div>
           <div style="font-size:12px; color:#94a3b8; margin-bottom:8px;" data-i18n="lbl_quick_presets">Preset-uri rapide de bază:</div>
           <div class="ui-preset-grid">
-            <button class="ui-preset-btn" onclick="applyQuickConfig('std800'); closeConfigModal();">800p · Standard (0.70m)</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('transit800'); closeConfigModal();">800p · Culoar Tranzit</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800'); closeConfigModal();">800p · Decalat (Șah)</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('room600'); closeConfigModal();">600p · Sală 30×20m</button>
-            <button class="ui-preset-btn" onclick="applyQuickConfig('small50'); closeConfigModal();">50p · Sală mică 16×12m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('std800'); closeConfigModal();" data-i18n="preset_std800">800p · Standard (0.70m)</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('transit800'); closeConfigModal();" data-i18n="preset_transit800">800p · Culoar Tranzit</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('stagger800'); closeConfigModal();" data-i18n="preset_stagger800">800p · Decalat (Șah)</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('room600'); closeConfigModal();" data-i18n="preset_room600">600p · Sală 30×20m</button>
+            <button class="ui-preset-btn" onclick="applyQuickConfig('small50'); closeConfigModal();" data-i18n="preset_small50">50p · Sală mică 16×12m</button>
           </div>
         </div>
 
@@ -2710,8 +2812,30 @@
       "gif_cam_macro": "Detaliu culoar & participanți (Macro)",
       "gif_status_gen": "Se generează cadrele GIF...",
       "modal_gif_btn_cancel": "Anulează",
-      "modal_gif_btn_generate": "Generează și Descarcă GIF"
-},
+      "modal_gif_btn_generate": "Generează și Descarcă GIF",
+      "lbl_per_step_right": "per pas la dreapta",
+      "lbl_min_lanes": "1 Culoar (0 Bucle)",
+      "lbl_max_lanes": "14 Culoare",
+      "lbl_min_pers": "0 pers",
+      "btn_save_current_title": "Salvează setările curente cu acest nume",
+      "btn_load_selected_title": "Încarcă configurația selectată",
+      "btn_del_selected_title": "Șterge configurația selectată",
+      "preset_std800": "800p · Standard (0.70m)",
+      "preset_transit800": "800p · Culoar Tranzit",
+      "preset_stagger800": "800p · Decalat (Șah)",
+      "preset_room600": "600p · Sală 30×20m",
+      "preset_small50": "50p · Sală mică 16×12m",
+      "sol_diag_desc": "• <b>Pe linia dreaptă</b>: Există <b>73.4 cm</b> per persoană → foarte lejer (&gt; 46 cm umeri).<br>• <b>Pe interiorul celor 8 viraje U (la 1.20m lățime)</b>: Curbura strânsă comprimă rândul interior la <b style=\"color:#f87171; font-variant-numeric: tabular-nums;\">35.1 cm</b> (&lt; 46 cm umeri = suprapunere -10.9 cm).<br>• <b style=\"color:#38bdf8;\">Pentru a păstra toți cei 800 de oameni</b>, apasă pe oricare din cele 4 soluții de mai jos pentru a o vedea live în animație:",
+      "sol_1_desc": "• Pe liniile drepte păstrezi <b>1.20 m</b> lățime pentru contactul vizual față în față.<br>• Pe virajele U culoarul se îngustează la <b>0.70 m</b> (la pas de rotație nu e nevoie de 1.2m).<br>• Raza interioară crește de la 0.55m la <b>0.80 m</b>.<br>• Spațiul pe interior crește la <b style=\"color:#22c55e; font-weight: 700;\">51.0 cm</b> (&gt; 46 cm umeri).<br>• <b style=\"color:#38bdf8;\">Timp total ca toți cei 800 să treacă unii prin fața celorlalți (400 pași):</b><br>&nbsp;&nbsp;→ La <b>10 secunde/pas</b>: exact <b style=\"color:#4ade80;\">66 min 40s (1h 06m)</b>.<br>&nbsp;&nbsp;→ La <b>5 secunde/pas</b>: exact <b style=\"color:#4ade80;\">33 min 20s</b>.<br>&nbsp;&nbsp;→ La <b>3 secunde/pas</b>: exact <b style=\"color:#4ade80;\">20 minute</b>.<br><b style=\"color:#22c55e;\">Rezultat: ZERO zone roșii! 800 de oameni încap perfect și parcurg tot turul fără nicio secundă pierdută din cauza blocajelor.</b>",
+      "sol_2_desc": "• În exercițiul de 10s privire față în față, oamenii nu se opresc pe o curbă la 180°.<br>• Toate cele <b>400 de perechi (800 oameni)</b> stau față în față <b>exclusiv pe cele 9 culoare drepte</b>, unde au <b style=\"color:#22c55e; font-weight: 700;\">66.1 cm</b> per om (+20 cm liber între umeri).<br>• Virajele U sunt <b>Zone de Rotație Continuă</b> (tranzit fluid fără oprire umăr la umăr).<br><b style=\"color:#22c55e;\">Rezultat: ZERO zone roșii! Nimeni nu stă blocat pe viraj; totul decurge natural și fluid.</b>",
+      "sol_3_desc": "• Participanții de pe rândul interior sunt decalați cu o jumătate de pas (20 cm).<br>• Grosimea corpului din profil este de doar <b>24 cm</b> (față de 46 cm lățimea umerilor).<br>• Umerii nu se mai ciocnesc lateral, ci se suprapun liber în spațiul toracic decalat.<br><b style=\"color:#22c55e;\">Rezultat: ZERO zone roșii! Se păstrează lățimea de 1.20m peste tot, fără frecare de umeri.</b>",
+      "sol_4_desc": "• Traseul se apropie la <b>0.60 m</b> de pereții de capăt și 0.80 m lateral.<br>• Lungimea totală a circuitului crește la <b style=\"color:#22c55e; font-weight: 700;\">304.5 metri</b>.<br>• Spațiu foarte generos: <b>76.1 cm</b> pe liniile drepte și <b>51.8 cm</b> pe viraje.<br><b style=\"color:#22c55e;\">Rezultat: ZERO zone roșii! Circuit extins la maximum în sala de 35.3m × 21.6m.</b>",
+      "sol_5_desc": "• În centrul fiecărei curbe stă <b>un singur asistent (om portocaliu)</b>: participanții trec în curbă strânsă în jurul lui, fără să se oprească, iar el îi întoarce de pe un culoar pe următorul.<br>• Pe curbă nu se stă față în față, ci doar se trece (circa 1 m din traseu pe curbă), deci nu mai există zonă de înghesuială.<br>• Culoarele au <b style=\"color:#22c55e;\">30.8 m</b> (capetele la 0.50 m de perete).<br>• Distanța între persoane pe culoar: <b style=\"color:#22c55e;\">71.3 cm</b> (umeri 46 cm, deci rămân 25 cm liberi).<br>• Necesar: <b>8 asistenți întorcători</b>, câte unul în centrul fiecărei curbe, în plus față de A1–A40.<br><b style=\"color:#22c55e;\">Rezultat: ZERO zone roșii! 800 de oameni, fără înghesuială la curbe; durata turului rămâne aceeași.</b>",
+      "sol_6_desc": "Combină tot ce ai cerut într-o singură configurație:<br>• <b>Câte un întorcător în centrul fiecărei curbe</b> (om portocaliu): participanții trec în jurul lui, fără oprire, deci nu există înghesuială.<br>• <b>Șirurile albastre fără asistenți fixi în spate</b>, la <b>85 cm</b> spate în spate: destul cât un asistent să treacă și să se oprească la ei (minim 60 cm liberi; cu întorcători nu poți coborî sub 50 cm).<br>• <b>Asistenții în zone portocalii</b>, în spatele șirurilor roz: 5 zone cu câte 8 asistenți (A1–A40), cu 66 cm liberi fiecare.<br>• <b>Steluțe pentru toți cei 800</b>: aleile din spatele ambelor șiruri au peste 60 cm liberi, deci asistenții se pot opri la fiecare participant; pentru toate steluțele în 10 min (5 s fiecare) sunt necesari 8 asistenți, iar cei 40 termină în aproximativ 1 min 50 s.<br>• Spațiul câștigat față de Soluția 5 se folosește pentru <b>un al 10-lea culoar</b> (rămân 0,85 m până la pereții laterali, suficient ca asistenții să ajungă și la șirurile de lângă perete).<br>• <b style=\"color:#22c55e;\">79,8 cm între persoane</b> pe culoar (în loc de 71,3 cm la Soluția 5), cu 34 cm liberi față de umeri; pe fiecare culoar stau 80 de oameni în loc de 89.<br>• Necesar: 40 de asistenți pe culoare și <b>9 întorcători</b> (câte unul în mijlocul fiecărui capăt).<br>• Rezerva: cu 46 cm pe persoană aceeași sală ar încăpea până la aproximativ 1.380 de participanți.<br><b style=\"color:#22c55e;\">Rezultat: ZERO zone roșii! 800 de oameni, zero înghesuială, cel mai mult spațiu pe persoană; durata turului rămâne aceeași.</b>",
+      "sol_none_desc": "Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje (&lt; 46cm umeri = coliziune garantată).",
+      "why_tapered_desc": "<b style=\"color:#fbbf24; font-size:12px;\">NU se îngustează spațiul de trecere al omului!</b><br>• <b>Lățimea umerilor</b> unui om este de <b>46 cm</b>.<br>• Când pe linia dreaptă culoarul este de <b>1.20 m</b>, înseamnă că cei doi oameni care stau față în față privesc unul la altul de la <b>1.20 m distanță (piept-în-piept)</b>. În acest timp, pe lateral au <b>73.4 cm între umeri</b> (foarte lejer!).<br>• Pe virajul U la 180°, dacă încearcă să mențină aceeași distanță uriașă de 1.20m între ei, cercul din interior devine minuscul, iar oamenii din interior au doar <b>35.1 cm la umeri</b> (se calcă pe picioare).<br>• <b>„Culoar 0.70m pe viraj”</b> înseamnă DOAR că în cele câteva secunde când trec prin curba U, <b>cei doi parteneri se apropie la 70 cm privire-în-privire</b> (aproximativ două palme întinse).<br>• Făcând asta, cercul interior se lărgește automat de la raza de 0.55m la <b>0.80 m</b>, iar la umeri pe lateral spațiul devine <b style=\"color:#4ade80;\">51.0 cm</b> (&gt; 46 cm umeri = fără atingere)!<br>• <i>Dacă NU vrei să se apropie la 70 cm pe viraj, folosește <b>Soluția 2 (Tranzit Fluid)</b>: pe viraj nimeni nu se oprește, iar contactul de 10 secunde se face EXCLUSIV pe liniile drepte la 1.20m distanță!</i>",
+      "why_not_diag_desc": "<div style=\"margin-bottom:10px;\"><b style=\"color:#f87171; font-size:12px;\">1. VARIANTA ORIZONTALĂ (Transversală pe lățimea de 21.6m):</b><br>• <b>Blocaj direct de stâlpi:</b> Sala are două rânduri masive de stâlpi de beton la 6.6m și 14.3m. Culoarele orizontale s-ar ciocni perpendicular în stâlpi, lăsând oameni cu un stâlp de 1 metru în față în loc de partener!<br>• <b>Prea multe viraje U:</b> Ai avea <b>15 viraje U</b> în loc de 8, dublând practic zonele de înghesuială din sală.<br>• <b>Verdict:</b> Imposibil de implementat curat din cauza stâlpilor de rezistență.</div><div style=\"border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; margin-bottom:10px;\"><b style=\"color:#fbbf24; font-size:12px;\">2. VARIANTA PE DIAGONALĂ (Unghi la 45°):</b><br>• <b>Lungimi de culoare inegale:</b> La colțurile sălii culoarul are doar 4-5m (10 oameni), iar pe mijloc are 40m (100 oameni). Într-un workshop sincronizat, dacă o pereche face 10 pași și a terminat culoarul, iar alta are 100 de pași, rotația se blochează complet.<br>• <b>Viraje ascuțite:</b> Capetele ar avea viraje la 45°, mult mai strânse și mai dureroase decât la 180°.<br>• <b>Verdict:</b> Haotic și imposibil de sincronizat pentru 800 de participanți.</div><div style=\"border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; margin-bottom:10px;\"><b style=\"color:#4ade80; font-size:12px;\">3. VARIANTA SPIRALĂ / LABIRINT CONCENTRIC (Perimetru → Centru):</b><br>• <b>Avantaj uriaș:</b> Virajele NU mai sunt la 180°, ci <b>colțuri la 90°</b>! La 90°, raza este mare și nu există nicio înghesuială la umeri.<br>• <b>Limitare:</b> Când oamenii ajung în centrul sălii, au nevoie de un culoar liber de întoarcere pentru a ieși.<br>• <b>Verdict:</b> O variantă foarte elegantă dacă sala permite o alee centrală liberă.</div><div style=\"border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;\"><b style=\"color:#c084fc; font-size:12px;\">4. VARIANTA 3 SUB-CIRCUITE PARALELE (Zonele C1, C2, C3):</b><br>• <b>Cum funcționează:</b> În loc de 1 singur circuit gigantic de 800 de oameni, folosim cele 3 compartimente naturale create de stâlpi:<br>&nbsp;&nbsp;→ <b>Zona C3 (stânga):</b> 3 culoare → 266 oameni (133 perechi)<br>&nbsp;&nbsp;→ <b>Zona C2 (centru):</b> 3 culoare → 268 oameni (134 perechi)<br>&nbsp;&nbsp;→ <b>Zona C1 (dreapta):</b> 3 culoare → 266 oameni (133 perechi)<br>• <b>AVANTAJ GIGANTIC DE TIMP:</b> Turul complet durează doar <b>22 de minute</b> (la 10s/pas) în loc de 66 de minute!<br>• <b>Fără probleme de stâlpi:</b> Fiecare zonă este liberă de stâlpi și perfect sincronizată.</div>"
+    },
       en: {
       "auto_save_note": "Settings are automatically saved and restored on reload.",
       "banner_save_html": "<b>💾 SAVE & LOAD CONFIGURATIONS:</b> Save current state with a name, reload later, or export/import a JSON file backup.",
@@ -2892,7 +3016,29 @@
       "vis_reach": "Mark with red dot participants assistants cannot reach",
       "vis_stars": "Star Exercise Option",
       "vis_title": "Visual Overlays:",
-      "vis_walls": "Clearances & Distances to Walls (Top, Bottom, Sides)"
+      "vis_walls": "Clearances & Distances to Walls (Top, Bottom, Sides)",
+      "lbl_per_step_right": "per step to the right",
+      "lbl_min_lanes": "1 Lane (0 Loops)",
+      "lbl_max_lanes": "14 Lanes",
+      "lbl_min_pers": "0 people",
+      "btn_save_current_title": "Save current settings with this name",
+      "btn_load_selected_title": "Load selected configuration",
+      "btn_del_selected_title": "Delete selected configuration",
+      "preset_std800": "800p · Standard (0.70m)",
+      "preset_transit800": "800p · Transit Lane",
+      "preset_stagger800": "800p · Staggered (Chess)",
+      "preset_room600": "600p · Room 30×20m",
+      "preset_small50": "50p · Small room 16×12m",
+      "sol_diag_desc": "• <b>On straight lines</b>: There are <b>73.4 cm</b> per person → very comfortable (&gt; 46 cm shoulders).<br>• <b>On inner side of 8 U-turns (at 1.20m width)</b>: Tight curvature compresses inner line to <b style=\"color:#f87171; font-variant-numeric: tabular-nums;\">35.1 cm</b> (&lt; 46 cm shoulders = -10.9 cm overlap).<br>• <b style=\"color:#38bdf8;\">To fit all 800 people</b>, click any of the solutions below to see it live in animation:",
+      "sol_1_desc": "• On straight lines keep <b>1.20 m</b> width for face-to-face eye contact.<br>• On U-turns lane narrows to <b>0.70 m</b> (rotation step doesn't require 1.2m).<br>• Inner turn radius increases from 0.55m to <b>0.80 m</b>.<br>• Space on inner side expands to <b style=\"color:#22c55e; font-weight: 700;\">51.0 cm</b> (&gt; 46 cm shoulders).<br>•  <b style=\"color:#38bdf8;\">Total time for all 800 to pass each other (400 steps):</b><br>&nbsp;&nbsp;→ At <b>10 sec/step</b>: exactly <b style=\"color:#4ade80;\">66 min 40s (1h 06m)</b>.<br>&nbsp;&nbsp;→ At <b>5 sec/step</b>: exactly <b style=\"color:#4ade80;\">33 min 20s</b>.<br>&nbsp;&nbsp;→ At <b>3 sec/step</b>: exactly <b style=\"color:#4ade80;\">20 minutes</b>.<br><b style=\"color:#22c55e;\">Result: ZERO red zones! All 800 participants fit perfectly and complete the tour with zero delay from bottlenecks.</b>",
+      "sol_2_desc": "• During the 10s face-to-face gaze exercise, people do not pause on a 180° curve.<br>• All <b>400 pairs (800 people)</b> face each other <b>exclusively on straight lanes</b> with <b style=\"color:#22c55e; font-weight: 700;\">66.1 cm</b> per person (+20 cm clear shoulder space).<br>• U-turns are <b>Continuous Rotation Zones</b> (smooth transit without shoulder-to-shoulder stops).<br><b style=\"color:#22c55e;\">Result: ZERO red zones! Nobody is blocked on turns; motion is natural and fluid.</b>",
+      "sol_3_desc": "• Inner row participants are offset by half a step (20 cm).<br>• Profile body depth is only <b>24 cm</b> (compared to 46 cm shoulder width).<br>• Shoulders no longer collide laterally; they fit freely into staggered chest spaces.<br><b style=\"color:#22c55e;\">Result: ZERO red zones! 1.20m width maintained everywhere with no shoulder rubbing.</b>",
+      "sol_4_desc": "• Route extends to <b>0.60 m</b> from end walls and 0.80 m from side walls.<br>• Total circuit length increases to <b style=\"color:#22c55e; font-weight: 700;\">304.5 meters</b>.<br>• Very generous spacing: <b>76.1 cm</b> on straight lanes and <b>51.8 cm</b> on turns.<br><b style=\"color:#22c55e;\">Result: ZERO red zones! Circuit maximized across the 35.3m × 21.6m hall.</b>",
+      "sol_5_desc": "• In each curve center stands <b>one assistant (orange figure)</b>: participants pass in a tight curve around them without stopping, and they spin them to the next lane.<br>• No facing gaze on curves, only transit (~1 m curve length), eliminating bottlenecks.<br>• Corridors measure <b style=\"color:#22c55e;\">30.8 m</b> (ends at 0.50 m from walls).<br>• Distance between persons on lane: <b style=\"color:#22c55e;\">71.3 cm</b> (46 cm shoulders, leaving 25 cm clear).<br>• Needed: <b>8 turner assistants</b>, one per curve center, in addition to A1–A40.<br><b style=\"color:#22c55e;\">Result: ZERO red zones! 800 people, zero turn crowding; tour duration remains identical.</b>",
+      "sol_6_desc": "Combines all optimal factors into one configuration:<br>• <b>One turner assistant in center of each curve</b> (orange figure): participants pass around them without pausing, eliminating crowding.<br>• <b>Blue rows without stationary assistants behind</b> at <b>85 cm</b> back-to-back: ample space for assistants to walk and pause (minimum 60 cm clear; with turners minimum is 50 cm).<br>• <b>Assistants in orange zones</b> behind pink rows: 5 zones of 8 assistants (A1–A40) with 66 cm clear space each.<br>• <b>Stars for all 800</b>: aisles behind both rows exceed 60 cm clear space so assistants can stop at each participant; 8 assistants needed for 10 min, all 40 finish in ~1 min 50s.<br>• Space gained vs Solution 5 enables <b>a 10th lane</b> (leaving 0.85 m side wall clearance).<br>• <b style=\"color:#22c55e;\">79.8 cm between people</b> on lane (vs 71.3 cm in Sol. 5), with 34 cm shoulder clearance; 80 people per lane instead of 89.<br>• Needed: 40 corridor assistants and <b>9 turners</b> (one at each end center).<br>• Capacity reserve: at 46 cm/person the same hall can accommodate up to ~1,380 participants.<br><b style=\"color:#22c55e;\">Result: ZERO red zones! 800 people, zero crowding, maximum space per person; lap time remains identical.</b>",
+      "sol_none_desc": "Demonstrates exactly why a standard 1.20m turn causes 35.1 cm bottleneck on the inner side of all 8 turns (&lt; 46cm shoulders = guaranteed collision).",
+      "why_tapered_desc": "<b style=\"color:#fbbf24; font-size:12px;\">Human walking space is NOT narrowed!</b><br>• <b>Shoulder width</b> of a person is <b>46 cm</b>.<br>• On straight lines, a <b>1.20 m</b> lane means two facing people look at each other from <b>1.20 m chest-to-chest</b>, with <b>73.4 cm shoulder space</b> (very roomy!).<br>• On 180° U-turns, maintaining 1.20m face-to-face forces the inner circle radius too tight, compressing inner shoulders to <b>35.1 cm</b> (crowding).<br>• <b>„0.70m Lane on Turn”</b> simply means that during the few seconds traversing the U-curve, <b>facing partners draw closer to 70 cm gaze distance</b> (~two forearm lengths).<br>• This automatically widens inner radius from 0.55m to <b>0.80 m</b>, increasing shoulder space to <b style=\"color:#4ade80;\">51.0 cm</b> (&gt; 46 cm shoulders = no contact)!<br>• <i>If you prefer not closing to 70 cm on turns, choose <b>Solution 2 (Fluid Transit)</b>: nobody stops on turns; all 10s gaze stops occur EXCLUSIVELY on straight lanes at 1.20m distance!</i>",
+      "why_not_diag_desc": "<div style=\"margin-bottom:10px;\"><b style=\"color:#f87171; font-size:12px;\">1. HORIZONTAL OPTION (Crosswise along 21.6m width):</b><br>• <b>Direct pillar clash:</b> Hall has two massive rows of concrete pillars at 6.6m and 14.3m. Horizontal lanes would hit pillars head-on, placing participants in front of a concrete column instead of a partner!<br>• <b>Too many U-turns:</b> Would require <b>15 U-turns</b> instead of 8, nearly doubling turn areas.<br>• <b>Verdict:</b> Unfeasible due to structural columns.</div><div style=\"border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; margin-bottom:10px;\"><b style=\"color:#fbbf24; font-size:12px;\">2. DIAGONAL OPTION (45° Angle):</b><br>• <b>Unequal lane lengths:</b> Room corners have only 4-5m lanes (10 people), while the center reaches 40m (100 people). In a synchronized workshop, unequal length destroys timing synchronization.<br>• <b>Sharp turn angles:</b> 45° turns are sharper and harder to navigate than 180° sweeps.<br>• <b>Verdict:</b> Chaotic and impossible to synchronize for 800 participants.</div><div style=\"border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; margin-bottom:10px;\"><b style=\"color:#4ade80; font-size:12px;\">3. SPIRAL / CONCENTRIC LABYRINTH (Perimeter → Center):</b><br>• <b>Major benefit:</b> Turns are <b>90° corners</b> rather than 180° bends, providing wide radius and zero shoulder crowding.<br>• <b>Limitation:</b> Reaching the center requires an open exit corridor.<br>• <b>Verdict:</b> Very elegant layout if hall layout permits a central exit aisle.</div><div style=\"border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;\"><b style=\"color:#c084fc; font-size:12px;\">4. 3 PARALLEL SUB-CIRCUITS (Zones C1, C2, C3):</b><br>• <b>How it works:</b> Instead of 1 giant circuit of 800, use the 3 natural compartments between pillars:<br>&nbsp;&nbsp;→ <b>Zone C3 (left):</b> 3 lanes → 266 people (133 pairs)<br>&nbsp;&nbsp;→ <b>Zone C2 (center):</b> 3 lanes → 268 people (134 pairs)<br>&nbsp;&nbsp;→ <b>Zone C1 (right):</b> 3 lanes → 266 people (133 pairs)<br>• <b>MASSIVE TIME SAVINGS:</b> Complete lap takes only <b>22 minutes</b> (at 10s/step) instead of 66 minutes!<br>• <b>Pillar-free:</b> Each bay is free of pillars and perfectly synchronized.</div>"
 }
     };
 
@@ -2928,6 +3074,9 @@
       syncStarUI();
       syncFastUI();
       syncPlayButtonUI();
+      syncRoomUI();
+      syncBackGapUI();
+      refreshNamedConfigsUI();
       renderReportHTML();
       redraw();
     }
@@ -3266,10 +3415,13 @@
       const w = document.getElementById('inp-room-w'), l = document.getElementById('inp-room-l');
       if (w && document.activeElement !== w) w.value = ROOM_W;
       if (l && document.activeElement !== l) l.value = ROOM_L;
-      const a = document.getElementById('room-area-note'); if (a) a.innerText = `Suprafață ${fm(ROOM_W * ROOM_L, 1)} m²`;
+      const en = currentLang === 'en';
+      const a = document.getElementById('room-area-note'); if (a) a.innerText = `${en ? 'Area ' : 'Suprafață '}${fm(ROOM_W * ROOM_L, 1)} m²`;
       const c = document.getElementById('calc-room');
       if (c) c.innerHTML = `${fm(ROOM_L, 1)} m × ${fm(ROOM_W, 1)} m = <b>${fm(ROOM_W * ROOM_L)} m²</b>`;
-      document.title = `Față în față - Pas la dreapta în contrasens (${fm(ROOM_L, 1)}m × ${fm(ROOM_W, 1)}m)`;
+      document.title = en 
+        ? `Face to Face - Counter-Flow Step Right (${fm(ROOM_L, 1)}m × ${fm(ROOM_W, 1)}m)` 
+        : `Față în față - Pas la dreapta în contrasens (${fm(ROOM_L, 1)}m × ${fm(ROOM_W, 1)}m)`;
     }
     function onRoomChange() {
       const w = parseFloat(document.getElementById('inp-room-w').value);
@@ -3421,14 +3573,19 @@
     function setBackGapAuto() { backGapAuto = true; recalculateAll(); saveState(); }
     function onAssistGapChange(v) { assistGap = parseFloat(v); recalculateAll(); saveState(); }
     function syncBackGapUI() {
+      const en = currentLang === 'en';
       const sl = document.getElementById('rng-backgap'); if (sl) sl.value = Math.min(2.0, Math.max(0.1, backGap));
       const d = document.getElementById('disp-backgap'); if (d) d.innerText = backGap.toFixed(2) + ' m';
       const n = document.getElementById('backgap-note');
-      if (n) n.innerText = `între umeri/spate: ${(backGap * 100).toFixed(0)} cm`;
+      if (n) n.innerText = `${en ? 'between shoulders/back: ' : 'între umeri/spate: '}${(backGap * 100).toFixed(0)} cm`;
       const w = document.getElementById('backgap-warn');
       if (w) {
-        let msg = backGapClamped ? `Cu aceste setări nu încap ${nLanes} culoare; distanța a fost limitată la ${(backGap * 100).toFixed(0)} cm.` : '';
-        if (isTurnerMode() && backGap <= 0.5001) msg = (msg ? msg + ' ' : '') + 'Cu întorcători, albaștrii nu pot fi mai aproape de 50 cm: atât încape asistentul din centrul curbei.';
+        let msg = backGapClamped 
+          ? (en ? `With these settings, ${nLanes} lanes do not fit; distance was limited to ${(backGap * 100).toFixed(0)} cm.` : `Cu aceste setări nu încap ${nLanes} culoare; distanța a fost limitată la ${(backGap * 100).toFixed(0)} cm.`)
+          : '';
+        if (isTurnerMode() && backGap <= 0.5001) {
+          msg = (msg ? msg + ' ' : '') + (en ? 'With turners, blue rows cannot be closer than 50 cm to fit the curve center assistant.' : 'Cu întorcători, albaștrii nu pot fi mai aproape de 50 cm: atât încape asistentul din centrul curbei.');
+        }
         w.style.display = msg ? 'block' : 'none';
         w.innerText = msg;
       }
@@ -3439,7 +3596,7 @@
       const na = document.getElementById('assistgap-note');
       if (na) {
         const free = Math.max(0, assistGap - TORSO_DEPTH);
-        na.innerText = `liber pentru asistent: ${(free * 100).toFixed(0)} cm` + (free < ASSIST_DIA ? ' (prea puțin)' : '');
+        na.innerText = `${en ? 'clear for assistant: ' : 'liber pentru asistent: '}${(free * 100).toFixed(0)} cm` + (free < ASSIST_DIA ? (en ? ' (too narrow)' : ' (prea puțin)') : '');
         na.style.color = free < ASSIST_DIA ? '#fca5a5' : '#fb923c';
       }
     }
@@ -3460,6 +3617,10 @@
       document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) 
         ? (en ? 'A1 - A40 (per slide)' : 'A1 - A40 (conform slide)') 
         : (assistCount > 0 ? (en ? `Every ${(totalPathLength/assistCount).toFixed(1)} m` : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`) : (en ? 'No assistants' : 'Fără asistenți'));
+      const elVisAssist = document.getElementById('vis-assist-label');
+      if (elVisAssist) {
+        elVisAssist.innerHTML = `<span class="dot dot-orange"></span><span>${assistCount} ${en ? 'Assistants on Dots' : 'Asistenți pe Buline'} (A1-A${assistCount})</span>`;
+      }
       const bucleText = (nLanes - 1) === 1 ? (en ? '1 U-Loop' : '1 Buclă U') : `${Math.max(0, nLanes - 1)} ${en ? 'U-Loops' : 'Bucle U'}`;
       const laneText = nLanes === 1 ? (en ? '1 Lane' : '1 Culoar') : `${nLanes} ${en ? 'Lanes' : 'Culoare'}`;
       document.getElementById('disp-lanes').innerText = `${laneText} (${bucleText})`;
@@ -3746,10 +3907,15 @@
       if (fastSim.active) return;
       const out = document.getElementById('fastsim-out');
       if (!out) return;
+      const en = currentLang === 'en';
       if (enableStars) {
-        out.innerHTML = `Turul s-a terminat, iar asistenții au dat steluțele: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
+        out.innerHTML = en
+          ? `Tour finished, assistants delivered stars: <b>${starred.size} of ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(some participants lack an assistant facing them)</span>' : ' <span class="ok">(all)</span>')
+          : `Turul s-a terminat, iar asistenții au dat steluțele: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
       } else {
-        out.innerHTML = `Turul s-a terminat cu succes. Toți cei <b>${partCount}</b> participanți au parcurs circuitul complet.`;
+        out.innerHTML = en
+          ? `The tour finished successfully. All <b>${partCount}</b> participants completed the full circuit.`
+          : `Turul s-a terminat cu succes. Toți cei <b>${partCount}</b> participanți au parcurs circuitul complet.`;
       }
     }
 
@@ -3945,7 +4111,8 @@
     function updateInterval(v) {
       stepIntervalSec = parseFloat(v);
       stepTimer = 0;
-      document.getElementById('disp-interval').innerText = `${stepIntervalSec.toFixed(1)} sec / pas`;
+      const en = currentLang === 'en';
+      document.getElementById('disp-interval').innerText = `${stepIntervalSec.toFixed(1)} ${en ? 'sec / step' : 'sec / pas'}`;
       updateLapTimeMetric();
       document.querySelectorAll('.preset-btn').forEach(b => {
         b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - stepIntervalSec) < 0.1);
@@ -3963,6 +4130,7 @@
     }
 
     function updateLapTimeMetric() {
+      const en = currentLang === 'en';
       const pairs = Math.round(partCount / 2);
       const totalSec = pairs * stepIntervalSec;
       const mins = Math.floor(totalSec / 60);
@@ -3986,7 +4154,7 @@
       }
 
       const elLap = document.getElementById('calc-lap-time');
-      if (elLap) elLap.innerText = `${pairs} pași la ${stepIntervalSec.toFixed(1)}s = ${str}`;
+      if (elLap) elLap.innerText = `${pairs} ${en ? 'steps at' : 'pași la'} ${stepIntervalSec.toFixed(1)}s = ${str}`;
 
       const elDispTotal = document.getElementById('disp-total-duration');
       if (elDispTotal) elDispTotal.innerText = str;
@@ -3995,16 +4163,47 @@
       if (elDispCalcSec) elDispCalcSec.innerText = stepIntervalSec.toFixed(1);
 
       const elDispTimeRem = document.getElementById('disp-time-remaining');
-      if (elDispTimeRem) elDispTimeRem.innerText = `${remStr} (${stepsRemaining} pași rămași)`;
+      if (elDispTimeRem) elDispTimeRem.innerText = `${remStr} (${stepsRemaining} ${en ? 'steps remaining' : 'pași rămași'})`;
 
       const elOvlTotal = document.getElementById('ovl-total-time');
       if (elOvlTotal) elOvlTotal.innerText = str;
 
       const elOvlSub = document.getElementById('ovl-total-sub');
-      if (elOvlSub) elOvlSub.innerText = `(${pairs} pași la ${stepIntervalSec.toFixed(0)}s)`;
+      if (elOvlSub) elOvlSub.innerText = `(${pairs} ${en ? 'steps at' : 'pași la'} ${stepIntervalSec.toFixed(0)}s)`;
 
       const elHdrTotal = document.getElementById('hdr-total-time');
       if (elHdrTotal) elHdrTotal.innerText = `${mins}m ${remSec > 0 ? remSec + 's' : ''}`;
+
+      const elBadge = document.getElementById('summary-badge-part');
+      if (elBadge) elBadge.innerText = `${partCount} ${en ? 'PEOPLE' : 'OAMENI'}`;
+
+      const elDetails = document.getElementById('summary-details-box');
+      if (elDetails) {
+        elDetails.innerHTML = en
+          ? `• <b>${pairs} face-to-face meetings</b> (everyone interacts with all partners)<br>` +
+            `• At <b>${stepIntervalSec.toFixed(1)} seconds</b> gaze pause per step<br>` +
+            `• <b>Fluid rotation:</b> complete circuit runs smoothly with <b>zero bottlenecks or delays</b>!`
+          : `• <b>${pairs} întâlniri față în față</b> (fiecare interacționează cu toți partenerii)<br>` +
+            `• La <b>${stepIntervalSec.toFixed(1)} secunde</b> pauză de privire la fiecare pas<br>` +
+            `• <b>Rotație fluidă:</b> turul complet se desfășoară lin, <b>fără niciun blocaj sau întârziere</b>!`;
+      }
+
+      const setRowLbl = (id, sec, rec) => {
+        const el = document.getElementById(id);
+        if (el) {
+          if (rec) {
+            el.innerText = en ? `At ${sec} sec/step (recommended):` : `La ${sec} sec/pas (recomandat):`;
+          } else {
+            el.innerText = en ? `At ${sec} sec/step:` : `La ${sec} sec/pas:`;
+          }
+        }
+      };
+      setRowLbl('lbl-trow-3s', 3, false);
+      setRowLbl('lbl-trow-5s', 5, false);
+      setRowLbl('lbl-trow-10s', 10, true);
+      setRowLbl('lbl-trow-15s', 15, false);
+      setRowLbl('lbl-trow-20s', 20, false);
+      setRowLbl('lbl-trow-30s', 30, false);
     }
 
     function updateStepProgressUI() {
@@ -4067,7 +4266,8 @@
       recalculateAll();
       redraw();
       saveState();
-      showToast(`S-a setat la ${n} participanți (${Math.round(n/2)} perechi)`, '#38bdf8');
+      const en = currentLang === 'en';
+      showToast(en ? `Set to ${n} participants (${Math.round(n/2)} pairs)` : `S-a setat la ${n} participanți (${Math.round(n/2)} perechi)`, '#38bdf8');
     }
 
     function onPerRowChange(val) {
@@ -4093,7 +4293,8 @@
       }
       onPerRowChange(n);
       saveState();
-      showToast(`S-a setat la ${n} pers/șir (Total: ${partCount} participanți)`, '#38bdf8');
+      const en = currentLang === 'en';
+      showToast(en ? `Set to ${n} pers/line (Total: ${partCount} participants)` : `S-a setat la ${n} pers/șir (Total: ${partCount} participanți)`, '#38bdf8');
     }
 
     function setExactLanes(n) {
@@ -4103,9 +4304,10 @@
       recalculateAll();
       redraw();
       saveState();
-      const bText = (n - 1) === 1 ? '1 buclă U' : `${Math.max(0, n - 1)} bucle U`;
-      const lText = n === 1 ? '1 culoar' : `${n} culoare`;
-      showToast(`S-au setat ${lText} (${bText})`, '#38bdf8');
+      const en = currentLang === 'en';
+      const bText = (n - 1) === 1 ? (en ? '1 U-loop' : '1 buclă U') : `${Math.max(0, n - 1)} ${en ? 'U-loops' : 'bucle U'}`;
+      const lText = n === 1 ? (en ? '1 lane' : '1 culoar') : `${n} ${en ? 'lanes' : 'culoare'}`;
+      showToast(en ? `Set to ${lText} (${bText})` : `S-au setat ${lText} (${bText})`, '#38bdf8');
     }
 
     function setCompactMode(isCompact) {
@@ -4114,11 +4316,12 @@
       const bFull = document.getElementById('btn-mode-fullhall');
       if (bComp) bComp.classList.toggle('active', isCompact);
       if (bFull) bFull.classList.toggle('active', !isCompact);
+      const en = currentLang === 'en';
       const st = document.getElementById('disp-compact-status');
-      if (st) st.innerText = isCompact ? 'Auto-compact' : 'Toată sala';
+      if (st) st.innerText = isCompact ? 'Auto-compact' : (en ? 'Full hall' : 'Toată sala');
       recalculateAll();
       saveState();
-      showToast(isCompact ? 'Traseu compact adaptat la numărul de oameni' : 'Traseu extins pe toată lungimea sălii', '#38bdf8');
+      showToast(isCompact ? (en ? 'Compact route adapted to participant count' : 'Traseu compact adaptat la numărul de oameni') : (en ? 'Route extended across full hall length' : 'Traseu extins pe toată lungimea sălii'), '#38bdf8');
     }
 
     function toggleEqualLoops(isEqual) {
@@ -4127,7 +4330,8 @@
       if (chk) chk.checked = isEqual;
       recalculateAll();
       saveState();
-      showToast(isEqual ? 'Toate buclele au acum aceeași lățime/rază' : 'Distanțe asimetrice între bucle', '#38bdf8');
+      const en = currentLang === 'en';
+      showToast(isEqual ? (en ? 'All loops now have equal width/radius' : 'Toate buclele au acum aceeași lățime/rază') : (en ? 'Asymmetrical distances between loops' : 'Distanțe asimetrice între bucle'), '#38bdf8');
     }
 
     function setWallEndPreset(dist) {
@@ -4336,6 +4540,9 @@
       sb.classList.toggle('collapsed');
       applySidebarState();
       window.dispatchEvent(new Event('resize'));
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 280);
     }
     function applySidebarState() {
       const sb = document.querySelector('.sidebar');
@@ -4344,6 +4551,20 @@
       const btn = document.getElementById('btn-toggle-sidebar');
       if (btn) btn.classList.toggle('off', hidden);
     }
+
+    document.addEventListener('click', (e) => {
+      if (document.body.classList.contains('fs')) {
+        const sb = document.querySelector('.sidebar');
+        const btnToggle = document.getElementById('btn-toggle-sidebar');
+        if (sb && !sb.classList.contains('collapsed')) {
+          if (!sb.contains(e.target) && btnToggle && !btnToggle.contains(e.target)) {
+            sb.classList.add('collapsed');
+            applySidebarState();
+            setTimeout(() => window.dispatchEvent(new Event('resize')), 280);
+          }
+        }
+      }
+    });
 
     let currentMobView = 'plan';
     function setMobileView(view) {
@@ -4605,13 +4826,16 @@
         const elOvlTimer = document.getElementById('overlay-timer');
         if (elOvlTimer) elOvlTimer.innerText = `${remainingSec.toFixed(1)}s`;
         const lblT = document.getElementById('hud-timer-label');
+        const en = (currentLang === 'en');
         if (phase !== 'running') {
           const pctD = distrib ? Math.min(100, Math.round(100 * distrib.served / Math.max(1, distrib.reachable))) : 100;
-          const txt = (phase === 'distributing') ? `${pctD}%` : 'gata';
-          if (lblT) lblT.innerText = (phase === 'distributing') ? 'Distribuire steluțe' : 'Turul s-a terminat';
+          const txt = (phase === 'distributing') ? `${pctD}%` : (en ? 'Done' : 'Gata');
+          if (lblT) lblT.innerText = (phase === 'distributing') ? (en ? 'Distributing stars' : 'Distribuire steluțe') : (en ? 'Tour finished' : 'Turul s-a terminat');
           if (elOvlTimer) elOvlTimer.innerText = txt;
           const hc = document.getElementById('hdr-countdown'); if (hc) hc.innerText = txt;
-        } else if (lblT) lblT.innerText = 'Următorul pas în';
+        } else if (lblT) {
+          lblT.innerText = en ? 'Next step in' : 'Următorul pas în';
+        }
 
         // Camera follow
         if (camMode === 'follow') {
@@ -4812,10 +5036,11 @@
             ctx.font = 'bold 0.26px Inter, system-ui, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(` ZONĂ ROȘIE: ${(spaceInner * 100).toFixed(1)} cm`, 0, -0.12);
+            const enCanvas = (currentLang === 'en');
+            ctx.fillText(enCanvas ? `🚨 RED ZONE: ${(spaceInner * 100).toFixed(1)} cm` : `🚨 ZONĂ ROȘIE: ${(spaceInner * 100).toFixed(1)} cm`, 0, -0.12);
             ctx.font = 'bold 0.18px Inter, system-ui, sans-serif';
             ctx.fillStyle = '#fecaca';
-            ctx.fillText(`(< 46cm umeri = suprapunere -${((0.46 - spaceInner)*100).toFixed(1)}cm)`, 0, 0.16);
+            ctx.fillText(enCanvas ? `(< 46cm shoulders = overlap -${((0.46 - spaceInner)*100).toFixed(1)}cm)` : `(< 46cm umeri = suprapunere -${((0.46 - spaceInner)*100).toFixed(1)}cm)`, 0, 0.16);
             ctx.restore();
 
             ctx.restore();
@@ -5051,10 +5276,11 @@
         const isLead1 = (i === 0 && showLead);
         const p1Col = isCongested1 ? '#dc2626' : (isLead1 ? '#f59e0b' : '#0284c7');
         const p1High = isCongested1 ? '#ef4444' : (isLead1 ? '#fbbf24' : '#38bdf8');
+        const isEnLead = (currentLang === 'en');
         drawHumanTopDown(
           p1x, p1y, gaze1,
           isStepping ? lateralFootStride : 0,
-          isLead1, 'Lider #1 (Stânga)',
+          isLead1, isEnLead ? 'Leader #1 (Left)' : 'Lider #1 (Stânga)',
           p1Col, p1High,
           showArrows, i + 1,
           isCongested1, space1
@@ -5069,7 +5295,7 @@
         drawHumanTopDown(
           p2x, p2y, gaze2,
           isStepping ? lateralFootStride : 0,
-          isLead2, 'Lider #1 (Dreapta)',
+          isLead2, isEnLead ? 'Leader #1 (Right)' : 'Lider #1 (Dreapta)',
           p2Col, p2High,
           showArrows, i + 1,
           isCongested2, space2
@@ -5222,15 +5448,16 @@
 
         ctx.save();
         ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-        roundRect(ctx, -1.05, -0.16, 0.70, 0.32, 0.06, true, false);
+        const bW = (currentLang === 'en') ? 0.95 : 0.80;
+        roundRect(ctx, -bW - 0.35, -0.16, bW, 0.32, 0.06, true, false);
         ctx.strokeStyle = '#f59e0b';
         ctx.lineWidth = 0.02;
-        roundRect(ctx, -1.05, -0.16, 0.70, 0.32, 0.06, false, true);
-        ctx.font = 'bold 0.13px Inter, system-ui, sans-serif';
+        roundRect(ctx, -bW - 0.35, -0.16, bW, 0.32, 0.06, false, true);
+        ctx.font = 'bold 0.125px Inter, system-ui, sans-serif';
         ctx.fillStyle = '#f59e0b';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(leadText, -0.70, 0);
+        ctx.fillText(leadText, -bW / 2 - 0.35, 0);
         ctx.restore();
       }
 
@@ -6193,10 +6420,11 @@
 
     function saveNamedConfig() {
       const inp = document.getElementById('inp-conf-name');
+      const en = currentLang === 'en';
       let name = (inp && inp.value.trim()) || '';
       if (!name) {
         const now = new Date();
-        name = `Configurație ${now.toLocaleDateString('ro-RO')} ${now.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
+        name = (en ? 'Config ' : 'Configurație ') + `${now.toLocaleDateString(en ? 'en-US' : 'ro-RO')} ${now.toLocaleTimeString(en ? 'en-US' : 'ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
       }
       const cfgs = getNamedConfigs();
       const st = collectState();
@@ -6206,9 +6434,11 @@
         state: st
       };
       setNamedConfigs(cfgs);
+      try { localStorage.setItem('fata-in-fata-active-conf', name); } catch(e) {}
+      saveState();
       if (inp) inp.value = '';
       refreshNamedConfigsUI(name);
-      showConfigNotice(`Configurația „${name}” a fost salvată!`, '#22c55e');
+      showConfigNotice(en ? `Configuration “${name}” was saved!` : `Configurația „${name}” a fost salvată!`, '#22c55e');
     }
 
     const DEFAULT_PRESETS = [
@@ -6221,9 +6451,12 @@
 
     function loadConfigByValue(val) {
       if (!val) return;
+      const en = currentLang === 'en';
       if (val.startsWith('preset:')) {
         const pType = val.replace('preset:', '');
         applyQuickConfig(pType);
+        try { localStorage.setItem('fata-in-fata-active-conf', val); } catch(e) {}
+        saveState();
         closeConfigModal();
         if (window.innerWidth <= 900) setMobileView('plan');
         return;
@@ -6231,20 +6464,23 @@
       const cfgs = getNamedConfigs();
       const item = cfgs[val];
       if (!item || !item.state) {
-        showConfigNotice('Configurația selectată nu a putut fi găsită.', '#ef4444');
+        showConfigNotice(en ? 'Selected configuration could not be found.' : 'Configurația selectată nu a putut fi găsită.', '#ef4444');
         return;
       }
       applyLoadedState(item.state);
+      try { localStorage.setItem('fata-in-fata-active-conf', val); } catch(e) {}
+      saveState();
       setCamMode('full');
       closeConfigModal();
       if (window.innerWidth <= 900) setMobileView('plan');
-      showConfigNotice(`Configurația „${item.name}” a fost încărcată!`, '#22c55e');
+      showConfigNotice(en ? `Configuration “${item.name}” loaded!` : `Configurația „${item.name}” a fost încărcată!`, '#22c55e');
     }
 
     function loadSelectedNamedConfig() {
       const sel = document.getElementById('sel-named-configs');
+      const en = currentLang === 'en';
       if (!sel || !sel.value) {
-        showConfigNotice('Alege o configurație din listă pentru a o încărca.', '#f59e0b');
+        showConfigNotice(en ? 'Select a configuration from the list to load.' : 'Alege o configurație din listă pentru a o încărca.', '#f59e0b');
         return;
       }
       loadConfigByValue(sel.value);
@@ -6252,20 +6488,21 @@
 
     function deleteSelectedNamedConfig() {
       const sel = document.getElementById('sel-named-configs');
+      const en = currentLang === 'en';
       if (!sel || !sel.value) {
-        showConfigNotice('Alege o configurație din listă pentru a o șterge.', '#f59e0b');
+        showConfigNotice(en ? 'Select a configuration from the list to delete.' : 'Alege o configurație din listă pentru a o șterge.', '#f59e0b');
         return;
       }
       const name = sel.value;
       if (name.startsWith('preset:')) {
-        showConfigNotice('Preset-urile implicite nu pot fi șterse.', '#f59e0b');
+        showConfigNotice(en ? 'Default presets cannot be deleted.' : 'Preset-urile implicite nu pot fi șterse.', '#f59e0b');
         return;
       }
       const cfgs = getNamedConfigs();
       delete cfgs[name];
       setNamedConfigs(cfgs);
       refreshNamedConfigsUI();
-      showConfigNotice(`Configurația „${name}” a fost ștearsă.`, '#ef4444');
+      showConfigNotice(en ? `Configuration “${name}” was deleted.` : `Configurația „${name}” a fost ștearsă.`, '#ef4444');
     }
 
     function showToast(msg, color = '#22c55e') {
@@ -6304,7 +6541,8 @@
       a.href = URL.createObjectURL(blob);
       a.download = `configuratii-sala-800-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
-      showConfigNotice('Fișierul JSON cu toate configurațiile a fost descărcat!', '#22c55e');
+      const en = currentLang === 'en';
+      showConfigNotice(en ? 'JSON file with all configurations downloaded!' : 'Fișierul JSON cu toate configurațiile a fost descărcat!', '#22c55e');
     }
 
     function importConfigsJSON(e) {
@@ -6319,10 +6557,12 @@
             const merged = { ...current, ...parsed };
             setNamedConfigs(merged);
             refreshNamedConfigsUI();
-            showConfigNotice('Configurațiile au fost importate cu succes!', '#22c55e');
+            const en = currentLang === 'en';
+            showConfigNotice(en ? 'Configurations imported successfully!' : 'Configurațiile au fost importate cu succes!', '#22c55e');
           }
         } catch (err) {
-          alert('Fișier JSON invalid!');
+          const en = currentLang === 'en';
+          alert(en ? 'Invalid JSON file!' : 'Fișier JSON invalid!');
         }
       };
       reader.readAsText(file);
@@ -6347,10 +6587,11 @@
 
     function modalSaveNamedConfig() {
       const inp = document.getElementById('modal-inp-conf-name');
+      const en = currentLang === 'en';
       let name = (inp && inp.value.trim()) || '';
       if (!name) {
         const now = new Date();
-        name = `Configurație ${now.toLocaleDateString('ro-RO')} ${now.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
+        name = (en ? 'Config ' : 'Configurație ') + `${now.toLocaleDateString(en ? 'en-US' : 'ro-RO')} ${now.toLocaleTimeString(en ? 'en-US' : 'ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
       }
       const cfgs = getNamedConfigs();
       const st = collectState();
@@ -6359,15 +6600,18 @@
       if (inp) inp.value = '';
       refreshNamedConfigsUI(name);
       const stat = document.getElementById('modal-conf-status');
-      if (stat) { stat.style.color = '#22c55e'; stat.innerText = `Configurația „${name}” a fost salvată!`; }
-      showConfigNotice(`Configurația „${name}” a fost salvată!`, '#22c55e');
+      const saveMsg = en ? `Configuration “${name}” was saved!` : `Configurația „${name}” a fost salvată!`;
+      if (stat) { stat.style.color = '#22c55e'; stat.innerText = saveMsg; }
+      showConfigNotice(saveMsg, '#22c55e');
     }
 
     function modalLoadSelectedConfig() {
       const sel = document.getElementById('modal-sel-named-configs');
+      const en = currentLang === 'en';
       if (!sel || !sel.value) {
         const stat = document.getElementById('modal-conf-status');
-        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o opțiune din listă!'; }
+        const msg = en ? 'Select an option from list!' : 'Alege o opțiune din listă!';
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = msg; }
         return;
       }
       loadConfigByValue(sel.value);
@@ -6377,10 +6621,12 @@
       const sel = document.getElementById('modal-sel-named-configs');
       if (!sel || !sel.value) return;
       const name = sel.value;
+      const en = currentLang === 'en';
       if (name.startsWith('preset:')) {
         const stat = document.getElementById('modal-conf-status');
-        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Preset-urile implicite nu pot fi șterse.'; }
-        showConfigNotice('Preset-urile implicite nu pot fi șterse.', '#f59e0b');
+        const msg = en ? 'Default presets cannot be deleted.' : 'Preset-urile implicite nu pot fi șterse.';
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = msg; }
+        showConfigNotice(msg, '#f59e0b');
         return;
       }
       const cfgs = getNamedConfigs();
@@ -6388,16 +6634,18 @@
       setNamedConfigs(cfgs);
       refreshNamedConfigsUI();
       const stat = document.getElementById('modal-conf-status');
-      if (stat) { stat.style.color = '#ef4444'; stat.innerText = `Configurația „${name}” a fost ștearsă.`; }
-      showConfigNotice(`Configurația „${name}” a fost ștearsă.`, '#ef4444');
+      const delMsg = en ? `Configuration “${name}” was deleted.` : `Configurația „${name}” a fost ștearsă.`;
+      if (stat) { stat.style.color = '#ef4444'; stat.innerText = delMsg; }
+      showConfigNotice(delMsg, '#ef4444');
     }
 
     function tabSaveNamedConfig() {
       const inp = document.getElementById('tab-inp-conf-name');
+      const en = currentLang === 'en';
       let name = (inp && inp.value.trim()) || '';
       if (!name) {
         const now = new Date();
-        name = `Configurație ${now.toLocaleDateString('ro-RO')} ${now.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
+        name = (en ? 'Config ' : 'Configurație ') + `${now.toLocaleDateString(en ? 'en-US' : 'ro-RO')} ${now.toLocaleTimeString(en ? 'en-US' : 'ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
       }
       const cfgs = getNamedConfigs();
       const st = collectState();
@@ -6406,16 +6654,19 @@
       if (inp) inp.value = '';
       refreshNamedConfigsUI(name);
       const stat = document.getElementById('tab-conf-save-status');
-      if (stat) { stat.style.color = '#22c55e'; stat.innerText = `Configurația „${name}” a fost salvată!`; }
-      showConfigNotice(`Configurația „${name}” a fost salvată!`, '#22c55e');
+      const saveMsg = en ? `Configuration “${name}” was saved!` : `Configurația „${name}” a fost salvată!`;
+      if (stat) { stat.style.color = '#22c55e'; stat.innerText = saveMsg; }
+      showConfigNotice(saveMsg, '#22c55e');
     }
 
     function tabLoadSelectedConfig() {
       const sel = document.getElementById('tab-sel-named-configs');
+      const en = currentLang === 'en';
       if (!sel || !sel.value) {
         const stat = document.getElementById('tab-conf-load-status');
-        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o opțiune din listă!'; }
-        showConfigNotice('Alege o opțiune din listă!', '#f59e0b');
+        const msg = en ? 'Select an option from list!' : 'Alege o opțiune din listă!';
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = msg; }
+        showConfigNotice(msg, '#f59e0b');
         return;
       }
       loadConfigByValue(sel.value);
@@ -6425,10 +6676,12 @@
       const sel = document.getElementById('tab-sel-named-configs');
       if (!sel || !sel.value) return;
       const name = sel.value;
+      const en = currentLang === 'en';
       if (name.startsWith('preset:')) {
         const stat = document.getElementById('tab-conf-load-status');
-        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Preset-urile implicite nu pot fi șterse.'; }
-        showConfigNotice('Preset-urile implicite nu pot fi șterse.', '#f59e0b');
+        const msg = en ? 'Default presets cannot be deleted.' : 'Preset-urile implicite nu pot fi șterse.';
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = msg; }
+        showConfigNotice(msg, '#f59e0b');
         return;
       }
       const cfgs = getNamedConfigs();
@@ -6436,14 +6689,16 @@
       setNamedConfigs(cfgs);
       refreshNamedConfigsUI();
       const stat = document.getElementById('tab-conf-load-status');
-      if (stat) { stat.style.color = '#ef4444'; stat.innerText = `Configurația „${name}” a fost ștearsă.`; }
-      showConfigNotice(`Configurația „${name}” a fost ștearsă.`, '#ef4444');
+      const delMsg = en ? `Configuration “${name}” was deleted.` : `Configurația „${name}” a fost ștearsă.`;
+      if (stat) { stat.style.color = '#ef4444'; stat.innerText = delMsg; }
+      showConfigNotice(delMsg, '#ef4444');
     }
 
     function refreshNamedConfigsUI(selectedName) {
       const selIds = ['sel-named-configs', 'tab-sel-named-configs', 'modal-sel-named-configs'];
       const cfgs = getNamedConfigs();
       const keys = Object.keys(cfgs).sort((a, b) => (cfgs[b].savedAt || 0) - (cfgs[a].savedAt || 0));
+      const en = currentLang === 'en';
 
       selIds.forEach(id => {
         const el = document.getElementById(id);
@@ -6452,33 +6707,34 @@
 
         const optDefault = document.createElement('option');
         optDefault.value = '';
-        optDefault.text = '-- Alege opțiune / preset --';
+        optDefault.text = en ? '-- Select option / preset --' : '-- Alege opțiune / preset --';
         el.appendChild(optDefault);
 
         const grpPresets = document.createElement('optgroup');
-        grpPresets.label = 'Preset-uri rapide de bază:';
+        grpPresets.label = en ? 'Default quick presets:' : 'Preset-uri rapide de bază:';
         DEFAULT_PRESETS.forEach(p => {
           const opt = document.createElement('option');
           opt.value = p.id;
-          opt.text = p.name;
+          const k = p.id.replace(':', '_');
+          opt.text = (en && I18N.en && I18N.en[k]) ? I18N.en[k] : p.name;
           if (selectedName && p.id === selectedName) opt.selected = true;
           grpPresets.appendChild(opt);
         });
         el.appendChild(grpPresets);
 
         const grpCustom = document.createElement('optgroup');
-        grpCustom.label = 'Configurațiile mele salvate:';
+        grpCustom.label = en ? 'My saved configurations:' : 'Configurațiile mele salvate:';
         if (keys.length === 0) {
           const optNone = document.createElement('option');
           optNone.value = '';
           optNone.disabled = true;
-          optNone.text = '(Nicio configurație salvată încă)';
+          optNone.text = en ? '(No configurations saved yet)' : '(Nicio configurație salvată încă)';
           grpCustom.appendChild(optNone);
         } else {
           keys.forEach(k => {
             const opt = document.createElement('option');
             opt.value = k;
-            const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString('ro-RO') : '';
+            const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString(en ? 'en-US' : 'ro-RO') : '';
             opt.text = `💾 ${k}${dateStr ? ` (${dateStr})` : ''}`;
             if (selectedName && k === selectedName) opt.selected = true;
             grpCustom.appendChild(opt);
@@ -6614,16 +6870,17 @@
           gctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, gifW, gifH);
 
           // Bandă elegantă jos în GIF cu detalii exercițiu
+          const en = currentLang === 'en';
           gctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
           gctx.fillRect(0, gifH - 24, gifW, 24);
           gctx.fillStyle = '#38bdf8';
           gctx.font = 'bold 11px Inter, system-ui, sans-serif';
           gctx.textAlign = 'left';
           gctx.textBaseline = 'middle';
-          gctx.fillText(`Față în față · Contrasens (${partCount} pers · ${nLanes} culoare)`, 10, gifH - 12);
+          gctx.fillText(en ? `Face to face · Counter-flow (${partCount} people · ${nLanes} lanes)` : `Față în față · Contrasens (${partCount} pers · ${nLanes} culoare)`, 10, gifH - 12);
           gctx.fillStyle = '#94a3b8';
           gctx.textAlign = 'right';
-          gctx.fillText(`Pas ${currentStepNumber} / ${pairs}`, gifW - 10, gifH - 12);
+          gctx.fillText(en ? `Step ${currentStepNumber} / ${pairs}` : `Pas ${currentStepNumber} / ${pairs}`, gifW - 10, gifH - 12);
 
           // Encodare cadru GIF
           const imgData = gctx.getImageData(0, 0, gifW, gifH).data;
@@ -6632,10 +6889,11 @@
           gif.writeFrame(idx, gifW, gifH, { palette: pal, delay: 100, repeat: 0 });
         }
 
+        const en = currentLang === 'en';
         const pct = Math.round((frameIdx / totalFrames) * 100);
         if (barFill) barFill.style.width = pct + '%';
         if (txtPct) txtPct.innerText = pct + '%';
-        if (txtStatus) txtStatus.innerText = `Generare cadru ${frameIdx} din ${totalFrames}...`;
+        if (txtStatus) txtStatus.innerText = en ? `Generating frame ${frameIdx} of ${totalFrames}...` : `Generare cadru ${frameIdx} din ${totalFrames}...`;
 
         if (frameIdx < totalFrames) {
           setTimeout(processBatch, 0);
@@ -6659,7 +6917,7 @@
 
           isExportingGif = false;
           closeGifModal();
-          showConfigNotice('GIF-ul de 10-15s a fost generat și descărcat cu succes!', '#22c55e');
+          showConfigNotice(en ? '10-15s GIF animation generated and downloaded successfully!' : 'GIF-ul de 10-15s a fost generat și descărcat cu succes!', '#22c55e');
         }
       }
 
