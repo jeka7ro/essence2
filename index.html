@@ -1069,7 +1069,7 @@
       flex-shrink: 0 !important;
     }
 
-    .hdr-sim, .hdr-pdf {
+    .hdr-sim {
       height: 38px !important;
       box-sizing: border-box !important;
       display: inline-flex !important;
@@ -1089,8 +1089,39 @@
       flex-shrink: 0 !important;
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
     }
-    .hdr-sim:hover, .hdr-pdf:hover { background: #2f3f58 !important; color: #fff !important; }
+    .hdr-sim:hover { background: #2f3f58 !important; color: #fff !important; }
     .hdr-sim.on { background: #0284c7 !important; border-color: #38bdf8 !important; color: #fff !important; }
+
+    /* Buton Salvare / Export PDF cu albastru distinctiv (blue) */
+    .hdr-pdf {
+      height: 38px !important;
+      box-sizing: border-box !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 7px !important;
+      padding: 0 16px !important;
+      border-radius: 999px !important;
+      border: 1px solid #38bdf8 !important;
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      cursor: pointer !important;
+      white-space: nowrap !important;
+      font-family: inherit !important;
+      flex-shrink: 0 !important;
+      box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4) !important;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease !important;
+    }
+    .hdr-pdf:hover {
+      background: #0ea5e9 !important;
+      border-color: #7dd3fc !important;
+      color: #ffffff !important;
+    }
+    .hdr-pdf:active {
+      transform: translateY(1px) !important;
+    }
 
     /* ===== UNIFIED DESIGN SYSTEM: ROWS, INPUTS, SELECTS, BUTTONS ===== */
     .ui-row {
@@ -1518,7 +1549,7 @@
       <button class="hdr-sim" onclick="toggleFastSimVideo()" title="Simulare rapidă înregistrată ca video (se descarcă .webm)" data-i18n-title="hdr_video_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span class="lbl" data-i18n="hdr_video">Video</span></button>
       <button class="hdr-sim" onclick="openGifModal()" title="Exportă animație GIF (10-15s, se descarcă .gif)" data-i18n-title="hdr_gif_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span class="lbl" data-i18n="hdr_gif">GIF</span></button>
       <button class="hdr-sim" onclick="openConfigModal()" title="Salvare & Încărcare configurații sală" data-i18n-title="hdr_configs_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span class="lbl" data-i18n="hdr_configs">Config</span></button>
-      <button class="hdr-sim" id="hdr-btn-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF (A4)" data-i18n-title="hdr_pdf_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> <span class="lbl" data-i18n="hdr_pdf">PDF</span></button>
+      <button class="hdr-pdf" id="hdr-btn-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF" data-i18n-title="hdr_pdf_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> <span class="lbl" data-i18n="hdr_pdf">Export PDF</span></button>
 
       <!-- Comutator rotunjit Limbă (RO / EN) în header cu steaguri -->
       <div class="lang-switch-box" id="hdr-lang-box" title="Schimbă limba / Switch language (RO / EN)">
