@@ -4744,6 +4744,42 @@
       centerOn(ROOM_W / 2, ROOM_L / 2);
     }
 
+    function clampPan() {
+      const vp = viewportEl();
+      if (!vp) return;
+      const vpW = vp.clientWidth;
+      const vpH = vp.clientHeight;
+      if (vpW <= 0 || vpH <= 0) return;
+
+      const c = Math.cos(viewRot), sn = Math.sin(viewRot);
+      const rx = (c * ROOM_W / 2 - sn * ROOM_L / 2) * scale;
+      const ry = (sn * ROOM_W / 2 + c * ROOM_L / 2) * scale;
+
+      const cosAbs = Math.abs(c), sinAbs = Math.abs(sn);
+      const roomHalfW = ((ROOM_W * cosAbs + ROOM_L * sinAbs) / 2) * scale;
+      const roomHalfH = ((ROOM_W * sinAbs + ROOM_L * cosAbs) / 2) * scale;
+
+      // Păstrăm cel puțin 80px sau 35% din sală vizibilă pe ecran, împiedicând planul să zboare afară din vizualizare
+      const minMarginX = Math.min(80, roomHalfW * 0.35);
+      const minMarginY = Math.min(80, roomHalfH * 0.35);
+
+      const minCenterX = -roomHalfW + minMarginX;
+      const maxCenterX = vpW + roomHalfW - minMarginX;
+      const minCenterY = -roomHalfH + minMarginY;
+      const maxCenterY = vpH + roomHalfH - minMarginY;
+
+      let curCenterX = panX + rx;
+      let curCenterY = panY + ry;
+
+      if (curCenterX < minCenterX) curCenterX = minCenterX;
+      if (curCenterX > maxCenterX) curCenterX = maxCenterX;
+      if (curCenterY < minCenterY) curCenterY = minCenterY;
+      if (curCenterY > maxCenterY) curCenterY = maxCenterY;
+
+      panX = curCenterX - rx;
+      panY = curCenterY - ry;
+    }
+
     function zoom(f) {
       enterFreeCam();
       const vp = viewportEl();
@@ -4754,6 +4790,7 @@
       const actualRatio = scale / oldScale;
       panX = cx - (cx - panX) * actualRatio;
       panY = cy - (cy - panY) * actualRatio;
+      clampPan();
       redraw();
     }
     function resetZoom() { setCamMode(camMode === 'free' ? lastCamMode : camMode); }
@@ -6106,6 +6143,7 @@
         enterFreeCam();
         panX = e.clientX - dragStart.x;
         panY = e.clientY - dragStart.y;
+        clampPan();
         redraw();
       }
     });
@@ -6156,6 +6194,7 @@
         if (touchMoved) {
           panX = e.touches[0].clientX - dragStart.x;
           panY = e.touches[0].clientY - dragStart.y;
+          clampPan();
           redraw();
         }
       } else if (e.touches.length >= 2) {
@@ -6176,6 +6215,7 @@
 
           panX = cx - (cx - panX) * actualRatio + (cx - lastTouchCenter.x);
           panY = cy - (cy - panY) * actualRatio + (cy - lastTouchCenter.y);
+          clampPan();
           redraw();
         }
         lastTouchDist = currentDist;
@@ -6230,36 +6270,38 @@
         const actualRatio = scale / oldScale;
         panX = mouseX - (mouseX - panX) * actualRatio;
         panY = mouseY - (mouseY - panY) * actualRatio;
+        clampPan();
         redraw();
         return;
       }
 
-      // 2. Shift + rotiță / trackpad -> mișcă orizontal (stânga / dreapta)
+      // 2. Shift + rotiță -> glisare orizontală (stânga / dreapta)
       if (e.shiftKey) {
         const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
         panX -= d;
+        clampPan();
         redraw();
         return;
       }
 
-      // 3. Glisare cu două degete pe trackpad (stânga, dreapta, sus, jos):
-      // Are deltaX sau mișcare fină deltaY (< 40 pixeli)
-      const isTrackpadScroll = Math.abs(e.deltaX) > 0 || (Math.abs(e.deltaY) < 40 && e.deltaMode === 0);
-      if (isTrackpadScroll) {
+      // 3. Glisare orizontală explicită pe trackpad (deltaX dominant)
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5) {
         panX -= e.deltaX;
-        panY -= e.deltaY;
+        clampPan();
         redraw();
         return;
       }
 
-      // 4. Rotiță clasică de mouse (trepte mari deltaY >= 40 sau mod linii) -> Zoom centrat pe cursor
+      // 4. Rotiță normală de mouse / scroll: ZOOM IN / ZOOM OUT centrat pe cursorul mouse-ului!
+      // Rotiță înainte / sus (deltaY < 0) = Zoom IN; Rotiță înapoi / jos (deltaY > 0) = Zoom OUT
       const delta = Math.max(-60, Math.min(60, e.deltaY));
-      const zoomFactor = Math.exp(-delta * 0.002);
+      const zoomFactor = Math.exp(-delta * 0.003);
       const oldScale = scale;
       scale = Math.max(4, Math.min(250, scale * zoomFactor));
       const actualRatio = scale / oldScale;
       panX = mouseX - (mouseX - panX) * actualRatio;
       panY = mouseY - (mouseY - panY) * actualRatio;
+      clampPan();
       redraw();
     }, { passive: false });
 
