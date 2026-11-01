@@ -1096,21 +1096,55 @@
     /* ===== telefon: planul ocupa aproape tot ecranul ===== */
     .mob-cams, .hud-sol { display: none; }
     @media (max-width: 900px) {
-      header { display: none !important; }                     /* camerele sunt pe plan, restul jos */
-      .stage > .canvas-overlay-info { padding: 6px 10px !important; gap: 4px 10px !important; flex-wrap: nowrap !important; }
-      .stage > .canvas-overlay-info .hud-seg,
+      header { display: none !important; }
+      .stage > .canvas-overlay-info {
+        padding: 6px 10px !important;
+        gap: 6px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .stage > .canvas-overlay-info .hud-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 8px;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .stage > .canvas-overlay-info .hud-seg {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        gap: 5px !important;
+        padding: 4px 6px !important;
+        border-radius: 999px !important;
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        scrollbar-width: none;
+        max-width: 100% !important;
+        touch-action: pan-x;
+        z-index: 10;
+      }
+      .stage > .canvas-overlay-info .hud-seg::-webkit-scrollbar { display: none; }
+      .stage > .canvas-overlay-info .hud-seg .sol-pill {
+        flex-shrink: 0 !important;
+        padding: 5px 12px !important;
+        font-size: 12px !important;
+        border-radius: 999px !important;
+        cursor: pointer !important;
+        touch-action: manipulation;
+      }
       .stage > .canvas-overlay-info .hud-status,
       .stage > .canvas-overlay-info .hud-sub,
       .stage > .canvas-overlay-info .hud-sep,
       .stage > .canvas-overlay-info .hud-toggle { display: none !important; }
-      .stage > .canvas-overlay-info .hud-row { flex-wrap: nowrap !important; gap: 10px; width: 100%; justify-content: space-between; overflow: hidden; }
       .stage > .canvas-overlay-info .hud-stat { gap: 5px; }
       .stage > .canvas-overlay-info .hud-label { font-size: 11px; }
       .stage > .canvas-overlay-info #hud-timer-label { display: none; }
       .stage > .canvas-overlay-info .hud-stat:nth-of-type(2) .hud-label { display: none; }
       .stage > .canvas-overlay-info .hud-val { font-size: 13px; }
-      .hud-sol { display: inline-flex; align-items: center; gap: 2px; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18);
-                 background: #1e293b; color: #fff; font-family: inherit; font-size: 12px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
+      .hud-sol { display: none !important; }
       .mob-cams { display: none !important; }
       .mc-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: #cbd5e1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
       .mc-btn .ic { width: 18px; height: 18px; }
@@ -1121,6 +1155,9 @@
       .stage > .canvas-overlay-info .hud-stat .hud-label { display: none; }
       .tool-btn { width: 34px !important; height: 34px !important; }
       .tool-sep { display: none; }
+      .ui-input, .ui-select, .num-in, select, input[type="text"], input[type="number"] {
+        font-size: 16px !important;
+      }
     }
   </style>
 </head>
@@ -1368,7 +1405,7 @@
 
           <!-- Incarca / Sterge configuratie salvata -->
           <div class="ui-row">
-            <select id="sel-named-configs" class="ui-select">
+            <select id="sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
               <option value="">-- Alege configurație salvată --</option>
             </select>
             <button id="btn-load-conf" class="ui-btn ui-btn-primary" onclick="loadSelectedNamedConfig()" title="Încarcă configurația selectată">
@@ -1813,7 +1850,7 @@
         <div class="section-title">Configurații salvate anterior</div>
         <div class="param-box">
           <div class="ui-row">
-            <select id="tab-sel-named-configs" class="ui-select">
+            <select id="tab-sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
               <option value="">-- Alege configurație salvată --</option>
             </select>
             <button class="ui-btn ui-btn-primary" onclick="tabLoadSelectedConfig()">
@@ -1945,7 +1982,7 @@
   <nav class="mob-bottom">
     <button class="mb-btn active" data-go="plan" onclick="mobGo('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span>Plan</span></button>
     <button class="mb-btn" data-go="tab-circuit" onclick="mobGo('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>Pas</span></button>
-    <button class="mb-btn" onclick="openConfigModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Salvare</span></button>
+    <button class="mb-btn" data-go="tab-configs" onclick="mobGo('tab-configs')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Salvare</span></button>
     <button class="mb-btn" data-go="tab-params" onclick="mobGo('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Setări</span></button>
     <button class="mb-btn" data-go="tab-congestion" onclick="mobGo('tab-congestion')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Soluții</span></button>
     <button class="mb-btn" data-go="tab-calc" onclick="mobGo('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg><span>Calcul</span></button>
@@ -1980,7 +2017,7 @@
         <div style="background:#1e293b; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
           <div style="font-size:12px; font-weight:700; color:#e2e8f0; margin-bottom:8px;">Configurații salvate anterior:</div>
           <div class="ui-row">
-            <select id="modal-sel-named-configs" class="ui-select">
+            <select id="modal-sel-named-configs" class="ui-select" onchange="loadConfigByValue(this.value)">
               <option value="">-- Alege o configurație salvată --</option>
             </select>
             <button class="ui-btn ui-btn-primary" onclick="modalLoadSelectedConfig()">
@@ -3096,6 +3133,7 @@
       updateSolutionPills();
       recalculateAll();
       setCamMode('congestion');
+      if (window.innerWidth <= 900) setMobileView('plan');
     }
 
     function updateSolutionPills() {
@@ -4695,7 +4733,7 @@
     // ===================== SALVARE AUTOMATA A SETARILOR (rămân după refresh) =====================
     const STORE_KEY = 'fata-in-fata-setari-v1';
     const CHK_IDS = ['chk-gaze', 'chk-dir-arrows', 'chk-lead-marker', 'chk-assistants', 'chk-wall-dims', 'chk-reach'];
-    const TAB_IDS = ['tab-circuit', 'tab-params', 'tab-congestion', 'tab-calc'];
+    const TAB_IDS = ['tab-circuit', 'tab-params', 'tab-congestion', 'tab-calc', 'tab-configs'];
     let savedCam = null, savedTab = null;
 
     function collectState() {
@@ -4812,20 +4850,41 @@
       showConfigNotice(`Configurația „${name}” a fost salvată!`, '#22c55e');
     }
 
+    const DEFAULT_PRESETS = [
+      { id: 'preset:std800', name: '⭐ 800p · Standard (0.70m viraj)' },
+      { id: 'preset:transit800', name: '🔄 800p · Culoar Tranzit (0.65m)' },
+      { id: 'preset:stagger800', name: '♟️ 800p · Decalat / Șah (0.60m)' },
+      { id: 'preset:room600', name: '🏢 600p · Sală 30×20m (8 culoare)' },
+    ];
+
+    function loadConfigByValue(val) {
+      if (!val) return;
+      if (val.startsWith('preset:')) {
+        const pType = val.replace('preset:', '');
+        applyQuickConfig(pType);
+        closeConfigModal();
+        if (window.innerWidth <= 900) setMobileView('plan');
+        return;
+      }
+      const cfgs = getNamedConfigs();
+      const item = cfgs[val];
+      if (!item || !item.state) {
+        showConfigNotice('Configurația selectată nu a putut fi găsită.', '#ef4444');
+        return;
+      }
+      applyLoadedState(item.state);
+      closeConfigModal();
+      if (window.innerWidth <= 900) setMobileView('plan');
+      showConfigNotice(`Configurația „${item.name}” a fost încărcată!`, '#22c55e');
+    }
+
     function loadSelectedNamedConfig() {
       const sel = document.getElementById('sel-named-configs');
       if (!sel || !sel.value) {
         showConfigNotice('Alege o configurație din listă pentru a o încărca.', '#f59e0b');
         return;
       }
-      const cfgs = getNamedConfigs();
-      const item = cfgs[sel.value];
-      if (!item || !item.state) {
-        showConfigNotice('Configurația selectată nu a putut fi găsită.', '#ef4444');
-        return;
-      }
-      applyLoadedState(item.state);
-      showConfigNotice(`Configurația „${item.name}” a fost încărcată cu succes!`, '#22c55e');
+      loadConfigByValue(sel.value);
     }
 
     function deleteSelectedNamedConfig() {
@@ -4835,6 +4894,10 @@
         return;
       }
       const name = sel.value;
+      if (name.startsWith('preset:')) {
+        showConfigNotice('Preset-urile implicite nu pot fi șterse.', '#f59e0b');
+        return;
+      }
       const cfgs = getNamedConfigs();
       delete cfgs[name];
       setNamedConfigs(cfgs);
@@ -4941,21 +5004,22 @@
       const sel = document.getElementById('modal-sel-named-configs');
       if (!sel || !sel.value) {
         const stat = document.getElementById('modal-conf-status');
-        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o configurație din listă!'; }
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o opțiune din listă!'; }
         return;
       }
-      const cfgs = getNamedConfigs();
-      const item = cfgs[sel.value];
-      if (!item || !item.state) return;
-      applyLoadedState(item.state);
-      closeConfigModal();
-      showConfigNotice(`Configurația „${item.name}” a fost încărcată!`, '#22c55e');
+      loadConfigByValue(sel.value);
     }
 
     function modalDeleteSelectedConfig() {
       const sel = document.getElementById('modal-sel-named-configs');
       if (!sel || !sel.value) return;
       const name = sel.value;
+      if (name.startsWith('preset:')) {
+        const stat = document.getElementById('modal-conf-status');
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Preset-urile implicite nu pot fi șterse.'; }
+        showConfigNotice('Preset-urile implicite nu pot fi șterse.', '#f59e0b');
+        return;
+      }
       const cfgs = getNamedConfigs();
       delete cfgs[name];
       setNamedConfigs(cfgs);
@@ -4987,22 +5051,23 @@
       const sel = document.getElementById('tab-sel-named-configs');
       if (!sel || !sel.value) {
         const stat = document.getElementById('tab-conf-load-status');
-        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o configurație din listă!'; }
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Alege o opțiune din listă!'; }
+        showConfigNotice('Alege o opțiune din listă!', '#f59e0b');
         return;
       }
-      const cfgs = getNamedConfigs();
-      const item = cfgs[sel.value];
-      if (!item || !item.state) return;
-      applyLoadedState(item.state);
-      const stat = document.getElementById('tab-conf-load-status');
-      if (stat) { stat.style.color = '#22c55e'; stat.innerText = `Configurația „${item.name}” a fost încărcată!`; }
-      showConfigNotice(`Configurația „${item.name}” a fost încărcată!`, '#22c55e');
+      loadConfigByValue(sel.value);
     }
 
     function tabDeleteSelectedConfig() {
       const sel = document.getElementById('tab-sel-named-configs');
       if (!sel || !sel.value) return;
       const name = sel.value;
+      if (name.startsWith('preset:')) {
+        const stat = document.getElementById('tab-conf-load-status');
+        if (stat) { stat.style.color = '#f59e0b'; stat.innerText = 'Preset-urile implicite nu pot fi șterse.'; }
+        showConfigNotice('Preset-urile implicite nu pot fi șterse.', '#f59e0b');
+        return;
+      }
       const cfgs = getNamedConfigs();
       delete cfgs[name];
       setNamedConfigs(cfgs);
@@ -5020,15 +5085,43 @@
       selIds.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.innerHTML = '<option value="">-- Alege configurație salvată --</option>';
-        keys.forEach(k => {
+        el.innerHTML = '';
+
+        const optDefault = document.createElement('option');
+        optDefault.value = '';
+        optDefault.text = '-- Alege opțiune / preset --';
+        el.appendChild(optDefault);
+
+        const grpPresets = document.createElement('optgroup');
+        grpPresets.label = 'Preset-uri rapide de bază:';
+        DEFAULT_PRESETS.forEach(p => {
           const opt = document.createElement('option');
-          opt.value = k;
-          const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString('ro-RO') : '';
-          opt.text = `${k}${dateStr ? ` (${dateStr})` : ''}`;
-          if (selectedName && k === selectedName) opt.selected = true;
-          el.appendChild(opt);
+          opt.value = p.id;
+          opt.text = p.name;
+          if (selectedName && p.id === selectedName) opt.selected = true;
+          grpPresets.appendChild(opt);
         });
+        el.appendChild(grpPresets);
+
+        const grpCustom = document.createElement('optgroup');
+        grpCustom.label = 'Configurațiile mele salvate:';
+        if (keys.length === 0) {
+          const optNone = document.createElement('option');
+          optNone.value = '';
+          optNone.disabled = true;
+          optNone.text = '(Nicio configurație salvată încă)';
+          grpCustom.appendChild(optNone);
+        } else {
+          keys.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k;
+            const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString('ro-RO') : '';
+            opt.text = `💾 ${k}${dateStr ? ` (${dateStr})` : ''}`;
+            if (selectedName && k === selectedName) opt.selected = true;
+            grpCustom.appendChild(opt);
+          });
+        }
+        el.appendChild(grpCustom);
       });
     }
 
@@ -5058,6 +5151,7 @@
       updateSolutionPills();
       fitFullRoom();
       redraw();
+      if (window.innerWidth <= 900) setMobileView('plan');
       showConfigNotice('Preset rapid aplicat cu succes!', '#22c55e');
     }
 
