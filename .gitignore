@@ -10,6 +10,8 @@ bot_slice.jpg
 left_slice.jpg
 right_slice.jpg
 highres_rotated.jpg
+*.webm
+*.gif
 .DS_Store
 .system_generated/
 scratch/

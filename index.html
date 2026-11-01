@@ -6,7 +6,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Simulare 800 Oameni Față în Față - Pas la Dreapta în Contrasens (35.3m × 21.6m)</title>
   <style>
     :root {
@@ -835,6 +835,82 @@
 
     /* canvas-ul nu influenteaza marimea zonei in care sta */
     .viewport > canvas { position: absolute; left: 0; top: 0; }
+
+    .hdr-sim { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: #1e293b; color: #e2e8f0; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .hdr-sim:hover { background: #2f3f58; }
+    .hdr-sim.on { background: #0284c7; border-color: #38bdf8; color: #fff; }
+    @media (max-width: 1250px) { .hdr-sim { padding: 8px 11px; } .hdr-sim .lbl { display: none; } }
+    @media (max-width: 1650px) { .pill-extra { display: none; } }
+
+    /* Modal export GIF */
+    .app-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(2, 6, 23, 0.78); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .app-modal-backdrop.open { display: flex; }
+    .app-modal-card {
+      background: #0f172a; border: 1px solid var(--card-border); border-radius: 20px;
+      width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; color: #f8fafc;
+    }
+    .app-modal-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .app-modal-title { font-size: 17px; font-weight: 700; color: #fff; margin: 0; }
+    .app-modal-sub { font-size: 12px; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
+    .app-modal-close { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; border-radius: 8px; }
+    .app-modal-close:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+    /* ===== telefon: navigare jos, panou compact ===== */
+    .mob-bottom { display: none; }
+    @media (max-width: 900px) {
+      .mobile-nav-bar { display: none !important; }
+      .sidebar .tab-nav { display: none !important; }
+      .mob-bottom {
+        display: flex; flex-shrink: 0; gap: 2px; padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        background: #0b1220; border-top: 1px solid var(--card-border); z-index: 50;
+      }
+      .mb-btn {
+        flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+        padding: 6px 2px; border: none; background: transparent; color: #94a3b8; font-family: inherit; font-size: 10.5px; font-weight: 600;
+        border-radius: 14px; cursor: pointer;
+      }
+      .mb-btn .ic { width: 20px; height: 20px; }
+      .mb-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      .mb-btn.active { color: #fff; background: rgba(2, 132, 199, 0.35); }
+      /* panoul de stare: solutiile pe un singur rand care se deruleaza lateral */
+      .stage > .canvas-overlay-info .hud-seg { flex-wrap: nowrap !important; overflow-x: auto !important; border-radius: 999px !important; }
+      .stage > .canvas-overlay-info .hud-status { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      .canvas-overlay-info { gap: 6px 14px !important; }
+    }
+
+    /* ===== telefon: planul ocupa aproape tot ecranul ===== */
+    .mob-cams, .hud-sol { display: none; }
+    @media (max-width: 900px) {
+      header { display: none !important; }                     /* camerele sunt pe plan, restul jos */
+      .stage > .canvas-overlay-info { padding: 6px 10px !important; gap: 4px 10px !important; flex-wrap: nowrap !important; }
+      .stage > .canvas-overlay-info .hud-seg,
+      .stage > .canvas-overlay-info .hud-status,
+      .stage > .canvas-overlay-info .hud-sub,
+      .stage > .canvas-overlay-info .hud-sep,
+      .stage > .canvas-overlay-info .hud-toggle { display: none !important; }
+      .stage > .canvas-overlay-info .hud-row { flex-wrap: nowrap !important; gap: 10px; width: 100%; justify-content: space-between; overflow: hidden; }
+      .stage > .canvas-overlay-info .hud-stat { gap: 5px; }
+      .stage > .canvas-overlay-info .hud-label { font-size: 11px; }
+      .stage > .canvas-overlay-info #hud-timer-label { display: none; }
+      .stage > .canvas-overlay-info .hud-stat:nth-of-type(2) .hud-label { display: none; }
+      .stage > .canvas-overlay-info .hud-val { font-size: 13px; }
+      .hud-sol { display: inline-flex; align-items: center; gap: 2px; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18);
+                 background: #1e293b; color: #fff; font-family: inherit; font-size: 12px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
+      .mob-cams { display: none !important; }
+      .mc-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: #cbd5e1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+      .mc-btn .ic { width: 18px; height: 18px; }
+      .mc-btn[data-cam="congestion"] { color: #f87171; }
+      .mc-btn.active { background: #0284c7; color: #fff; }
+      .viewport-toolbar { bottom: 8px !important; right: 50% !important; transform: translateX(50%); gap: 4px !important; padding: 4px 6px !important; }
+      .viewport-toolbar { flex-wrap: nowrap !important; max-width: calc(100% - 12px) !important; }
+      .stage > .canvas-overlay-info .hud-stat .hud-label { display: none; }
+      .tool-btn { width: 34px !important; height: 34px !important; }
+      .tool-sep { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -878,6 +954,9 @@
       <span class="sep pill-extra"></span>
       <span class="pill-extra"><b id="hdr-progress">0%</b></span>
     </div>
+    <button class="hdr-sim" id="hdr-fast" onclick="toggleFastSim()" title="Simulare rapidă: tot turul în câteva secunde"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span class="lbl">Simulare rapidă</span></button>
+    <button class="hdr-sim" onclick="toggleFastSimVideo()" title="Simulare rapidă înregistrată ca video (se descarcă .webm)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span class="lbl">Video</span></button>
+    <button class="hdr-sim" onclick="openGifModal()" title="Exportă animație GIF (10-15s, se descarcă .gif)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span class="lbl">GIF (10-15s)</span></button>
     <button class="hdr-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Export PDF</button>
     </div>
   </header>
@@ -925,12 +1004,14 @@
         <!-- Simulare rapida: tot turul in cateva secunde -->
         <div class="fast-box">
           <button id="btn-fastsim" class="ctl ctl-wide" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span id="fastsim-label">Simulare rapidă</span></button>
+          <button class="ctl ctl-wide" style="margin-top:8px;" onclick="toggleFastSimVideo()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg> <span>Simulare + descarcă video (.webm)</span></button>
+          <button class="ctl ctl-wide" style="margin-top:8px; background:#1e293b; border-color:#0284c7; color:#38bdf8;" onclick="openGifModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> <span>Exportă animație GIF (10-15s)</span></button>
           <div class="param-header" style="margin-top:10px;">
             <span class="param-name">Durata simulării rapide</span>
             <span class="param-val" id="disp-fastdur">8 s</span>
           </div>
           <input type="range" class="param-slider" id="rng-fastdur" min="3" max="60" step="1" value="8" oninput="updateFastDur(this.value)">
-          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;">Rulează tot turul într-un timp scurt; steluțele se dau abia după ce tot grupul a terminat turul.</div>
+          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;">Rulează tot turul într-un timp scurt; după ce tot grupul a terminat turul, asistenții intră pe culoare și dau steluța tuturor.</div>
         </div>
 
         <!-- Progress Box -->
@@ -1057,6 +1138,46 @@
 
       <!-- TAB 2: PARAMETRI SALĂ -->
       <div id="tab-params" class="tab-content">
+        <!-- CONFIGURAȚII CU NUME (Salvare / Încărcare) -->
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Configurații cu Nume</span>
+          <span style="font-size:11px; font-weight:normal; color:#94a3b8;">Salvare & Încărcare</span>
+        </div>
+        <div class="param-box" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Salveaza configuratia curenta -->
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="inp-conf-name" class="num-in" style="flex:1; text-align:left; padding:8px 12px; font-size:12.5px;" placeholder="Nume configurație nouă...">
+            <button class="preset-btn" style="flex:0 0 auto; background:var(--primary); color:#fff; border-color:var(--primary); font-weight:600; padding:8px 12px; display:inline-flex; align-items:center; gap:5px;" onclick="saveNamedConfig()" title="Salvează setările curente cu acest nume">
+              <svg class="ic" style="width:15px; height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Salvează
+            </button>
+          </div>
+
+          <!-- Incarca / Sterge configuratie salvata -->
+          <div style="display:flex; gap:6px;">
+            <select id="sel-named-configs" class="num-in" style="flex:1; text-align:left; padding:8px 8px; font-size:12px; background:#1e293b; color:#fff;">
+              <option value="">-- Alege configurație salvată --</option>
+            </select>
+            <button id="btn-load-conf" class="preset-btn" style="flex:0 0 auto; padding:8px 11px; background:#0ea5e9; color:#fff; font-weight:600; display:inline-flex; align-items:center; gap:4px;" onclick="loadSelectedNamedConfig()" title="Încarcă configurația selectată">
+              <svg class="ic" style="width:15px; height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Încarcă
+            </button>
+            <button id="btn-del-conf" class="preset-btn" style="flex:0 0 auto; padding:8px 8px; color:#ef4444; border-color:rgba(239,68,68,0.35);" onclick="deleteSelectedNamedConfig()" title="Șterge configurația selectată">
+              <svg class="ic" style="width:15px; height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+
+          <div id="conf-status-note" style="font-size:11.5px; color:#38bdf8; min-height:14px;"></div>
+
+          <div style="font-size:11px; color:#94a3b8;">Preset-uri rapide predefinite:</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button class="preset-btn" style="font-size:11px; padding:4px 8px;" onclick="applyQuickConfig('std800')">800p · Standard (0.70m)</button>
+            <button class="preset-btn" style="font-size:11px; padding:4px 8px;" onclick="applyQuickConfig('transit800')">800p · Culoar Tranzit</button>
+            <button class="preset-btn" style="font-size:11px; padding:4px 8px;" onclick="applyQuickConfig('stagger800')">800p · Decalat (Șah)</button>
+            <button class="preset-btn" style="font-size:11px; padding:4px 8px;" onclick="applyQuickConfig('room600')">600p · Sală 30×20m</button>
+          </div>
+        </div>
+
         <div class="section-title">Dimensiunile sălii</div>
         <div class="param-box">
           <div class="room-grid">
@@ -1136,10 +1257,6 @@
             <span class="param-val" id="disp-distrib">10 min</span>
           </div>
           <input type="range" class="param-slider" id="rng-distrib" min="2" max="90" step="1" value="10" oninput="onStarChange()">
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; margin-top:12px;">
-            <input type="checkbox" id="chk-assist-blue" onchange="onAssistBlueChange()">
-            <span>Asistenți și în aleile albastre (steluță pentru toți participanții)</span>
-          </label>
           <div id="star-out" class="star-out"></div>
         </div>
 
@@ -1464,6 +1581,7 @@
       <!-- Viewport Overlay with Direct Solution Selector -->
     <div class="canvas-overlay-info">
       <div class="hud-row">
+        <button class="hud-sol" id="hud-sol" onclick="mobGo('tab-congestion')" title="Schimbă soluția"><span class="dot dot-green"></span><span id="hud-sol-txt">Sol. 1</span></button>
         <div class="hud-stat">
           <svg class="ic" style="width:16px;height:16px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
           <span class="hud-label" id="hud-timer-label">Următorul pas în</span>
@@ -1501,6 +1619,16 @@
     <div class="viewport" id="viewport">
       <canvas id="simCanvas"></canvas>
 
+
+      <!-- Camere pe plan (telefon) -->
+      <div class="mob-cams">
+        <button class="mc-btn active" data-cam="macro" onclick="setCamMode('macro')" title="Macro"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+        <button class="mc-btn" data-cam="close" onclick="setCamMode('close')" title="Culoar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg></button>
+        <button class="mc-btn" data-cam="congestion" onclick="setCamMode('congestion')" title="Viraj roșu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></button>
+        <button class="mc-btn" data-cam="follow" onclick="setCamMode('follow')" title="Lider"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></button>
+        <button class="mc-btn" data-cam="full" onclick="setCamMode('full')" title="Toată sala"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></button>
+      </div>
+
       <!-- Top Tools -->
       <div class="viewport-toolbar">
         <button class="tool-btn" title="Rotește la stânga 90°" onclick="rotateView(-90)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
@@ -1511,6 +1639,7 @@
         <button class="tool-btn" title="Recentrează vederea" onclick="resetZoom()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
         <span class="tool-sep tool-ctl"></span>
         <button class="tool-btn tool-ctl" id="tool-play" title="Pauză / Pornește" onclick="toolPlayToggle()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></button>
+        <button class="tool-btn tool-ctl" id="tool-video" title="Simulare + video (.webm)" onclick="toggleFastSimVideo()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></button>
         <button class="tool-btn tool-ctl" id="tool-fast" title="Simulare rapidă (tot turul în câteva secunde)" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg></button>
         <button class="tool-btn tool-ctl" title="Pas la dreapta" onclick="triggerContrasensStep()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         <span class="tool-sep"></span>
@@ -1521,6 +1650,77 @@
 
   </div>
 
+  <!-- Navigare jos (telefon) -->
+  <nav class="mob-bottom">
+    <button class="mb-btn active" data-go="plan" onclick="mobGo('plan')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span>Plan</span></button>
+    <button class="mb-btn" data-go="tab-circuit" onclick="mobGo('tab-circuit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>Pas</span></button>
+    <button class="mb-btn" data-go="tab-params" onclick="mobGo('tab-params')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Parametri</span></button>
+    <button class="mb-btn" data-go="tab-congestion" onclick="mobGo('tab-congestion')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Soluții</span></button>
+    <button class="mb-btn" data-go="tab-calc" onclick="mobGo('tab-calc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 15.3 8.7 2.7a1 1 0 0 0-1.4 0L2.7 7.3a1 1 0 0 0 0 1.4l12.6 12.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg><span>Calcul</span></button>
+    <button class="mb-btn" onclick="exportPlanPDF()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>PDF</span></button>
+  </nav>
+
+  <!-- Modal Export GIF (10-15s) -->
+  <div id="modal-gif" class="app-modal-backdrop" onclick="if(event.target===this)closeGifModal()">
+    <div class="app-modal-card">
+      <div class="app-modal-header">
+        <div>
+          <h3 class="app-modal-title">Export Animație GIF (10-15s)</h3>
+          <div class="app-modal-sub">Generează un GIF animat demonstrativ cu mișcarea în contrasens, privirea față în față și direcțiile de mers.</div>
+        </div>
+        <button class="app-modal-close" onclick="closeGifModal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <label style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600;">
+          Durată animație GIF:
+          <select id="gif-opt-dur" class="num-in" style="text-align:left; padding:8px 10px; font-size:13px; background:#1e293b; color:#fff;">
+            <option value="12" selected>12 secunde (120 cadre @ 10 fps) - Recomandat</option>
+            <option value="10">10 secunde (100 cadre @ 10 fps)</option>
+            <option value="15">15 secunde (150 cadre @ 10 fps)</option>
+          </select>
+        </label>
+
+        <label style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600;">
+          Tip mișcare în GIF:
+          <select id="gif-opt-mode" class="num-in" style="text-align:left; padding:8px 10px; font-size:13px; background:#1e293b; color:#fff;">
+            <option value="steps" selected>Mișcare continuă & direcții (arată clar pașii și privirea)</option>
+            <option value="fast">Tur accelerat (de la pasul 1 la pasul 400)</option>
+          </select>
+        </label>
+
+        <label style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600;">
+          Cadru / Cameră:
+          <select id="gif-opt-cam" class="num-in" style="text-align:left; padding:8px 10px; font-size:13px; background:#1e293b; color:#fff;">
+            <option value="full" selected>Toată sala (Full Room - panoramă completă)</option>
+            <option value="current">Vedere curentă din ecran (Zoom & Pan curent)</option>
+            <option value="macro">Detaliu culoar & participanți (Macro)</option>
+          </select>
+        </label>
+
+        <!-- Progress Box -->
+        <div id="gif-progress-box" style="display:none; flex-direction:column; gap:6px; margin-top:6px; padding:12px; background:rgba(2,132,199,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px;">
+            <span id="gif-status-text" style="color:#38bdf8; font-weight:600;">Se generează cadrele GIF...</span>
+            <span id="gif-pct-text" style="color:#fff; font-weight:700;">0%</span>
+          </div>
+          <div style="height:8px; background:#1e293b; border-radius:999px; overflow:hidden;">
+            <div id="gif-bar-fill" style="height:100%; width:0%; background:linear-gradient(90deg, #0284c7, #38bdf8); transition:width 0.1s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
+        <button class="preset-btn" onclick="closeGifModal()" id="btn-gif-cancel">Anulează</button>
+        <button class="preset-btn" style="background:#0284c7; color:#fff; border-color:#38bdf8; font-weight:700; padding:10px 18px; display:inline-flex; align-items:center; gap:7px;" onclick="startGifExport()" id="btn-gif-generate">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Generează și Descarcă GIF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="gifenc.min.js"></script>
   <script>
     // Inaltimea aplicatiei = inaltimea reala a ferestrei (100vh ramane uneori gresit cand intri / iesi din ecran complet)
     function updateAppHeight() {
@@ -1818,11 +2018,20 @@
         aisleStops[k] = Math.max(aisleStops[k] || 0, r.persons);
       }
       for (const k in aisleStops) stops += aisleStops[k];
-      const workSec = reachable * starSec + stops * stepDist / 1.0;
+      // Steluțele se dau de pe culoarul dintre cele doua siruri (asistentul se strecoara lateral intre doi participanti):
+      // ajunge la toti daca pe culoar raman >= 60 cm liberi si intre participanti incape adancimea unui om (24 cm).
+      const corridorFree = corridorW - TORSO_DEPTH;
+      const gapBetween = stepDist - SHOULDER;
+      const corrOk = corridorFree >= WALK_W && gapBetween >= TORSO_DEPTH;
+      for (let i = 0; i < starRowOk.length; i++) starRowOk[i] = { L: corrOk, R: corrOk };
+      if (corrOk) { reachable = total; pinkOk = pinkAll; blueOk = blueAll; }
+      else { reachable = 0; pinkOk = 0; blueOk = 0; }
+      const workSec = reachable * starSec + (reachable / 2) * stepDist / 1.0 + assistCount * 2 * (corridorW / 2 + assistGap / 2);
       const needed = Math.max(1, Math.ceil(workSec / (distribMin * 60)));
       const haveSec = workSec / Math.max(1, assistCount);
       return { rows, reachable: Math.round(reachable), total: Math.round(total), pinkOk: Math.round(pinkOk), pinkAll: Math.round(pinkAll),
-               blueOk: Math.round(blueOk), blueAll: Math.round(blueAll), minFreePink, minFreeBlue, workSec, needed, haveSec, stepDist };
+               blueOk: Math.round(blueOk), blueAll: Math.round(blueAll), minFreePink, minFreeBlue, workSec, needed, haveSec, stepDist,
+               corridorFree, gapBetween, corrOk };
     }
 
     // Zona asistentilor (portocalie): spatiul din spatele participantilor ROZ, nu intre participanti.
@@ -1860,7 +2069,7 @@
         const cx = (bd.left + bd.right) / 2;
         for (let j = 0; j < cnt; j++) {
           const t = (j + 0.5) / cnt;
-          assistants.push({ x: cx, y: yTop + t * segLen, y0: yTop + t * segLen, angle: 0, id: `A${id++}`, aisle: k });
+          assistants.push({ x: cx, y: yTop + t * segLen, x0: cx, y0: yTop + t * segLen, angle: 0, id: `A${id++}`, aisle: k });
         }
       }
     }
@@ -1910,9 +2119,9 @@
       const sp = computeStarPlan();
       const fc = (v) => (Math.max(0, v) * 100).toFixed(0) + ' cm';
       const need = (WALK_W * 100).toFixed(0);
-      const pinkOk = sp.minFreePink >= WALK_W, blueOk = sp.minFreeBlue >= WALK_W;
-      let h = `Spațiu liber în spatele șirurilor roz: <span class="${pinkOk ? 'ok' : 'bad'}">${fc(sp.minFreePink)}</span> (necesar ${need} cm)<br>`;
-      h += `Spațiu liber în spatele șirurilor albastre: <span class="${blueOk ? 'ok' : 'bad'}">${fc(sp.minFreeBlue)}</span> (necesar ${need} cm)<br>`;
+      let h = `Asistenții intră pe culoarul dintre cele două șiruri și dau steluța ambelor șiruri (roz și albastru).<br>`;
+      h += `Loc liber pe culoar: <span class="${sp.corridorFree >= WALK_W ? 'ok' : 'bad'}">${fc(sp.corridorFree)}</span> (necesar ${need} cm)<br>`;
+      h += `Spațiu între doi participanți: <span class="${sp.gapBetween >= TORSO_DEPTH ? 'ok' : 'bad'}">${fc(sp.gapBetween)}</span> (asistentul trece lateral: necesar ${(TORSO_DEPTH * 100).toFixed(0)} cm)<br>`;
       h += `Participanți la care ajung asistenții: <b>${sp.reachable} din ${sp.total}</b><br>`;
       h += `Asistenți necesari pentru ${distribMin} min: <span class="${sp.needed <= assistCount ? 'ok' : 'bad'}"><b>${sp.needed}</b></span> (ai ${assistCount}; cu ei durează ${fmtDur(sp.haveSec)})`;
       out.innerHTML = h;
@@ -2037,7 +2246,8 @@
           const pt = getPointAtV(d);
           const hw = (pt.type === 'arc') ? (((pt.seg && pt.seg.wTurnLocal) || corridorWTurn || corridorW) / 2) : halfW;
           const ux = -Math.sin(pt.angle), uy = Math.cos(pt.angle);
-          out.push({ key: i + (sgn > 0 ? 'b' : 'p'), x: pt.x + sgn * ux * hw, y: pt.y + sgn * uy * hw, arcAisle: (pt.type === 'arc' && pt.seg) ? pt.seg.turnIdx : undefined });
+          out.push({ key: i + (sgn > 0 ? 'b' : 'p'), x: pt.x + sgn * ux * hw, y: pt.y + sgn * uy * hw, cx: pt.x, cy: pt.y,
+                     lanes: (pt.type === 'arc' && pt.seg) ? [pt.seg.turnIdx, pt.seg.turnIdx + 1] : [pt.seg ? pt.seg.laneIdx : 0] });
         }
       }
       return out;
@@ -2045,39 +2255,70 @@
 
     // Steluțele se dau DUPA ce tot grupul a terminat turul prin sala (nu in timpul mișcării):
     // participantii stau pe loc, iar asistentii merg pe alee si se opresc la fiecare.
+    const starPop = new Map();    // momentul in care participantul a primit steluta (pentru animatia de aparitie)
     let phase = 'running';        // 'running' (turul) -> 'distributing' (steluțe) -> 'done'
     let distrib = null;
     const ASSIST_WALK = 1.0;      // viteza de mers a asistentului (m/s)
 
+    // Dupa joc, asistentul se strecoara lateral intre doi participanti (24 cm adancime < spatiul dintre ei)
+    // si merge pe culoarul dintre cele doua siruri; de acolo da steluta ambelor siruri (roz si albastru).
+    // Fiecare asistent serveste culoarele vecine aleii lui (aleea k margineste culoarele k si k+1).
     function startDistribution(targetSec) {
       if (phase === 'distributing' || !assistants.length) return;
       const P = participantsAt(targetShift).filter(p => !starred.has(p.key));
       const stations = assistants.map(a => ({ a, list: [], stops: [], i: 0, mode: 'walk', t: 0, k: 0 }));
+      const lanesOf = (k) => [k, k + 1].filter(L => L >= 0 && L < nLanes);
       for (const p of P) {
-        let best = null, bd = 1e9;
+        let best = null, bd = 1e9, bestLane = p.lanes[0];
         for (const st of stations) {
-          const b = aisleBoundsK(st.a.aisle);
-          if (p.arcAisle !== undefined) { if (st.a.aisle !== p.arcAisle) continue; }      // cine e in curba e servit din aleea curbei
-          else if (p.x < b.left - 0.2 || p.x > b.right + 0.2) continue;                  // doar din aleea din spatele lui
-          const d = Math.abs(p.y - st.a.y);
-          if (d < bd) { bd = d; best = st; }
+          const own = lanesOf(st.a.aisle);
+          const common = p.lanes.filter(L => own.includes(L));
+          if (!common.length) continue;
+          const d = Math.abs(p.cy - st.a.y0) + 0.01 * Math.abs(p.cx - st.a.x0);
+          if (d < bd) { bd = d; best = st; bestLane = common[0]; }
         }
-        if (best) best.list.push(p);
+        if (!best) {                                         // rezerva: cel mai apropiat asistent
+          for (const st of stations) { const d = Math.hypot(p.cx - st.a.x0, p.cy - st.a.y0); if (d < bd) { bd = d; best = st; } }
+        }
+        if (best) best.list.push({ p, lane: bestLane });
       }
       let maxWork = 0, reachable = 0;
       for (const st of stations) {
-        st.list.sort((u, v) => u.y - v.y);
-        for (const p of st.list) {
-          const last = st.stops[st.stops.length - 1];
-          if (last && p.y - last.y < 0.35) last.targets.push(p); else st.stops.push({ y: p.y, targets: [p] });
+        // grupare pe culoare, apoi opriri pe axa culoarului (o oprire = cei doi participanti fata in fata)
+        const byLane = {};
+        for (const it of st.list) (byLane[it.lane] = byLane[it.lane] || []).push(it.p);
+        let curY = st.a.y0;
+        const laneOrder = Object.keys(byLane).map(Number).sort((u, v) => Math.abs(laneXs[u] - st.a.x0) - Math.abs(laneXs[v] - st.a.x0));
+        for (const L of laneOrder) {
+          const arr = byLane[L].sort((u, v) => u.cy - v.cy);
+          const stopsL = [];
+          for (const q of arr) {
+            const last = stopsL[stopsL.length - 1];
+            if (last && Math.hypot(q.cx - last.cx, q.cy - last.cy) < 0.35) last.targets.push(q);
+            else stopsL.push({ cx: q.cx, cy: q.cy, lane: L, targets: [q] });
+          }
+          if (stopsL.length && Math.abs(stopsL[stopsL.length - 1].cy - curY) < Math.abs(stopsL[0].cy - curY)) stopsL.reverse();
+          st.stops.push(...stopsL);
+          if (stopsL.length) curY = stopsL[stopsL.length - 1].cy;
         }
-        let work = 0, y = st.a.y;
-        for (const sp of st.stops) { work += Math.abs(sp.y - y) / ASSIST_WALK + sp.targets.length * starSec; y = sp.y; reachable += sp.targets.length; }
+        let work = 0, x = st.a.x0, y = st.a.y0, lane = undefined;
+        for (const sp of st.stops) {
+          if (lane !== sp.lane) { work += Math.abs(laneXs[sp.lane] - x) / ASSIST_WALK; x = laneXs[sp.lane]; lane = sp.lane; }
+          work += Math.hypot(sp.cx - x, sp.cy - y) / ASSIST_WALK + sp.targets.length * starSec;
+          x = sp.cx; y = sp.cy; reachable += sp.targets.length;
+        }
         maxWork = Math.max(maxWork, work);
       }
       const ts = targetSec ? Math.max(1, maxWork / targetSec) : 1;       // simularea rapida accelereaza distribuirea
       distrib = { stations, ts, reachable, served: 0, maxWork, elapsed: 0 };
       phase = 'distributing';
+    }
+
+    function moveToward(a, tx, ty, mv) {
+      const dx = tx - a.x, dy = ty - a.y, dl = Math.hypot(dx, dy);
+      if (dl <= mv) { a.x = tx; a.y = ty; return true; }
+      a.x += dx / dl * mv; a.y += dy / dl * mv;
+      return false;
     }
 
     function updateDistribution(dt) {
@@ -2086,22 +2327,42 @@
       d.elapsed += step;
       let active = false;
       for (const st of d.stations) {
-        if (st.i >= st.stops.length) continue;
+        if (st.i >= st.stops.length) {
+          // a terminat: iese inapoi in zona lui portocalie
+          if (st.a.lane !== undefined) {
+            st.a.face = Math.PI / 2;
+            if (moveToward(st.a, st.a.x0, st.a.y, ASSIST_WALK * step)) st.a.lane = undefined;
+            else active = true;
+          } else if (Math.abs(st.a.y - st.a.y0) > 0.01) { active = true; moveToward(st.a, st.a.x0, st.a.y0, ASSIST_WALK * step); }
+          continue;
+        }
         active = true;
         const stop = st.stops[st.i];
+        const mv = ASSIST_WALK * step;
         if (st.mode === 'walk') {
-          const dy = stop.y - st.a.y, mv = ASSIST_WALK * step;
-          if (Math.abs(dy) <= mv) { st.a.y = stop.y; st.mode = 'dwell'; st.t = 0; st.k = 0; }
-          else st.a.y += Math.sign(dy) * mv;
+          st.a.serving = null;
+          if (st.a.lane !== stop.lane) {
+            // se strecoara lateral intre doi participanti, catre axa culoarului
+            st.a.face = Math.PI / 2;
+            if (moveToward(st.a, laneXs[stop.lane], st.a.y, mv)) st.a.lane = stop.lane;
+          } else {
+            const dx = stop.cx - st.a.x, dy = stop.cy - st.a.y;
+            if (Math.hypot(dx, dy) > 0.01) st.a.face = Math.atan2(dy, dx);
+            if (moveToward(st.a, stop.cx, stop.cy, mv)) { st.mode = 'dwell'; st.t = 0; st.k = 0; }
+          }
         } else {
           st.t += step;
           while (st.k < stop.targets.length && st.t >= starSec * (st.k + 1)) {
             const p = stop.targets[st.k];
             starred.add(p.key);
-            starEvents.push({ ax: st.a.x, ay: st.a.y, px: p.x, py: p.y, t: performance.now() });
+            starPop.set(p.key, performance.now());
             st.k++; d.served++;
           }
-          if (st.k >= stop.targets.length) { st.i++; st.mode = 'walk'; }
+          if (st.k < stop.targets.length) {
+            const p = stop.targets[st.k];
+            st.a.serving = p;
+            st.a.face = Math.atan2(p.y - st.a.y, p.x - st.a.x);
+          } else { st.a.serving = null; st.i++; st.mode = 'walk'; }
         }
       }
       updateStarHUD();
@@ -2116,9 +2377,9 @@
     }
 
     function resetStars() {
-      starred = new Set(); starEvents = [];
+      starred = new Set(); starEvents = []; starPop.clear();
       phase = 'running'; distrib = null;
-      for (const a of assistants) if (a.y0 !== undefined) a.y = a.y0;
+      for (const a of assistants) { if (a.y0 !== undefined) a.y = a.y0; if (a.x0 !== undefined) a.x = a.x0; a.serving = null; a.face = undefined; a.lane = undefined; }
       updateStarHUD();
     }
     function updateStarHUD() {
@@ -2126,28 +2387,32 @@
       if (el) el.innerText = `${starred.size} / ${partCount}`;
     }
     function drawStarEvents() {
-      const now = performance.now();
-      starEvents = starEvents.filter(e => now - e.t < 1600);
-      for (const e of starEvents) {
-        const k = 1 - (now - e.t) / 1600;
+      if (phase !== 'distributing') return;
+      for (const a of assistants) {
+        const p = a.serving;
+        if (!p) continue;
+        const dx = p.x - a.x, dy = p.y - a.y, dl = Math.hypot(dx, dy) || 1;
         ctx.save();
-        ctx.globalAlpha = Math.max(0, k);
-        ctx.strokeStyle = '#facc15'; ctx.lineWidth = 0.05;
-        ctx.setLineDash([0.12, 0.1]);
-        ctx.beginPath(); ctx.moveTo(e.ax, e.ay); ctx.lineTo(e.px, e.py); ctx.stroke();
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.9)'; ctx.lineWidth = 0.035;
+        ctx.setLineDash([0.08, 0.07]);
+        ctx.beginPath(); ctx.moveTo(a.x + dx / dl * 0.18, a.y + dy / dl * 0.18); ctx.lineTo(p.x - dx / dl * 0.14, p.y - dy / dl * 0.14); ctx.stroke();
         ctx.setLineDash([]);
-        ctx.beginPath(); ctx.arc(e.ax, e.ay, 0.55 + 0.35 * (1 - k), 0, Math.PI * 2); ctx.stroke();
+        // steluta tinuta in mana, intinsa spre participant
+        ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 0.02;
+        drawStarShape(ctx, a.x + dx / dl * 0.30, a.y + dy / dl * 0.30, 0.09); ctx.fill(); ctx.stroke();
         ctx.restore();
       }
     }
-    // steluta primita: aurie, in spatele participantului
+    // steluta primita: lipita pe participant (vizibila si cand vezi toata sala), cu animatie de aparitie
     function drawStarredMarker(px, py, pt, key) {
       if (!starred.has(key) || !pt) return;
-      const dx = px - pt.x, dy = py - pt.y, dl = Math.hypot(dx, dy) || 1;
-      const mx = px + (dx / dl) * 0.30, my = py + (dy / dl) * 0.30;
+      const t0 = starPop.get(key);
+      const pop = t0 ? Math.max(0, 1 - (performance.now() - t0) / 450) : 0;
+      const r = Math.max(0.15, 5 / scale) * (1 + 0.9 * pop);      // cand vezi toata sala steluta ramane vizibila (min. ~3 px)
       ctx.save();
-      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 0.03;
-      drawStarShape(ctx, mx, my, 0.15); ctx.fill(); ctx.stroke();
+      if (pop > 0) { ctx.fillStyle = `rgba(250, 204, 21, ${0.35 * pop})`; ctx.beginPath(); ctx.arc(px, py, 0.42, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.035;
+      drawStarShape(ctx, px, py, r); ctx.stroke(); ctx.fill();
       ctx.restore();
     }
 
@@ -2155,6 +2420,62 @@
     function updateFastDur(v) {
       fastDur = parseFloat(v);
       const d = document.getElementById('disp-fastdur'); if (d) d.innerText = fastDur + ' s';
+    }
+    // ----- inregistrare video a simularii (WebM), direct din canvas -----
+    let recorder = null, recChunks = [];
+    function startRecording() {
+      if (!canvas.captureStream || !window.MediaRecorder) return false;
+      try {
+        const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'].find(m => MediaRecorder.isTypeSupported(m));
+        recorder = new MediaRecorder(canvas.captureStream(30), mime ? { mimeType: mime, videoBitsPerSecond: 6000000 } : {});
+        recChunks = [];
+        recorder.ondataavailable = (e) => { if (e.data && e.data.size) recChunks.push(e.data); };
+        recorder.onstop = () => {
+          const type = recorder.mimeType || 'video/webm';
+          const blob = new Blob(recChunks, { type });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `simulare_sala_${partCount}_pers_${currentSolution800}.${type.includes('mp4') ? 'mp4' : 'webm'}`;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 8000);
+          recorder = null;
+        };
+        recorder.start(250);
+        return true;
+      } catch (err) { recorder = null; return false; }
+    }
+    function stopRecordingSoon() {
+      const r = recorder;
+      if (!r) return;
+      setTimeout(() => { try { if (r.state !== 'inactive') r.stop(); } catch (e) {} }, 700);   // ultimul cadru ramane in video
+    }
+    // text pe imagine cat timp se inregistreaza (apare in video)
+    function drawRecordingOverlay() {
+      if (!recorder) return;
+      const pairs = Math.round(partCount / 2);
+      const txt = phase === 'distributing' ? `Distribuire steluțe: ${starred.size} / ${partCount}` : `Pasul ${Math.min(pairs, currentStepNumber)} / ${pairs}   |   Steluțe: ${starred.size} / ${partCount}`;
+      const vp = document.getElementById('viewport');
+      ctx.save();
+      ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+      ctx.font = '600 15px Inter, system-ui, sans-serif';
+      const w = ctx.measureText(txt).width + 28;
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.82)';
+      roundRect(ctx, 14, 14, w, 34, 17, true, false);
+      ctx.fillStyle = '#e2e8f0'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(txt, 28, 31);
+      ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(vp.clientWidth - 24, 31, 6, 0, Math.PI * 2); ctx.fill();   // indicator REC
+      ctx.restore();
+    }
+
+    function toggleFastSimVideo() {
+      if (fastSim.active) { endFastSim(true); return; }
+      if (!startRecording()) {
+        const out = document.getElementById('fastsim-out');
+        if (out) out.innerHTML = '<span class="bad">Browserul nu poate înregistra video din plan. Folosește Chrome sau Edge.</span>';
+        return;
+      }
+      toggleFastSim();
     }
     function toggleFastSim() {
       if (fastSim.active) { endFastSim(true); return; }
@@ -2164,12 +2485,14 @@
     }
     function endFastSim(stopped) {
       fastSim.active = false;
+      const wasRec = !!recorder;
+      stopRecordingSoon();
       stepTimer = 0;
       const pairs = Math.round(partCount / 2);
       const out = document.getElementById('fastsim-out');
       if (out) {
         const real = fmtDur(pairs * stepIntervalSec);
-        out.innerHTML = `${stopped ? 'Oprită la' : 'Gata:'} pasul <b>${Math.min(pairs, currentStepNumber)} din ${pairs}</b>, în ${fastDur} s (în realitate ${real}).<br>Steluțe date: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
+        out.innerHTML = `${stopped ? 'Oprită la' : 'Gata:'} pasul <b>${Math.min(pairs, currentStepNumber)} din ${pairs}</b>, în ${fastDur} s (în realitate ${real}).<br>Steluțe date: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>') + (wasRec ? '<br>Videoclipul se descarcă automat (.webm).' : '');
       }
       syncFastUI();
     }
@@ -2178,6 +2501,7 @@
       if (b) b.classList.toggle('ctl-primary', fastSim.active);
       const lbl = document.getElementById('fastsim-label'); if (lbl) lbl.innerText = fastSim.active ? 'Oprește simularea' : 'Simulare rapidă';
       const t = document.getElementById('tool-fast'); if (t) t.classList.toggle('on', fastSim.active);
+      const hf = document.getElementById('hdr-fast'); if (hf) hf.classList.toggle('on', fastSim.active);
     }
 
     function triggerContrasensStep() {
@@ -2425,6 +2749,10 @@
         const cardBtn = document.getElementById(`card-${item.id}`);
         if (cardBtn) cardBtn.classList.toggle('active', currentSolution800 === item.mode);
       });
+      const short = { tapered: ['Sol. 1', 'green'], transit: ['Sol. 2', 'blue'], staggered: ['Sol. 3', 'yellow'], max_path: ['Sol. 4', 'purple'],
+                      turners: ['Sol. 5', 'teal'], recommended: ['Sol. 6', 'lime'], none: ['Problema', 'red'] }[currentSolution800] || ['', 'green'];
+      const hs = document.getElementById('hud-sol');
+      if (hs) hs.innerHTML = `<span class="dot dot-${short[1]}"></span><span>${short[0]}</span>`;
     }
 
     function toggleSidebar() {
@@ -2455,6 +2783,20 @@
     }
     document.body.classList.add('mob-view-plan');
 
+    // Navigare jos pe telefon: Plan sau unul dintre taburi
+    function mobGo(where) {
+      if (where === 'plan') setMobileView('plan');
+      else { switchTab(where); setMobileView('ctrl'); const sb = document.querySelector('.sidebar'); if (sb) sb.scrollTop = 0; }
+      syncMobBottom();
+    }
+    function syncMobBottom() {
+      const activeTab = (document.querySelector('.tab-content.active') || {}).id;
+      document.querySelectorAll('.mb-btn[data-go]').forEach(b => {
+        const go = b.dataset.go;
+        b.classList.toggle('active', currentMobView === 'plan' ? go === 'plan' : go === activeTab);
+      });
+    }
+
     let lastCamMode = 'macro';
     // Cand muti / zoomezi / rotesti planul cu mouse-ul sau degetele, camera devine "libera": nu o mai readuce nimic la loc
     function enterFreeCam() {
@@ -2469,6 +2811,7 @@
       document.getElementById('cam-congestion')?.classList.toggle('active', mode === 'congestion');
       document.getElementById('cam-follow')?.classList.toggle('active', mode === 'follow');
       document.getElementById('cam-full')?.classList.toggle('active', mode === 'full');
+      document.querySelectorAll('.mc-btn[data-cam]').forEach(b => b.classList.toggle('active', b.dataset.cam === mode));
 
       if (mode === 'macro') fitMacro();
       else if (mode === 'close') fitCloseUp();
@@ -2671,6 +3014,7 @@
       drawScene();
 
       ctx.restore();
+      drawRecordingOverlay();
     }
 
     function drawScene() {
@@ -2730,9 +3074,17 @@
       ctx.font = 'bold 2.0px Inter, system-ui, sans-serif';
       ctx.fillStyle = 'rgba(148, 163, 184, 0.10)';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('C3', SECTION_C3 / 2, ROOM_L / 2);
-      ctx.fillText('C2', xPart1 + WALL_POCKET_1 + SECTION_C2 / 2, ROOM_L / 2);
-      ctx.fillText('C1', xPart2 + WALL_POCKET_2 + SECTION_C1 / 2, ROOM_L / 2);
+      [
+        { txt: 'C3', x: SECTION_C3 / 2, y: ROOM_L / 2 },
+        { txt: 'C2', x: xPart1 + WALL_POCKET_1 + SECTION_C2 / 2, y: ROOM_L / 2 },
+        { txt: 'C1', x: xPart2 + WALL_POCKET_2 + SECTION_C1 / 2, y: ROOM_L / 2 }
+      ].forEach(c => {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(-viewRot);
+        ctx.fillText(c.txt, 0, 0);
+        ctx.restore();
+      });
     }
 
     function drawSlideTrack() {
@@ -2819,6 +3171,7 @@
 
             ctx.save();
             ctx.translate(bx, by);
+            ctx.rotate(-viewRot);
             const badgeW = 3.6;
             const badgeH = 0.75;
             ctx.fillStyle = 'rgba(185, 28, 28, 0.95)';
@@ -2954,21 +3307,20 @@
         ctx.restore();
       }
       for (let a of assistants) {
-        const bd = aisleBoundsK(a.aisle);
-        const rad = Math.min(0.40, Math.max(0.16, (bd.right - bd.left) / 2 - 0.02));
+        // asistentul la scara reala: umerii (46 cm) pe lungimea aleii, adancimea (24 cm) pe latimea ei
+        const face = (a.face !== undefined) ? a.face : 0;
+        drawHumanTopDown(a.x, a.y, face, 0, false, '', '#ea580c', '#fb923c', false, 0, false, 0);
+        // eticheta (A1, A2, ...) langa asistent, mereu dreapta
         ctx.save();
-        ctx.translate(a.x, a.y);
+        ctx.translate(a.x, a.y + 0.40);
         ctx.rotate(-viewRot);
-
-        ctx.fillStyle = '#ea580c';
-        ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.04; ctx.stroke();
-
+        ctx.font = 'bold 0.17px Inter, system-ui, sans-serif';
+        const tw = ctx.measureText(a.id).width + 0.12;
+        ctx.fillStyle = 'rgba(124, 45, 18, 0.92)';
+        roundRect(ctx, -tw / 2, -0.12, tw, 0.24, 0.12, true, false);
         ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${(rad * 0.62).toFixed(3)}px Inter, system-ui, sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(a.id, 0, 0);
-
+        ctx.fillText(a.id, 0, 0.005);
         ctx.restore();
       }
     }
@@ -3372,24 +3724,74 @@
     }
 
     function drawDimensionLine(x1, y1, x2, y2, text) {
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      if (x1 === x2) {
-        ctx.beginPath();
-        ctx.moveTo(x1 - 0.25, y1); ctx.lineTo(x1 + 0.25, y1);
-        ctx.moveTo(x2 - 0.25, y2); ctx.lineTo(x2 + 0.25, y2);
-        ctx.stroke();
-        ctx.save();
-        ctx.translate(x1 - 0.35, (y1 + y2) / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillText(text, 0, 0);
-        ctx.restore();
-      } else {
-        ctx.beginPath();
-        ctx.moveTo(x1, y1 - 0.25); ctx.lineTo(x1, y1 + 0.25);
-        ctx.moveTo(x2, y2 - 0.25); ctx.lineTo(x2, y2 + 0.25);
-        ctx.stroke();
-        ctx.fillText(text, (x1 + x2) / 2, y1 + 0.45);
+      ctx.save();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.fillStyle = '#38bdf8';
+      ctx.lineWidth = 0.04;
+
+      // Linie cotă
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      // Marcaje capete (ticks perpendiculare pe axa liniei)
+      const dx = x2 - x1, dy = y2 - y1;
+      const len = Math.hypot(dx, dy);
+      if (len < 0.001) { ctx.restore(); return; }
+      const ux = dx / len, uy = dy / len;
+      const nx = -uy, ny = ux;
+      const tick = 0.35;
+
+      ctx.beginPath();
+      ctx.moveTo(x1 - nx * tick, y1 - ny * tick);
+      ctx.lineTo(x1 + nx * tick, y1 + ny * tick);
+      ctx.moveTo(x2 - nx * tick, y2 - ny * tick);
+      ctx.lineTo(x2 + nx * tick, y2 + ny * tick);
+      ctx.stroke();
+
+      // Punct de mijloc
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+
+      // Calcul unghi linie în spațiul sălii
+      const lineAngle = Math.atan2(dy, dx);
+
+      // Unghiul net pe ecranul utilizatorului (ținând cont de rotirea camerei viewRot)
+      let screenAngle = (lineAngle + viewRot) % (2 * Math.PI);
+      if (screenAngle > Math.PI) screenAngle -= 2 * Math.PI;
+      if (screenAngle <= -Math.PI) screenAngle += 2 * Math.PI;
+
+      // Textul trebuie să fie mereu lizibil (stânga -> dreapta, sau jos -> sus când e vertical pe ecran).
+      // Dacă este inversat (ar arăta cu capul în jos), adăugăm 180° (Math.PI) pentru a-l îndrepta:
+      let drawAngle = lineAngle;
+      if (screenAngle < -Math.PI / 2 || screenAngle > Math.PI / 2 || Math.abs(screenAngle - Math.PI / 2) < 0.01) {
+        drawAngle += Math.PI;
       }
+
+      ctx.save();
+      ctx.translate(mx, my);
+      ctx.rotate(drawAngle);
+
+      ctx.font = 'bold 0.45px Inter, system-ui, sans-serif';
+      const tw = ctx.measureText(text).width;
+      const bw = tw + 0.6;
+      const bh = 0.70;
+
+      // Fundal tip „pastilă” întunecată cu bordură cyan pentru lizibilitate impecabilă pe orice unghi
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+      roundRect(ctx, -bw / 2, -bh / 2, bw, bh, 0.14, true, false);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 0.028;
+      roundRect(ctx, -bw / 2, -bh / 2, bw, bh, 0.14, false, true);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 0, 0);
+
+      ctx.restore();
+      ctx.restore();
     }
 
     function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
@@ -3425,6 +3827,7 @@
         document.querySelector('.tab-btn:nth-child(4)').classList.add('active');
         document.getElementById('tab-calc').classList.add('active');
       }
+      if (typeof syncMobBottom === 'function') syncMobBottom();
     }
 
 
@@ -3511,8 +3914,9 @@
       const sp = computeStarPlan();
       const cm2 = (v) => cm(Math.max(0, v));
       sections.push({ title: L('Steluțe: acces și asistenți', 'Stars: access and assistants'), rows: [
-        [L('Spațiu liber în spatele șirurilor roz', 'Free space behind the pink rows'), cm2(sp.minFreePink), L(`necesar ${(WALK_W * 100).toFixed(0)} cm ca asistentul să meargă și să se oprească`, `${(WALK_W * 100).toFixed(0)} cm needed so an assistant can walk and stop`)],
-        [L('Spațiu liber în spatele șirurilor albastre', 'Free space behind the blue rows'), cm2(sp.minFreeBlue), sp.minFreeBlue >= WALK_W ? L('suficient', 'sufficient') : L('insuficient', 'insufficient')],
+        [L('Cum se dau steluțele', 'How the stars are handed out'), L('de pe culoar', 'from the lane'), L('asistentul intră între cele două șiruri și servește ambele', 'the assistant steps between the two rows and serves both')],
+        [L('Loc liber pe culoar', 'Free space in the lane'), cm2(sp.corridorFree), L(`necesar ${(WALK_W * 100).toFixed(0)} cm ca asistentul să meargă și să se oprească`, `${(WALK_W * 100).toFixed(0)} cm needed so an assistant can walk and stop`)],
+        [L('Spațiu între doi participanți', 'Gap between two participants'), cm2(sp.gapBetween), L('asistentul trece lateral: necesar 24 cm', 'the assistant passes sideways: 24 cm needed')],
         [L('Participanți la care ajung asistenții', 'Participants reached by assistants'), `${sp.reachable} ${L('din', 'of')} ${sp.total}`, `${L('roz', 'pink')} ${sp.pinkOk}/${sp.pinkAll}, ${L('albastru', 'blue')} ${sp.blueOk}/${sp.blueAll}`],
         [L('Timp pe participant (steluță)', 'Time per participant (star)'), `${starSec} s`, L('setat în aplicație', 'set in the app')],
         [L('Timp maxim de distribuire', 'Maximum distribution time'), `${distribMin} min`, L('setat în aplicație', 'set in the app')],
@@ -3576,11 +3980,9 @@
 
       if (sp.reachable < sp.total) {
         const bgNeed = WALK_W + TORSO_DEPTH;
-        let t = L(`Asistenții nu ajung la ${sp.total - sp.reachable} de participanți: aleea din spatele lor are doar ${cm2(Math.min(sp.minFreePink, sp.minFreeBlue))} liberi (necesar ${(WALK_W * 100).toFixed(0)} cm).`,
-                  `Assistants cannot reach ${sp.total - sp.reachable} participants: the aisle behind them has only ${cm2(Math.min(sp.minFreePink, sp.minFreeBlue))} free (${(WALK_W * 100).toFixed(0)} cm needed).`);
-        if (sp.minFreeBlue < WALK_W) t += L(` Măriți distanța spate în spate la șirurile albastre la cel puțin ${f(bgNeed)} m (acum ${f(effBackGapForReport())} m).`, ` Increase the back-to-back distance of the blue rows to at least ${f(bgNeed)} m (now ${f(effBackGapForReport())} m).`);
-        if (sp.minFreePink < WALK_W) t += L(` La șirurile roz, cel puțin ${f(bgNeed)} m.`, ` For the pink rows, at least ${f(bgNeed)} m.`);
-        t += L(' Pentru șirurile de lângă pereți, distanța până la perete trebuie să fie de cel puțin 0,72 m.', ' For the rows next to the walls, the distance to the wall must be at least 0.72 m.');
+        let t = L(`Asistenții nu pot intra pe culoar ca să dea steluțele.`, `Assistants cannot enter the lane to hand out the stars.`);
+        if (sp.corridorFree < WALK_W) t += L(` Pe culoar rămân doar ${cm2(sp.corridorFree)} liberi; măriți distanța față în față la cel puțin ${f(WALK_W + TORSO_DEPTH)} m.`, ` Only ${cm2(sp.corridorFree)} remain free in the lane; increase the face-to-face distance to at least ${f(WALK_W + TORSO_DEPTH)} m.`);
+        if (sp.gapBetween < TORSO_DEPTH) t += L(` Între participanți sunt doar ${cm2(sp.gapBetween)} (necesar 24 cm ca asistentul să treacă lateral); reduceți numărul de participanți sau lungiți traseul.`, ` There are only ${cm2(sp.gapBetween)} between participants (24 cm needed for the assistant to pass sideways); reduce the number of participants or lengthen the route.`);
         sug.unshift(t);
       }
       if (sp.needed > assistCount) sug.push(L(`Pentru a distribui toate steluțele în ${distribMin} min sunt necesari ${sp.needed} asistenți (acum ${assistCount}), sau măriți timpul la ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`,
@@ -3860,63 +4262,65 @@
     let isTouching = false;
     let touchStartAngle = 0, touchStartRot = 0, touchStartWorld = { x: 0, y: 0 };
 
+    function touchCenterWorldStart(t1, t2) {
+      touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      touchStartScale = scale;
+      touchCenter.x = (t1.clientX + t2.clientX) / 2;
+      touchCenter.y = (t1.clientY + t2.clientY) / 2;
+      const rect0 = canvas.getBoundingClientRect();
+      touchStartWorld = screenToWorld(touchCenter.x - rect0.left, touchCenter.y - rect0.top);
+    }
     canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();                                    // fara scroll / zoom al paginii
       if (e.touches.length >= 1) enterFreeCam();
+      isTouching = true;
       if (e.touches.length === 1) {
-        isTouching = true;
         dragStart.x = e.touches[0].clientX - panX;
         dragStart.y = e.touches[0].clientY - panY;
-      } else if (e.touches.length === 2) {
-        isTouching = true;
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
-        touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-        touchStartScale = scale;
-        touchStartAngle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
-        touchStartRot = viewRot;
-        touchCenter.x = (t1.clientX + t2.clientX) / 2;
-        touchCenter.y = (t1.clientY + t2.clientY) / 2;
-        const rect0 = canvas.getBoundingClientRect();
-        touchStartWorld = screenToWorld(touchCenter.x - rect0.left, touchCenter.y - rect0.top);
-        touchStartPan.x = panX;
-        touchStartPan.y = panY;
+      } else if (e.touches.length >= 2) {
+        touchCenterWorldStart(e.touches[0], e.touches[1]);
       }
-    }, { passive: true });
+    }, { passive: false });
 
-    window.addEventListener('touchmove', (e) => {
+    canvas.addEventListener('touchmove', (e) => {
       if (!isTouching) return;
+      e.preventDefault();
       if (e.touches.length === 1) {
         panX = e.touches[0].clientX - dragStart.x;
         panY = e.touches[0].clientY - dragStart.y;
         redraw();
-      } else if (e.touches.length === 2) {
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
+      } else if (e.touches.length >= 2) {
+        const t1 = e.touches[0], t2 = e.touches[1];
         const currentDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
         if (touchStartDist > 10) {
-          const factor = currentDist / touchStartDist;
+          // doar zoom (si mutare cu centrul celor doua degete); rotirea se face din butoane / slider
           const rect = canvas.getBoundingClientRect();
           const cx = (t1.clientX + t2.clientX) / 2 - rect.left;
           const cy = (t1.clientY + t2.clientY) / 2 - rect.top;
-          scale = Math.max(10, Math.min(250, touchStartScale * factor));
-          viewRot = touchStartRot + (Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) - touchStartAngle);
+          scale = Math.max(6, Math.min(250, touchStartScale * currentDist / touchStartDist));
           const rp = rotPt(touchStartWorld.x, touchStartWorld.y);
           panX = cx - rp.x;
           panY = cy - rp.y;
-          syncRotUI();
           redraw();
         }
       }
-    }, { passive: true });
+    }, { passive: false });
 
-    window.addEventListener('touchend', (e) => {
+    const touchEnd = (e) => {
       if (e.touches.length === 0) {
         isTouching = false;
       } else if (e.touches.length === 1) {
         dragStart.x = e.touches[0].clientX - panX;
         dragStart.y = e.touches[0].clientY - panY;
+      } else {
+        touchCenterWorldStart(e.touches[0], e.touches[1]);
       }
-    });
+    };
+    canvas.addEventListener('touchend', touchEnd);
+    canvas.addEventListener('touchcancel', touchEnd);
+    // iOS Safari: blocheaza zoom-ul paginii cu doua degete
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
+    document.addEventListener('gesturechange', (e) => e.preventDefault());
 
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
@@ -3974,9 +4378,7 @@
         if (json !== lastSavedJson) { localStorage.setItem(STORE_KEY, json); lastSavedJson = json; }
       } catch (e) { /* localStorage indisponibil: ignorăm */ }
     }
-    function loadSavedState() {
-      let st = null;
-      try { st = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return; }
+    function applyLoadedState(st) {
       if (!st || st.v !== 1) return;
       const num = (v, d) => (typeof v === 'number' && isFinite(v)) ? v : d;
       ROOM_W = Math.min(80, Math.max(6, num(st.roomW, ROOM_W)));
@@ -3995,7 +4397,7 @@
       starSec = num(st.starSec, starSec);
       distribMin = num(st.distribMin, distribMin);
       fastDur = num(st.fastDur, fastDur);
-      assistBlue = !!st.assistBlue;
+      assistBlue = false;
       { const ab = document.getElementById('chk-assist-blue'); if (ab) ab.checked = assistBlue; const fd = document.getElementById('rng-fastdur'); if (fd) fd.value = fastDur; updateFastDur(fastDur); }
       if (['none', 'tapered', 'transit', 'staggered', 'max_path', 'turners', 'recommended'].includes(st.sol)) currentSolution800 = st.sol;
       viewRot = num(st.viewRot, 0);
@@ -4009,9 +4411,17 @@
       if (st.sidebarCollapsed) document.querySelector('.sidebar')?.classList.add('collapsed');
       applySidebarState();
       if (st.hudMin) document.querySelector('.canvas-overlay-info')?.classList.add('hud-min');
-      savedCam = st.cam || null;
-      savedTab = TAB_IDS.includes(st.tab) ? st.tab : null;
+      if (st.cam) setCamMode(st.cam);
+      if (st.tab && TAB_IDS.includes(st.tab)) switchTab(st.tab);
       syncRotUI();
+      recalculateAll();
+      updateSolutionPills();
+      redraw();
+    }
+    function loadSavedState() {
+      let st = null;
+      try { st = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return; }
+      if (st) applyLoadedState(st);
     }
     function resetSavedState() {
       suppressSave = true;
@@ -4021,6 +4431,273 @@
     setInterval(saveState, 600);
     window.addEventListener('beforeunload', saveState);
     document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
+
+    // ===================== CONFIGURAȚII CU NUME (Salvare & Încărcare) =====================
+    const NAMED_STORE_KEY = 'fata-in-fata-named-configs-v1';
+
+    function getNamedConfigs() {
+      try {
+        const raw = localStorage.getItem(NAMED_STORE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function setNamedConfigs(cfgs) {
+      try {
+        localStorage.setItem(NAMED_STORE_KEY, JSON.stringify(cfgs));
+      } catch (e) {}
+    }
+
+    function saveNamedConfig() {
+      const inp = document.getElementById('inp-conf-name');
+      let name = (inp && inp.value.trim()) || '';
+      if (!name) {
+        const now = new Date();
+        name = `Configurație ${now.toLocaleDateString('ro-RO')} ${now.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})}`;
+      }
+      const cfgs = getNamedConfigs();
+      const st = collectState();
+      cfgs[name] = {
+        name,
+        savedAt: Date.now(),
+        state: st
+      };
+      setNamedConfigs(cfgs);
+      if (inp) inp.value = '';
+      refreshNamedConfigsUI(name);
+      showConfigNotice(`Configurația „${name}” a fost salvată!`, '#22c55e');
+    }
+
+    function loadSelectedNamedConfig() {
+      const sel = document.getElementById('sel-named-configs');
+      if (!sel || !sel.value) {
+        showConfigNotice('Alege o configurație din listă pentru a o încărca.', '#f59e0b');
+        return;
+      }
+      const cfgs = getNamedConfigs();
+      const item = cfgs[sel.value];
+      if (!item || !item.state) {
+        showConfigNotice('Configurația selectată nu a putut fi găsită.', '#ef4444');
+        return;
+      }
+      applyLoadedState(item.state);
+      showConfigNotice(`Configurația „${item.name}” a fost încărcată cu succes!`, '#22c55e');
+    }
+
+    function deleteSelectedNamedConfig() {
+      const sel = document.getElementById('sel-named-configs');
+      if (!sel || !sel.value) {
+        showConfigNotice('Alege o configurație din listă pentru a o șterge.', '#f59e0b');
+        return;
+      }
+      const name = sel.value;
+      const cfgs = getNamedConfigs();
+      delete cfgs[name];
+      setNamedConfigs(cfgs);
+      refreshNamedConfigsUI();
+      showConfigNotice(`Configurația „${name}” a fost ștearsă.`, '#ef4444');
+    }
+
+    function showConfigNotice(msg, color = '#38bdf8') {
+      const el = document.getElementById('conf-status-note');
+      if (!el) return;
+      el.style.color = color;
+      el.innerText = msg;
+      setTimeout(() => { if (el.innerText === msg) el.innerText = ''; }, 4500);
+    }
+
+    function refreshNamedConfigsUI(selectedName) {
+      const sel = document.getElementById('sel-named-configs');
+      if (!sel) return;
+      const cfgs = getNamedConfigs();
+      const keys = Object.keys(cfgs).sort((a, b) => (cfgs[b].savedAt || 0) - (cfgs[a].savedAt || 0));
+      sel.innerHTML = '<option value="">-- Alege configurație salvată --</option>';
+      keys.forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        const dateStr = cfgs[k].savedAt ? new Date(cfgs[k].savedAt).toLocaleDateString('ro-RO') : '';
+        opt.text = `${k}${dateStr ? ` (${dateStr})` : ''}`;
+        if (selectedName && k === selectedName) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    function syncAllInputs() {
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      setVal('inp-room-w', ROOM_W); setVal('inp-room-l', ROOM_L);
+      setVal('rng-part', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
+      setVal('rng-corridor-w', corridorW); setVal('rng-wall-end', wallDistEnd); setVal('rng-wall-side', wallDistSide);
+      setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
+      setVal('rng-interval', stepIntervalSec); updateInterval(stepIntervalSec);
+      setVal('rng-glide', stepGlideSec); updateGlide(stepGlideSec);
+    }
+
+    function applyQuickConfig(type) {
+      if (type === 'std800') {
+        ROOM_W = 21.6; ROOM_L = 35.3; partCount = 800; assistCount = 40; nLanes = 9; corridorW = 0.70; corridorWTurn = 0.70; currentSolution800 = 'tapered';
+      } else if (type === 'transit800') {
+        ROOM_W = 21.6; ROOM_L = 35.3; partCount = 800; assistCount = 40; nLanes = 9; corridorW = 0.65; corridorWTurn = 0.65; currentSolution800 = 'transit';
+      } else if (type === 'stagger800') {
+        ROOM_W = 21.6; ROOM_L = 35.3; partCount = 800; assistCount = 40; nLanes = 9; corridorW = 0.60; corridorWTurn = 0.60; currentSolution800 = 'staggered';
+      } else if (type === 'room600') {
+        ROOM_W = 20.0; ROOM_L = 30.0; partCount = 600; assistCount = 30; nLanes = 8; corridorW = 0.70; corridorWTurn = 0.70; currentSolution800 = 'tapered';
+      }
+      applyRoomDims();
+      syncAllInputs();
+      recalculateAll();
+      updateSolutionPills();
+      fitFullRoom();
+      redraw();
+      showConfigNotice('Preset rapid aplicat cu succes!', '#22c55e');
+    }
+
+    // ===================== EXPORT ANIMAȚIE GIF (10-15s) =====================
+    function openGifModal() {
+      const m = document.getElementById('modal-gif');
+      if (m) {
+        m.classList.add('open');
+        const pbox = document.getElementById('gif-progress-box');
+        if (pbox) pbox.style.display = 'none';
+        const bg = document.getElementById('btn-gif-generate');
+        if (bg) { bg.disabled = false; bg.style.opacity = '1'; }
+      }
+    }
+    function closeGifModal() {
+      const m = document.getElementById('modal-gif');
+      if (m) m.classList.remove('open');
+    }
+
+    let isExportingGif = false;
+    function startGifExport() {
+      if (isExportingGif) return;
+      if (!window.GIFEnc) {
+        alert('Modulul de export GIF nu s-a încărcat. Vă rugăm reîncărcați pagina.');
+        return;
+      }
+      isExportingGif = true;
+
+      const durSec = parseInt(document.getElementById('gif-opt-dur')?.value || '12', 10);
+      const mode = document.getElementById('gif-opt-mode')?.value || 'steps';
+      const camChoice = document.getElementById('gif-opt-cam')?.value || 'full';
+
+      const pbox = document.getElementById('gif-progress-box');
+      if (pbox) pbox.style.display = 'flex';
+      const bg = document.getElementById('btn-gif-generate');
+      if (bg) { bg.disabled = true; bg.style.opacity = '0.5'; }
+      const txtStatus = document.getElementById('gif-status-text');
+      const txtPct = document.getElementById('gif-pct-text');
+      const barFill = document.getElementById('gif-bar-fill');
+
+      // Salvează starea curentă a vederii și simulării
+      const origPanX = panX, origPanY = panY, origScale = scale, origCam = camMode, origRot = viewRot;
+      const origAnimShift = animShift, origTargetShift = targetShift, origStep = currentStepNumber, origPhase = phase;
+
+      if (camChoice === 'full') fitFullRoom();
+      else if (camChoice === 'macro') fitMacro();
+
+      const vp = document.getElementById('viewport');
+      const gifW = 540;
+      const gifH = Math.max(340, Math.round(gifW * vp.clientHeight / vp.clientWidth));
+
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = gifW;
+      offCanvas.height = gifH;
+      const gctx = offCanvas.getContext('2d');
+
+      const { GIFEncoder, quantize, applyPalette } = window.GIFEnc;
+      const gif = GIFEncoder();
+
+      const fps = 10;
+      const totalFrames = durSec * fps;
+      const pairs = Math.round(partCount / 2);
+      const stepDist = totalVirtualLength / pairs;
+
+      let frameIdx = 0;
+      const batchSize = 6;
+
+      function processBatch() {
+        const batchEnd = Math.min(totalFrames, frameIdx + batchSize);
+        for (; frameIdx < batchEnd; frameIdx++) {
+          const progress = frameIdx / totalFrames;
+
+          if (mode === 'steps') {
+            // 6 pași compleți glisați lin pentru a arăta mișcarea în contrasens și orientarea
+            const simulatedSteps = 6;
+            const currentSimStep = progress * simulatedSteps;
+            const stepFraction = currentSimStep % 1;
+            const ease = stepFraction < 0.5 ? 2 * stepFraction * stepFraction : -1 + (4 - 2 * stepFraction) * stepFraction;
+            const continuousShift = (Math.floor(currentSimStep) + ease) * (stepDist / 2);
+            animShift = continuousShift;
+            targetShift = continuousShift + (stepDist / 2) * 0.1;
+            currentStepNumber = 1 + (Math.floor(currentSimStep) % pairs);
+          } else {
+            // Tur complet accelerat 1..pairs
+            const targetStep = Math.min(pairs - 1, Math.floor(progress * (pairs - 1)));
+            animShift = targetStep * (stepDist / 2);
+            targetShift = animShift;
+            currentStepNumber = 1 + targetStep;
+          }
+
+          // Redesenare pe canvas principal
+          redraw();
+
+          // Copiere scalată în canvas-ul GIF
+          gctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, gifW, gifH);
+
+          // Bandă elegantă jos în GIF cu detalii exercițiu
+          gctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+          gctx.fillRect(0, gifH - 24, gifW, 24);
+          gctx.fillStyle = '#38bdf8';
+          gctx.font = 'bold 11px Inter, system-ui, sans-serif';
+          gctx.textAlign = 'left';
+          gctx.textBaseline = 'middle';
+          gctx.fillText(`Față în față · Contrasens (${partCount} pers · ${nLanes} culoare)`, 10, gifH - 12);
+          gctx.fillStyle = '#94a3b8';
+          gctx.textAlign = 'right';
+          gctx.fillText(`Pas ${currentStepNumber} / ${pairs}`, gifW - 10, gifH - 12);
+
+          // Encodare cadru GIF
+          const imgData = gctx.getImageData(0, 0, gifW, gifH).data;
+          const pal = quantize(imgData, 256);
+          const idx = applyPalette(imgData, pal);
+          gif.writeFrame(idx, gifW, gifH, { palette: pal, delay: 100, repeat: 0 });
+        }
+
+        const pct = Math.round((frameIdx / totalFrames) * 100);
+        if (barFill) barFill.style.width = pct + '%';
+        if (txtPct) txtPct.innerText = pct + '%';
+        if (txtStatus) txtStatus.innerText = `Generare cadru ${frameIdx} din ${totalFrames}...`;
+
+        if (frameIdx < totalFrames) {
+          setTimeout(processBatch, 0);
+        } else {
+          // Finalizare GIF
+          gif.finish();
+          const blob = new Blob([gif.bytes()], { type: 'image/gif' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `simulare_sala_${partCount}p_${currentSolution800}_contrasens.gif`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 12000);
+
+          // Restaurare stare
+          panX = origPanX; panY = origPanY; scale = origScale; camMode = origCam; viewRot = origRot;
+          animShift = origAnimShift; targetShift = origTargetShift; currentStepNumber = origStep; phase = origPhase;
+          redraw();
+
+          isExportingGif = false;
+          closeGifModal();
+          showConfigNotice('GIF-ul de 10-15s a fost generat și descărcat cu succes!', '#22c55e');
+        }
+      }
+
+      setTimeout(processBatch, 10);
+    }
 
     // Start
     const vpInit = document.getElementById('viewport');
@@ -4033,6 +4710,7 @@
     ctx.scale(dprInit, dprInit);
 
     loadSavedState();   // setările salvate (parametri, soluție, vedere); parametrii din URL le suprascriu
+    refreshNamedConfigsUI();
     const urlParams = new URLSearchParams(window.location.search);
     const pParts = urlParams.get('parts');
     if (pParts) {
@@ -4065,7 +4743,7 @@
       updateSolutionPills();
     }
     recalculateAll();
-    const initCam = urlParams.get('cam') || savedCam || 'macro';
+    const initCam = urlParams.get('cam') || savedCam || (window.innerWidth <= 900 ? 'full' : 'macro');   // pe telefon pornim cu toata sala
     setCamMode(initCam);
     const initTab = urlParams.get('tab');
     if (initTab) switchTab('tab-' + initTab); else if (savedTab) switchTab(savedTab);
