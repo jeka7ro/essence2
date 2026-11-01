@@ -3440,7 +3440,11 @@
 
     function effBackGapForReport() { return backGap; }
 
-    function computeReport() {
+    function computeReport(lang) {
+      const en = lang === 'en';
+      const L = (ro, e) => en ? e : ro;
+      const f = (v, d = 2) => en ? v.toFixed(d) : fm(v, d);
+      const cm = (v) => en ? (v * 100).toFixed(1) + ' cm' : fcm(v);
       const pairs = Math.round(partCount / 2);
       const halfW = corridorW / 2;
       const wTurn = corridorWTurn ? corridorWTurn : corridorW;
@@ -3454,116 +3458,135 @@
       const freeAisle = Math.max(0, assistGap - TORSO_DEPTH);
       const totalSec = pairs * stepIntervalSec;
       const turnerAssist = turnerMode ? (nLanes - 1) : 0;
-      const solNames = { tapered: 'Soluția 1 - culoar îngustat pe viraj', transit: 'Soluția 2 - viraj tranzit fluid', staggered: 'Soluția 3 - dispunere în șah', max_path: 'Soluția 4 - traseu maxim', turners: 'Soluția 5 - întorcător în centrul curbelor', recommended: 'Soluția 6 - recomandarea mea', none: 'Configurația inițială' };
+      const solNames = {
+        tapered: L('Soluția 1 - culoar îngustat pe viraj', 'Solution 1 - narrowed lane on the turn'),
+        transit: L('Soluția 2 - viraj tranzit fluid', 'Solution 2 - fluid transit turn'),
+        staggered: L('Soluția 3 - dispunere în șah', 'Solution 3 - staggered layout'),
+        max_path: L('Soluția 4 - traseu maxim', 'Solution 4 - maximum path'),
+        turners: L('Soluția 5 - întorcător în centrul curbelor', 'Solution 5 - turner in the centre of each curve'),
+        recommended: L('Soluția 6 - recomandarea mea', 'Solution 6 - recommended'),
+        none: L('Configurația inițială', 'Initial configuration')
+      };
 
       const sections = [
-        { title: 'Sala', rows: [
-          ['Dimensiuni sală', `${fm(ROOM_W, 1)} m x ${fm(ROOM_L, 1)} m`, 'din plan'],
-          ['Suprafață', `${fm(ROOM_W * ROOM_L, 1)} m²`, 'lățime x lungime'],
-          ['Compartimente C3 / C2 / C1', `${fm(SECTION_C3, 1)} / ${fm(SECTION_C2, 1)} / ${fm(SECTION_C1, 1)} m`, 'separate de pereții de 0,9 m și 1,0 m'],
+        { title: L('Sala', 'Room'), rows: [
+          [L('Dimensiuni sală', 'Room dimensions'), `${f(ROOM_W, 1)} m x ${f(ROOM_L, 1)} m`, L('din plan', 'from the plan')],
+          [L('Suprafață', 'Area'), `${f(ROOM_W * ROOM_L, 1)} m²`, L('lățime x lungime', 'width x length')],
+          [L('Compartimente C3 / C2 / C1', 'Sections C3 / C2 / C1'), `${f(SECTION_C3, 1)} / ${f(SECTION_C2, 1)} / ${f(SECTION_C1, 1)} m`, L('separate de pereții de 0,9 m și 1,0 m', 'separated by 0.9 m and 1.0 m walls')],
         ]},
-        { title: 'Distanțe setate', rows: [
-          ['Față în față (lățime culoar)', `${fm(corridorW)} m`, 'distanța dintre cele două șiruri'],
-          ['Lățime culoar pe viraj', turnerMode ? 'se adaptează razei' : `${fm(wTurn)} m`, turnerMode ? 'min. 0,40 m, în jurul întorcătorului' : 'doar în zona virajului U'],
-          ['Spate în spate, șiruri albastre', `${fm(backGap)} m`, 'fără asistenți, minim 0,10 m'],
-          ['Spate în spate, șiruri roz', `${fm(assistGap)} m`, 'zona portocalie a asistenților'],
-          ['Pas între axe (roz / albastru)', `${fm(corridorW + assistGap)} / ${fm(corridorW + backGap)} m`, 'lățime culoar + spate în spate'],
-          ['Distanță capete față de perete', `${fm(wallDistEnd)} m`, 'sus și jos'],
-          ['Distanță culoare față de pereții laterali', `${fm(wallDistSide)} m`, 'stânga și dreapta'],
-          ['Număr culoare', `${nLanes}`, `${nLanes - 1} ${turnerMode ? 'treceri la capete' : 'viraje U'}`],
-          ['Rază viraj (axa culoarului)', `${fm(rTurn)} - ${fm((corridorW + Math.max(assistGap, backGap)) / 2)} m`, 'pas între axe / 2 (cel mai strâns - cel mai larg)'],
+        { title: L('Distanțe setate', 'Configured distances'), rows: [
+          [L('Față în față (lățime culoar)', 'Face to face (lane width)'), `${f(corridorW)} m`, L('distanța dintre cele două șiruri', 'distance between the two rows')],
+          [L('Lățime culoar pe viraj', 'Lane width on the turn'), turnerMode ? L('se adaptează razei', 'adapts to the radius') : `${f(wTurn)} m`, turnerMode ? L('min. 0,40 m, în jurul întorcătorului', 'min. 0.40 m, around the turner') : L('doar în zona virajului U', 'only in the U-turn area')],
+          [L('Spate în spate, șiruri albastre', 'Back to back, blue rows'), `${f(backGap)} m`, L('fără asistenți, minim 0,10 m', 'no assistants, minimum 0.10 m')],
+          [L('Spate în spate, șiruri roz', 'Back to back, pink rows'), `${f(assistGap)} m`, L('zona portocalie a asistenților', 'orange assistant zone')],
+          [L('Pas între axe (roz / albastru)', 'Lane pitch (pink / blue)'), `${f(corridorW + assistGap)} / ${f(corridorW + backGap)} m`, L('lățime culoar + spate în spate', 'lane width + back to back')],
+          [L('Distanță capete față de perete', 'Lane ends to wall'), `${f(wallDistEnd)} m`, L('sus și jos', 'top and bottom')],
+          [L('Distanță culoare față de pereții laterali', 'Lanes to side walls'), `${f(wallDistSide)} m`, L('stânga și dreapta', 'left and right')],
+          [L('Număr culoare', 'Number of lanes'), `${nLanes}`, `${nLanes - 1} ${turnerMode ? L('treceri la capete', 'end transitions') : L('viraje U', 'U-turns')}`],
+          [L('Rază viraj (axa culoarului)', 'Turn radius (lane axis)'), `${f(rTurn)} - ${f((corridorW + Math.max(assistGap, backGap)) / 2)} m`, L('pas între axe / 2 (cel mai strâns - cel mai larg)', 'pitch / 2 (tightest - widest)')],
         ]},
-        { title: 'Traseu', rows: [
-          ['Lungime culoar drept', `${fm(laneLen, 1)} m`, 'lungime sală - capete'],
-          ['Total tronsoane drepte', `${fm(sumLane, 1)} m`, `${nLanes} culoare`],
-          ['Lungime traseu', `${fm(totalPathLength, 1)} m`, 'drept + viraje'],
-          ['Lungime pe care stau oamenii', `${fm(totalVirtualLength, 1)} m`, turnerMode ? 'curbele se parcurg repede, asistat' : 'egală cu lungimea traseului'],
+        { title: L('Traseu', 'Route'), rows: [
+          [L('Lungime culoar drept', 'Straight lane length'), `${f(laneLen, 1)} m`, L('lungime sală - capete', 'room length - ends')],
+          [L('Total tronsoane drepte', 'Total straight sections'), `${f(sumLane, 1)} m`, `${nLanes} ${L('culoare', 'lanes')}`],
+          [L('Lungime traseu', 'Route length'), `${f(totalPathLength, 1)} m`, L('drept + viraje', 'straight + turns')],
+          [L('Lungime pe care stau oamenii', 'Length occupied by people'), `${f(totalVirtualLength, 1)} m`, turnerMode ? L('curbele se parcurg repede, asistat', 'curves are passed quickly, assisted') : L('egală cu lungimea traseului', 'equal to the route length')],
         ]},
-        { title: 'Persoane', rows: [
-          ['Participanți', `${partCount} (${pairs} perechi)`, `${pairs} în fiecare șir`],
-          ['Asistenți pe culoare', `${assistCount}`, 'în zonele portocalii, în spatele participanților'],
-          ['Asistenți întorcători', turnerMode ? `${turnerAssist}` : '0', turnerMode ? 'unul în centrul fiecărei curbe' : 'doar la Soluțiile 5 și 6'],
-          ['Spațiu pe persoană pe culoar', fcm(stepDist), 'lungime traseu / perechi'],
-          ['Liber față de umeri (46 cm)', fcm(stepDist - SHOULDER), 'spațiu pe persoană - 46 cm'],
-          ['Spațiu pe interior de viraj', turnerMode ? 'trecere rapidă, fără oprire' : fcm(spaceInner), 'spațiu pe persoană x R interior / R axă'],
-          ['Lățime liberă în zona asistenților', fcm(freeAisle), 'spate în spate roz - 24 cm (adâncime piept)'],
-          ['Lățime liberă între spatele albastre', fcm(Math.max(0, backGap - TORSO_DEPTH)), 'spate în spate albastru - 24 cm'],
+        { title: L('Persoane', 'People'), rows: [
+          [L('Participanți', 'Participants'), `${partCount} (${pairs} ${L('perechi', 'pairs')})`, `${pairs} ${L('în fiecare șir', 'in each row')}`],
+          [L('Asistenți pe culoare', 'Assistants on the lanes'), `${assistCount}`, L('în zonele portocalii, în spatele participanților', 'in the orange zones, behind the participants')],
+          [L('Asistenți întorcători', 'Turner assistants'), turnerMode ? `${turnerAssist}` : '0', turnerMode ? L('unul în centrul fiecărei curbe', 'one in the centre of each curve') : L('doar la Soluțiile 5 și 6', 'only in Solutions 5 and 6')],
+          [L('Spațiu pe persoană pe culoar', 'Space per person on the lane'), cm(stepDist), L('lungime traseu / perechi', 'route length / pairs')],
+          [L('Liber față de umeri (46 cm)', 'Clearance beyond shoulders (46 cm)'), cm(stepDist - SHOULDER), L('spațiu pe persoană - 46 cm', 'space per person - 46 cm')],
+          [L('Spațiu pe interior de viraj', 'Space on the inside of the turn'), turnerMode ? L('trecere rapidă, fără oprire', 'quick pass, no stopping') : cm(spaceInner), L('spațiu pe persoană x R interior / R axă', 'space per person x inner R / axis R')],
+          [L('Lățime liberă în zona asistenților', 'Free width in the assistant zone'), cm(freeAisle), L('spate în spate roz - 24 cm (adâncime piept)', 'pink back to back - 24 cm (chest depth)')],
+          [L('Lățime liberă între spatele albastre', 'Free width between blue backs'), cm(Math.max(0, backGap - TORSO_DEPTH)), L('spate în spate albastru - 24 cm', 'blue back to back - 24 cm')],
         ]},
-        { title: 'Timp', rows: [
-          ['Pauză față în față', `${fm(stepIntervalSec, 1)} s`, 'setată în aplicație'],
-          ['Număr de pași pentru un tur', `${pairs}`, 'fiecare se întâlnește cu toți partenerii'],
-          ['Durata unui tur complet', fmtDur(totalSec), 'pași x secunde pe pas'],
+        { title: L('Timp', 'Time'), rows: [
+          [L('Pauză față în față', 'Face-to-face pause'), `${f(stepIntervalSec, 1)} s`, L('setată în aplicație', 'set in the app')],
+          [L('Număr de pași pentru un tur', 'Steps for one full tour'), `${pairs}`, L('fiecare se întâlnește cu toți partenerii', 'everyone meets all partners')],
+          [L('Durata unui tur complet', 'Duration of a full tour'), fmtDur(totalSec), L('pași x secunde pe pas', 'steps x seconds per step')],
         ]},
       ];
 
       const sp = computeStarPlan();
-      const fcm2 = (v) => fcm(Math.max(0, v));
-      sections.push({ title: 'Steluțe: acces și asistenți', rows: [
-        ['Spațiu liber în spatele șirurilor roz', fcm2(sp.minFreePink), `necesar ${(WALK_W * 100).toFixed(0)} cm ca asistentul să meargă și să se oprească`],
-        ['Spațiu liber în spatele șirurilor albastre', fcm2(sp.minFreeBlue), sp.minFreeBlue >= WALK_W ? 'suficient' : 'insuficient'],
-        ['Participanți la care ajung asistenții', `${sp.reachable} din ${sp.total}`, `roz ${sp.pinkOk}/${sp.pinkAll}, albastru ${sp.blueOk}/${sp.blueAll}`],
-        ['Timp pe participant (steluță)', `${starSec} s`, 'setat în aplicație'],
-        ['Timp maxim de distribuire', `${distribMin} min`, 'setat în aplicație'],
-        ['Asistenți necesari', `${sp.needed}`, 'timp de lucru total / timp maxim'],
-        ['Asistenți disponibili', `${assistCount}`, `durata cu ei: ${fmtDur(sp.haveSec)}`],
+      const cm2 = (v) => cm(Math.max(0, v));
+      sections.push({ title: L('Steluțe: acces și asistenți', 'Stars: access and assistants'), rows: [
+        [L('Spațiu liber în spatele șirurilor roz', 'Free space behind the pink rows'), cm2(sp.minFreePink), L(`necesar ${(WALK_W * 100).toFixed(0)} cm ca asistentul să meargă și să se oprească`, `${(WALK_W * 100).toFixed(0)} cm needed so an assistant can walk and stop`)],
+        [L('Spațiu liber în spatele șirurilor albastre', 'Free space behind the blue rows'), cm2(sp.minFreeBlue), sp.minFreeBlue >= WALK_W ? L('suficient', 'sufficient') : L('insuficient', 'insufficient')],
+        [L('Participanți la care ajung asistenții', 'Participants reached by assistants'), `${sp.reachable} ${L('din', 'of')} ${sp.total}`, `${L('roz', 'pink')} ${sp.pinkOk}/${sp.pinkAll}, ${L('albastru', 'blue')} ${sp.blueOk}/${sp.blueAll}`],
+        [L('Timp pe participant (steluță)', 'Time per participant (star)'), `${starSec} s`, L('setat în aplicație', 'set in the app')],
+        [L('Timp maxim de distribuire', 'Maximum distribution time'), `${distribMin} min`, L('setat în aplicație', 'set in the app')],
+        [L('Asistenți necesari', 'Assistants needed'), `${sp.needed}`, L('timp de lucru total / timp maxim', 'total work time / maximum time')],
+        [L('Asistenți disponibili', 'Assistants available'), `${assistCount}`, `${L('durata cu ei', 'duration with them')}: ${fmtDur(sp.haveSec)}`],
       ]});
 
       const formulas = [
-                'Spațiu pe persoană = lungime traseu / număr de perechi',
-        'Liber față de umeri = spațiu pe persoană - 0,46 m',
-        'Spațiu pe interior de viraj = spațiu pe persoană x (R axă - lățime viraj / 2) / R axă',
-        'Lățime liberă între spate = distanță spate în spate - 0,24 m (adâncimea pieptului)',
-        'Pas între axe = lățime culoar + spate în spate (alternativ: roz cu asistenți, albastru fără)',
-        'Durată tur = număr de perechi x secunde pe pas',
-        'Timp de lucru steluțe = participanți x secunde pe steluță + opriri x (distanța dintre ei / 1 m/s)',
-        'Asistenți necesari = timp de lucru steluțe / timp maxim de distribuire',
+        L('Spațiu pe persoană = lungime traseu / număr de perechi', 'Space per person = route length / number of pairs'),
+        L('Liber față de umeri = spațiu pe persoană - 0,46 m', 'Clearance beyond shoulders = space per person - 0.46 m'),
+        L('Spațiu pe interior de viraj = spațiu pe persoană x (R axă - lățime viraj / 2) / R axă', 'Space on the inside of the turn = space per person x (axis R - turn width / 2) / axis R'),
+        L('Lățime liberă între spate = distanță spate în spate - 0,24 m (adâncimea pieptului)', 'Free width between backs = back-to-back distance - 0.24 m (chest depth)'),
+        L('Pas între axe = lățime culoar + spate în spate (alternativ: roz cu asistenți, albastru fără)', 'Lane pitch = lane width + back to back (alternating: pink with assistants, blue without)'),
+        L('Durată tur = număr de perechi x secunde pe pas', 'Tour duration = number of pairs x seconds per step'),
+        L('Timp de lucru steluțe = participanți x secunde pe steluță + opriri x (distanța dintre ei / 1 m/s)', 'Star work time = participants x seconds per star + stops x (distance between them / 1 m/s)'),
+        L('Asistenți necesari = timp de lucru steluțe / timp maxim de distribuire', 'Assistants needed = star work time / maximum distribution time'),
       ];
 
       const sug = [];
       const minSpace = SHOULDER;
+      let hasProblem = false;
       if (stepDist < minSpace) {
+        hasProblem = true;
         const maxPairs = Math.floor(totalVirtualLength / minSpace);
-        sug.push(`Pe culoar rămân doar ${fcm(stepDist)} pe persoană (sub 46 cm). Cu această lungime de traseu încap cel mult ${2 * maxPairs} persoane; scădeți numărul de participanți sau lungiți traseul.`);
+        sug.push(L(`Pe culoar rămân doar ${cm(stepDist)} pe persoană (sub 46 cm). Cu această lungime de traseu încap cel mult ${2 * maxPairs} persoane; scădeți numărul de participanți sau lungiți traseul.`,
+                   `Only ${cm(stepDist)} per person remain on the lane (below 46 cm). With this route length at most ${2 * maxPairs} people fit; reduce the number of participants or lengthen the route.`));
       }
       if (!turnerMode && spaceInner < minSpace) {
-        let t = `Pe interiorul virajului sunt ${fcm(spaceInner)} (sub 46 cm).`;
+        hasProblem = true;
+        let t = L(`Pe interiorul virajului sunt ${cm(spaceInner)} (sub 46 cm).`, `On the inside of the turn there are ${cm(spaceInner)} (below 46 cm).`);
         const rReq = SHOULDER * rTurn / stepDist;
         const wReq = 2 * (rTurn - rReq);
-        if (stepDist > SHOULDER && wReq > 0.3) t += ` Îngustați culoarul pe viraj la cel mult ${fm(wReq)} m (acum ${fm(wTurn)} m).`;
+        if (stepDist > SHOULDER && wReq > 0.3) t += L(` Îngustați culoarul pe viraj la cel mult ${f(wReq)} m (acum ${f(wTurn)} m).`, ` Narrow the lane on the turn to at most ${f(wReq)} m (now ${f(wTurn)} m).`);
         if (stepDist > SHOULDER) {
           const rtReq = wTurn / (2 * (1 - SHOULDER / stepDist));
           const bgReq = 2 * rtReq - corridorW;
-          if (isFinite(bgReq) && bgReq > backGap) t += ` Sau măriți distanța spate în spate la cel puțin ${fm(bgReq)} m.`;
+          if (isFinite(bgReq) && bgReq > backGap) t += L(` Sau măriți distanța spate în spate la cel puțin ${f(bgReq)} m.`, ` Or increase the back-to-back distance to at least ${f(bgReq)} m.`);
         }
-        t += ' Alternativ, folosiți Soluția 5 (întorcători la capete).';
+        t += L(' Alternativ, folosiți Soluția 5 (întorcători la capete).', ' Alternatively, use Solution 5 (turners at the ends).');
         sug.push(t);
       }
       if (freeAisle < ASSIST_DIA) {
         const need = ASSIST_DIA + TORSO_DEPTH;
-        sug.push(`Zona asistenților are ${fcm(freeAisle)} liberi, iar un asistent are nevoie de aproximativ 76 cm. Măriți distanța spate în spate la șirurile roz la cel puțin ${fm(need)} m.`);
+        sug.push(L(`Zona asistenților are ${cm(freeAisle)} liberi, iar un asistent are nevoie de aproximativ 76 cm. Măriți distanța spate în spate la șirurile roz la cel puțin ${f(need)} m.`,
+                   `The assistant zone has ${cm(freeAisle)} free, and an assistant needs about 76 cm. Increase the back-to-back distance of the pink rows to at least ${f(need)} m.`));
       }
       let possLanes = 1;
       for (let nn = 2; nn <= 40; nn++) {
         const aa = Math.ceil((nn - 1) / 2), bb = Math.floor((nn - 1) / 2);
         if ((nn - 1) * corridorW + aa * assistGap + bb * backGap + corridorW <= ROOM_W - 2.0) possLanes = nn; else break;
       }
-      if (possLanes > nLanes) sug.push(`Cu aceste distanțe ar încăpea ${possLanes} culoare (acum ${nLanes}), cu pereții laterali la 1,0 m. Mai multe culoare înseamnă culoare mai scurte sau mai mult spațiu pe persoană.`);
+      if (possLanes > nLanes) sug.push(L(`Cu aceste distanțe ar încăpea ${possLanes} culoare (acum ${nLanes}), cu pereții laterali la 1,0 m. Mai multe culoare înseamnă culoare mai scurte sau mai mult spațiu pe persoană.`,
+                                         `With these distances ${possLanes} lanes would fit (now ${nLanes}), with the side walls at 1.0 m. More lanes mean shorter lanes or more space per person.`));
       const secFor30 = 1800 / pairs;
-      if (totalSec > 1800) sug.push(`Pentru un tur sub 30 de minute pauza trebuie să fie de cel mult ${fm(secFor30, 1)} s pe pas (acum ${fm(stepIntervalSec, 1)} s).`);
+      if (totalSec > 1800) sug.push(L(`Pentru un tur sub 30 de minute pauza trebuie să fie de cel mult ${f(secFor30, 1)} s pe pas (acum ${f(stepIntervalSec, 1)} s).`,
+                                      `For a tour under 30 minutes the pause must be at most ${f(secFor30, 1)} s per step (now ${f(stepIntervalSec, 1)} s).`));
       const zoneSec = Math.round(pairs / 3) * stepIntervalSec;
-      sug.push(`Dacă sala se împarte în cele 3 compartimente (C1, C2, C3) cu câte un circuit separat, turul se reduce la aproximativ ${fmtDur(zoneSec)} la aceeași pauză, dar fiecare participant întâlnește doar o treime din parteneri.`);
-      if (!sug.some(t => t.startsWith('Pe culoar') || t.startsWith('Pe interior'))) sug.unshift('Configurația curentă respectă 46 cm pe persoană, atât pe culoar cât și la capete.');
+      sug.push(L(`Dacă sala se împarte în cele 3 compartimente (C1, C2, C3) cu câte un circuit separat, turul se reduce la aproximativ ${fmtDur(zoneSec)} la aceeași pauză, dar fiecare participant întâlnește doar o treime din parteneri.`,
+                 `If the room is split into the 3 sections (C1, C2, C3) with a separate circuit in each, the tour drops to about ${fmtDur(zoneSec)} at the same pause, but each participant meets only a third of the partners.`));
+      if (!hasProblem) sug.unshift(L('Configurația curentă respectă 46 cm pe persoană, atât pe culoar cât și la capete.', 'The current configuration keeps 46 cm per person, both on the lanes and at the ends.'));
 
       if (sp.reachable < sp.total) {
         const bgNeed = WALK_W + TORSO_DEPTH;
-        let t = `Asistenții nu ajung la ${sp.total - sp.reachable} de participanți: aleea din spatele lor are doar ${fcm2(Math.min(sp.minFreePink, sp.minFreeBlue))} liberi (necesar ${(WALK_W * 100).toFixed(0)} cm).`;
-        if (sp.minFreeBlue < WALK_W) t += ` Măriți distanța spate în spate la șirurile albastre la cel puțin ${fm(bgNeed)} m (acum ${fm(effBackGapForReport())} m).`;
-        if (sp.minFreePink < WALK_W) t += ` La șirurile roz, cel puțin ${fm(bgNeed)} m.`;
-        t += ' Pentru șirurile de lângă pereți, distanța până la perete trebuie să fie de cel puțin 0,72 m.';
+        let t = L(`Asistenții nu ajung la ${sp.total - sp.reachable} de participanți: aleea din spatele lor are doar ${cm2(Math.min(sp.minFreePink, sp.minFreeBlue))} liberi (necesar ${(WALK_W * 100).toFixed(0)} cm).`,
+                  `Assistants cannot reach ${sp.total - sp.reachable} participants: the aisle behind them has only ${cm2(Math.min(sp.minFreePink, sp.minFreeBlue))} free (${(WALK_W * 100).toFixed(0)} cm needed).`);
+        if (sp.minFreeBlue < WALK_W) t += L(` Măriți distanța spate în spate la șirurile albastre la cel puțin ${f(bgNeed)} m (acum ${f(effBackGapForReport())} m).`, ` Increase the back-to-back distance of the blue rows to at least ${f(bgNeed)} m (now ${f(effBackGapForReport())} m).`);
+        if (sp.minFreePink < WALK_W) t += L(` La șirurile roz, cel puțin ${f(bgNeed)} m.`, ` For the pink rows, at least ${f(bgNeed)} m.`);
+        t += L(' Pentru șirurile de lângă pereți, distanța până la perete trebuie să fie de cel puțin 0,72 m.', ' For the rows next to the walls, the distance to the wall must be at least 0.72 m.');
         sug.unshift(t);
       }
-      if (sp.needed > assistCount) sug.push(`Pentru a distribui toate steluțele în ${distribMin} min sunt necesari ${sp.needed} asistenți (acum ${assistCount}), sau măriți timpul la ${fm(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`);
-      else sug.push(`Pentru ${distribMin} min ajung ${sp.needed} asistenți; cei ${assistCount} disponibili termină în ${fmtDur(sp.haveSec)}.`);
+      if (sp.needed > assistCount) sug.push(L(`Pentru a distribui toate steluțele în ${distribMin} min sunt necesari ${sp.needed} asistenți (acum ${assistCount}), sau măriți timpul la ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`,
+                                              `To hand out all the stars in ${distribMin} min, ${sp.needed} assistants are needed (now ${assistCount}), or increase the time to ${f(sp.workSec / 60 / Math.max(1, assistCount), 1)} min.`));
+      else sug.push(L(`Pentru ${distribMin} min ajung ${sp.needed} asistenți; cei ${assistCount} disponibili termină în ${fmtDur(sp.haveSec)}.`,
+                      `${sp.needed} assistants are enough for ${distribMin} min; the ${assistCount} available finish in ${fmtDur(sp.haveSec)}.`));
 
       return { sections, formulas, sug, title: solNames[currentSolution800] || '' };
     }
@@ -3587,8 +3610,9 @@
     // --- EXPORT PLAN ÎN PDF (fără biblioteci externe, A4; portret sau peisaj după rotire) ---
     function exportPlanPDF() {
       const planPage = renderPlanPage();
-      const calcPage = renderCalcPage();
-      const pages = [planPage, calcPage].map(pg => {
+      const calcPage = renderCalcPage('ro');
+      const calcPageEn = renderCalcPage('en');      // pagina separata in engleza, cu aceleasi dimensiuni si calcule
+      const pages = [planPage, calcPage, calcPageEn].map(pg => {
         const b64 = pg.canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
         const bin = atob(b64);
         const jpg = new Uint8Array(bin.length);
@@ -3678,10 +3702,11 @@
         `${partCount} participanți (${pairs} perechi) | ${nLanes} culoare | ${assistCount} asistenți | traseu ${totalPathLength.toFixed(1)} m | culoar ${corridorW.toFixed(2)} m, spate în spate ${backGap.toFixed(2)} m`,
         M, M + 178);
       octx.fillText(
-        `Pauză față în față: ${stepIntervalSec.toFixed(0)} s / pas | ${pairs} pași = ${tMin} min ${tSec} s | Poziția afișată: pasul ${normStep} / ${pairs} | Toate dimensiunile și calculele: pagina 2`,
+        `Pauză față în față: ${stepIntervalSec.toFixed(0)} s / pas | ${pairs} pași = ${tMin} min ${tSec} s | Poziția afișată: pasul ${normStep} / ${pairs} `,
         M, M + 232);
+      octx.fillText('Dimensiuni, calcule și sugestii: pagina 2 (RO)  |  Dimensions, calculations and suggestions: page 3 (EN)', M, M + 286);
 
-      const topY = M + 310, botY = PH - M - 70;
+      const topY = M + 370, botY = PH - M - 70;
       const areaW = PW - 2 * M, areaH = botY - topY;
       const sc = Math.min((areaW - 300) / bw0, (areaH - 200) / bh0);
       const ox = M + areaW / 2;
@@ -3708,12 +3733,13 @@
       octx.fillStyle = '#64748b';
       octx.font = '32px Inter, system-ui, sans-serif';
       octx.textAlign = 'left';
-      octx.fillText(`Sală ${ROOM_W} m x ${ROOM_L} m | Pagina 1 din 2 | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M - 30);
+      octx.fillText(`Sală ${ROOM_W} m x ${ROOM_L} m | Pagina 1 din 3 | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M - 30);
       return { canvas: off, landscape };
     }
 
     // Pagina 2: dimensiuni, calcule și sugestii (portret)
-    function renderCalcPage() {
+    function renderCalcPage(lang) {
+      const en = lang === 'en';
       const PW = 2480, PH = 3508, M = 140;
       const off = document.createElement('canvas');
       off.width = PW; off.height = PH;
@@ -3721,11 +3747,11 @@
       c.fillStyle = '#ffffff'; c.fillRect(0, 0, PW, PH);
       c.textBaseline = 'top'; c.textAlign = 'left';
       const F = 'Inter, system-ui, sans-serif';
-      const rep = computeReport();
+      const rep = computeReport(lang);
 
       let y = M;
       c.fillStyle = '#0f172a'; c.font = `bold 66px ${F}`;
-      c.fillText('Dimensiuni, calcule și sugestii', M, y); y += 92;
+      c.fillText(en ? 'Dimensions, calculations and suggestions' : 'Dimensiuni, calcule și sugestii', M, y); y += 92;
       c.fillStyle = '#0369a1'; c.font = `bold 42px ${F}`;
       c.fillText(rep.title, M, y); y += 74;
 
@@ -3761,7 +3787,7 @@
       }
 
       c.fillStyle = '#0f172a'; c.font = `bold 40px ${F}`;
-      c.fillText('Formule folosite', M, y);
+      c.fillText(en ? 'Formulas used' : 'Formule folosite', M, y);
       c.strokeStyle = '#cbd5e1'; c.beginPath(); c.moveTo(M, y + 54); c.lineTo(PW - M, y + 54); c.stroke();
       y += 70;
       c.font = `32px ${F}`; c.fillStyle = '#334155';
@@ -3769,7 +3795,7 @@
       y += 14;
 
       c.fillStyle = '#0f172a'; c.font = `bold 40px ${F}`;
-      c.fillText('Sugestii', M, y);
+      c.fillText(en ? 'Suggestions' : 'Sugestii', M, y);
       c.strokeStyle = '#cbd5e1'; c.beginPath(); c.moveTo(M, y + 54); c.lineTo(PW - M, y + 54); c.stroke();
       y += 70;
       c.fillStyle = '#334155';
@@ -3781,7 +3807,7 @@
       }
 
       c.fillStyle = '#64748b'; c.font = `32px ${F}`;
-      c.fillText(`Pagina 2 din 2 | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M);
+      c.fillText(en ? `Page 3 of 3 | Generated: ${new Date().toLocaleString('en-GB')}` : `Pagina 2 din 3 | Generat: ${new Date().toLocaleString('ro-RO')}`, M, PH - M);
       return { canvas: off, landscape: false };
     }
 
