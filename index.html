@@ -38,6 +38,7 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      height: var(--app-h, 100dvh);   /* inaltimea reala a ferestrei, actualizata si la iesirea din ecran complet */
       overflow: hidden;
     }
 
@@ -1521,6 +1522,21 @@
   </div>
 
   <script>
+    // Inaltimea aplicatiei = inaltimea reala a ferestrei (100vh ramane uneori gresit cand intri / iesi din ecran complet)
+    function updateAppHeight() {
+      const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+      document.documentElement.style.setProperty('--app-h', Math.round(h) + 'px');
+    }
+    updateAppHeight();
+    window.addEventListener('resize', updateAppHeight);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', updateAppHeight);
+    window.addEventListener('orientationchange', updateAppHeight);
+    document.addEventListener('fullscreenchange', () => {
+      // tranzitia intrare / iesire din ecran complet dureaza: reverificam pana se stabilizeaza fereastra
+      let n = 0;
+      const t = setInterval(() => { updateAppHeight(); if (++n > 15) clearInterval(t); }, 100);
+    });
+
     const IC = {
       play: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16l13-8z" fill="currentColor"/></svg>',
       pause: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>',
@@ -2388,7 +2404,14 @@
     }
     document.body.classList.add('mob-view-plan');
 
+    let lastCamMode = 'macro';
+    // Cand muti / zoomezi / rotesti planul cu mouse-ul sau degetele, camera devine "libera": nu o mai readuce nimic la loc
+    function enterFreeCam() {
+      if (camMode === 'free') return;
+      setCamMode('free');
+    }
     function setCamMode(mode) {
+      if (mode !== 'free') lastCamMode = mode;
       camMode = mode;
       document.getElementById('cam-macro')?.classList.toggle('active', mode === 'macro');
       document.getElementById('cam-close')?.classList.toggle('active', mode === 'close');
@@ -2507,8 +2530,8 @@
       centerOn(ROOM_W / 2, ROOM_L / 2);
     }
 
-    function zoom(f) { scale *= f; redraw(); }
-    function resetZoom() { setCamMode(camMode); }
+    function zoom(f) { enterFreeCam(); scale *= f; redraw(); }
+    function resetZoom() { setCamMode(camMode === 'free' ? lastCamMode : camMode); }
 
     // --- Animation Loop ---
     let lastTime = performance.now();
@@ -3697,18 +3720,26 @@
 
     // --- Mouse Drag & Zoom ---
     let rotDrag = null;
-    canvas.addEventListener('mousedown', (e) => {
+    canvas.style.touchAction = 'none';
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch') return;                    // degetele sunt tratate mai jos (pan + pinch)
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
       if (e.shiftKey) {
         const r = canvas.getBoundingClientRect();
         rotDrag = { a0: Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)), r0: viewRot };
+        enterFreeCam();
         return;
       }
+      enterFreeCam();
       isDragging = true;
       dragStart.x = e.clientX - panX;
       dragStart.y = e.clientY - panY;
+      canvas.style.cursor = 'grabbing';
     });
 
-    window.addEventListener('mousemove', (e) => {
+    canvas.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'touch') return;
       if (rotDrag) {
         const r = canvas.getBoundingClientRect();
         const a = Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2));
@@ -3722,7 +3753,11 @@
       }
     });
 
-    window.addEventListener('mouseup', () => { isDragging = false; rotDrag = null; });
+    const endPointerDrag = () => { isDragging = false; rotDrag = null; canvas.style.cursor = ''; };
+    canvas.addEventListener('pointerup', endPointerDrag);
+    canvas.addEventListener('pointercancel', endPointerDrag);
+    canvas.addEventListener('lostpointercapture', endPointerDrag);
+    window.addEventListener('blur', endPointerDrag);
 
     // --- Mobile Touch Pan & Pinch-to-Zoom ---
     let touchStartDist = 0;
@@ -3733,6 +3768,7 @@
     let touchStartAngle = 0, touchStartRot = 0, touchStartWorld = { x: 0, y: 0 };
 
     canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length >= 1) enterFreeCam();
       if (e.touches.length === 1) {
         isTouching = true;
         dragStart.x = e.touches[0].clientX - panX;
@@ -3791,6 +3827,7 @@
 
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
+      enterFreeCam();
       const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
       const mouseX = e.clientX - canvas.getBoundingClientRect().left;
       const mouseY = e.clientY - canvas.getBoundingClientRect().top;
@@ -3812,7 +3849,7 @@
       if (camMode === 'macro') fitMacro();
       else if (camMode === 'close') fitCloseUp();
       else if (camMode === 'congestion') fitCongestion();
-      else fitFullRoom();
+      else if (camMode === 'full') fitFullRoom();
       redraw();
     });
 
@@ -3831,7 +3868,7 @@
       return {
         v: 1, roomW: ROOM_W, roomL: ROOM_L, partCount, assistCount, nLanes, corridorW, corridorWTurn, wallDistEnd, wallDistSide,
         backGap, backGapAuto, assistGap, starSec, distribMin, fastDur, assistBlue, sol: currentSolution800, stepIntervalSec, stepGlideSec,
-        viewRot, cam: camMode, tab: TAB_IDS[Math.max(0, activeTabIdx)], chk,
+        viewRot, cam: (camMode === 'free' ? lastCamMode : camMode), tab: TAB_IDS[Math.max(0, activeTabIdx)], chk,
         sidebarCollapsed: !!(sb && sb.classList.contains('collapsed')), hudMin: !!(hud && hud.classList.contains('hud-min'))
       };
     }
