@@ -930,7 +930,7 @@
             <span class="param-val" id="disp-fastdur">8 s</span>
           </div>
           <input type="range" class="param-slider" id="rng-fastdur" min="3" max="60" step="1" value="8" oninput="updateFastDur(this.value)">
-          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;">Rulează toți pașii într-un timp scurt; în pauzele dintre pași asistenții dau steluțe.</div>
+          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;">Rulează tot turul într-un timp scurt; steluțele se dau abia după ce tot grupul a terminat turul.</div>
         </div>
 
         <!-- Progress Box -->
@@ -1466,7 +1466,7 @@
       <div class="hud-row">
         <div class="hud-stat">
           <svg class="ic" style="width:16px;height:16px;color:#38bdf8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <span class="hud-label">Următorul pas în</span>
+          <span class="hud-label" id="hud-timer-label">Următorul pas în</span>
           <b id="overlay-timer" class="hud-val hud-green">10.0s</b>
         </div>
         <span class="hud-sep"></span>
@@ -1860,7 +1860,7 @@
         const cx = (bd.left + bd.right) / 2;
         for (let j = 0; j < cnt; j++) {
           const t = (j + 0.5) / cnt;
-          assistants.push({ x: cx, y: yTop + t * segLen, angle: 0, id: `A${id++}`, aisle: k });
+          assistants.push({ x: cx, y: yTop + t * segLen, y0: yTop + t * segLen, angle: 0, id: `A${id++}`, aisle: k });
         }
       }
     }
@@ -2035,40 +2035,91 @@
         for (const sgn of [1, -1]) {
           const d = ((i + 0.5) * step + sgn * shift + totalVirtualLength * 100) % totalVirtualLength;
           const pt = getPointAtV(d);
-          if (pt.type !== 'line') continue;
+          const hw = (pt.type === 'arc') ? (((pt.seg && pt.seg.wTurnLocal) || corridorWTurn || corridorW) / 2) : halfW;
           const ux = -Math.sin(pt.angle), uy = Math.cos(pt.angle);
-          out.push({ key: i + (sgn > 0 ? 'b' : 'p'), x: pt.x + sgn * ux * halfW, y: pt.y + sgn * uy * halfW });
+          out.push({ key: i + (sgn > 0 ? 'b' : 'p'), x: pt.x + sgn * ux * hw, y: pt.y + sgn * uy * hw, arcAisle: (pt.type === 'arc' && pt.seg) ? pt.seg.turnIdx : undefined });
         }
       }
       return out;
     }
 
-    function serveStars() {
-      if (!assistants.length) return;
-      const k = Math.max(1, Math.floor(stepIntervalSec / starSec));        // cate steluțe poate da un asistent intr-o pauza
-      const P = participantsAt(targetShift);
-      const now = performance.now();
-      for (const a of assistants) {
-        const bd = aisleBoundsK(a.aisle);
-        const cand = [];
-        for (const p of P) {
-          if (starred.has(p.key)) continue;
-          if (p.x < bd.left - 0.2 || p.x > bd.right + 0.2) continue;
-          const dy = Math.abs(p.y - a.y);
-          if (dy <= REACH_Y) cand.push({ p, dy });
+    // Steluțele se dau DUPA ce tot grupul a terminat turul prin sala (nu in timpul mișcării):
+    // participantii stau pe loc, iar asistentii merg pe alee si se opresc la fiecare.
+    let phase = 'running';        // 'running' (turul) -> 'distributing' (steluțe) -> 'done'
+    let distrib = null;
+    const ASSIST_WALK = 1.0;      // viteza de mers a asistentului (m/s)
+
+    function startDistribution(targetSec) {
+      if (phase === 'distributing' || !assistants.length) return;
+      const P = participantsAt(targetShift).filter(p => !starred.has(p.key));
+      const stations = assistants.map(a => ({ a, list: [], stops: [], i: 0, mode: 'walk', t: 0, k: 0 }));
+      for (const p of P) {
+        let best = null, bd = 1e9;
+        for (const st of stations) {
+          const b = aisleBoundsK(st.a.aisle);
+          if (p.arcAisle !== undefined) { if (st.a.aisle !== p.arcAisle) continue; }      // cine e in curba e servit din aleea curbei
+          else if (p.x < b.left - 0.2 || p.x > b.right + 0.2) continue;                  // doar din aleea din spatele lui
+          const d = Math.abs(p.y - st.a.y);
+          if (d < bd) { bd = d; best = st; }
         }
-        cand.sort((u, v) => u.dy - v.dy);
-        for (let j = 0; j < Math.min(k, cand.length); j++) {
-          const p = cand[j].p;
-          starred.add(p.key);
-          starEvents.push({ ax: a.x, ay: a.y, px: p.x, py: p.y, t: now });
+        if (best) best.list.push(p);
+      }
+      let maxWork = 0, reachable = 0;
+      for (const st of stations) {
+        st.list.sort((u, v) => u.y - v.y);
+        for (const p of st.list) {
+          const last = st.stops[st.stops.length - 1];
+          if (last && p.y - last.y < 0.35) last.targets.push(p); else st.stops.push({ y: p.y, targets: [p] });
+        }
+        let work = 0, y = st.a.y;
+        for (const sp of st.stops) { work += Math.abs(sp.y - y) / ASSIST_WALK + sp.targets.length * starSec; y = sp.y; reachable += sp.targets.length; }
+        maxWork = Math.max(maxWork, work);
+      }
+      const ts = targetSec ? Math.max(1, maxWork / targetSec) : 1;       // simularea rapida accelereaza distribuirea
+      distrib = { stations, ts, reachable, served: 0, maxWork, elapsed: 0 };
+      phase = 'distributing';
+    }
+
+    function updateDistribution(dt) {
+      const d = distrib; if (!d) { phase = 'done'; return; }
+      const step = dt * d.ts;
+      d.elapsed += step;
+      let active = false;
+      for (const st of d.stations) {
+        if (st.i >= st.stops.length) continue;
+        active = true;
+        const stop = st.stops[st.i];
+        if (st.mode === 'walk') {
+          const dy = stop.y - st.a.y, mv = ASSIST_WALK * step;
+          if (Math.abs(dy) <= mv) { st.a.y = stop.y; st.mode = 'dwell'; st.t = 0; st.k = 0; }
+          else st.a.y += Math.sign(dy) * mv;
+        } else {
+          st.t += step;
+          while (st.k < stop.targets.length && st.t >= starSec * (st.k + 1)) {
+            const p = stop.targets[st.k];
+            starred.add(p.key);
+            starEvents.push({ ax: st.a.x, ay: st.a.y, px: p.x, py: p.y, t: performance.now() });
+            st.k++; d.served++;
+          }
+          if (st.k >= stop.targets.length) { st.i++; st.mode = 'walk'; }
         }
       }
       updateStarHUD();
+      if (!active) { phase = 'done'; showStarSummary(); }
     }
+
+    function showStarSummary() {
+      if (fastSim.active) return;
+      const out = document.getElementById('fastsim-out');
+      if (!out) return;
+      out.innerHTML = `Turul s-a terminat, iar asistenții au dat steluțele: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
+    }
+
     function resetStars() {
       starred = new Set(); starEvents = [];
-      serveStars();
+      phase = 'running'; distrib = null;
+      for (const a of assistants) if (a.y0 !== undefined) a.y = a.y0;
+      updateStarHUD();
     }
     function updateStarHUD() {
       const el = document.getElementById('hud-stars');
@@ -2137,7 +2188,7 @@
       currentStepNumber++;
 
       updateStepProgressUI();
-      serveStars();
+      if (phase !== 'running') { phase = 'running'; distrib = null; }     // un pas manual dupa terminare reia turul
     }
 
     function triggerContrasensStepBack() {
@@ -2541,23 +2592,31 @@
       lastTime = currentTime;
 
       if (dt > 0 && dt < 0.1) {
+        if (phase === 'distributing') updateDistribution(dt);
         if (fastSim.active) {
-          // simulare rapida: tot turul in fastSim.dur secunde, fara pauze
+          // simulare rapida: tot turul (60% din timp), apoi distribuirea steluțelor (restul)
           const pairs = Math.round(partCount / 2);
+          const stepsDur = fastSim.dur * 0.6;
           const elapsed = (currentTime - fastSim.t0) / 1000;
-          const want = Math.min(pairs - 1, Math.floor(elapsed / fastSim.dur * (pairs - 1)));
-          while (fastSim.done < want) { triggerContrasensStep(); fastSim.done++; }
-          animShift = targetShift;
-          if (elapsed >= fastSim.dur) endFastSim(false);
+          if (phase === 'running') {
+            const want = Math.min(pairs - 1, Math.floor(elapsed / stepsDur * (pairs - 1)));
+            while (fastSim.done < want) { triggerContrasensStep(); fastSim.done++; }
+            animShift = targetShift;
+            if (fastSim.done >= pairs - 1 && elapsed >= stepsDur) startDistribution(fastSim.dur * 0.4);
+          } else if (phase === 'done') {
+            endFastSim(false);
+          }
         } else {
           // Smoothly glide to the target shift
           animShift += (targetShift - animShift) * (1 - Math.exp(-dt * 3 / stepGlideSec));   // pasul se termină în ~stepGlideSec secunde
 
-          if (isFlowPlaying) {
+          if (isFlowPlaying && phase === 'running') {
             stepTimer += dt;
             if (stepTimer >= stepIntervalSec) {
               stepTimer = 0;
-              triggerContrasensStep();
+              const pairsN = Math.round(partCount / 2);
+              if (currentStepNumber >= pairsN) startDistribution();      // tot grupul a terminat turul: urmeaza steluțele
+              else triggerContrasensStep();
             }
           }
         }
@@ -2574,6 +2633,14 @@
         if (elCdBar) elCdBar.style.width = `${countdownPct}%`;
         const elOvlTimer = document.getElementById('overlay-timer');
         if (elOvlTimer) elOvlTimer.innerText = `${remainingSec.toFixed(1)}s`;
+        const lblT = document.getElementById('hud-timer-label');
+        if (phase !== 'running') {
+          const pctD = distrib ? Math.min(100, Math.round(100 * distrib.served / Math.max(1, distrib.reachable))) : 100;
+          const txt = (phase === 'distributing') ? `${pctD}%` : 'gata';
+          if (lblT) lblT.innerText = (phase === 'distributing') ? 'Distribuire steluțe' : 'Turul s-a terminat';
+          if (elOvlTimer) elOvlTimer.innerText = txt;
+          const hc = document.getElementById('hdr-countdown'); if (hc) hc.innerText = txt;
+        } else if (lblT) lblT.innerText = 'Următorul pas în';
 
         // Camera follow
         if (camMode === 'follow') {
