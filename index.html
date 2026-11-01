@@ -913,7 +913,7 @@
     .hud-toggle { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.06); color: #cbd5e1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
     .hud-toggle:hover { background: rgba(255,255,255,0.14); color: #fff; }
     .hud-toggle .ic { width: 14px; height: 14px; transition: transform .2s ease; }
-    .canvas-overlay-info.hud-min .hud-seg, .canvas-overlay-info.hud-min .hud-status { display: none; }
+    .canvas-overlay-info.hud-min .hud-seg, .canvas-overlay-info.hud-min .hud-status, .canvas-overlay-info.hud-min #hud-step-progress-wrap { display: none; }
     .canvas-overlay-info.hud-min .hud-toggle .ic { transform: rotate(180deg); }
     @media (max-width: 900px) { .tool-zoom, .tool-sidebar { display: none; } }
 
@@ -973,7 +973,7 @@
     .stage > .canvas-overlay-info .hud-row { flex-wrap: nowrap; }
     .stage > .canvas-overlay-info .hud-seg { max-width: 100%; }
     .stage > .canvas-overlay-info .hud-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); margin: 0; }
-    .stage > .canvas-overlay-info.hud-min .hud-seg, .stage > .canvas-overlay-info.hud-min .hud-status { display: none; }
+    .stage > .canvas-overlay-info.hud-min .hud-seg, .stage > .canvas-overlay-info.hud-min .hud-status, .stage > .canvas-overlay-info.hud-min #hud-step-progress-wrap { display: none; }
 
     /* buton unic pentru meniul lateral */
     .sb-toggle { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: #1e293b; color: #e2e8f0; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
@@ -2342,6 +2342,11 @@
           <b id="hud-stars" class="hud-val">0 / 800</b>
         </div>
         <button class="hud-toggle" title="Micșorează / extinde panoul" onclick="toggleHud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+      </div>
+
+      <!-- Linia animată de progres pas în HUD (Screen 2) -->
+      <div id="hud-step-progress-wrap" style="width:100%; height:5px; background:rgba(30,41,59,0.85); border-radius:999px; overflow:hidden; margin:4px 0 6px 0; border:1px solid rgba(255,255,255,0.12);">
+        <div id="countdown-bar-fill-hud" style="height:100%; width:100%; background:linear-gradient(90deg, #38bdf8, #22c55e); border-radius:999px; transition:width 0.08s linear; box-shadow:0 0 8px rgba(56,189,248,0.5);"></div>
       </div>
 
       <div class="hud-seg" role="group" aria-label="Soluții 800 persoane">
@@ -4816,6 +4821,8 @@
         if (elDispCd) elDispCd.innerText = `${remainingSec.toFixed(1)}s`;
         const elCdBar = document.getElementById('countdown-bar-fill');
         if (elCdBar) elCdBar.style.width = `${countdownPct}%`;
+        const elCdBarHud = document.getElementById('countdown-bar-fill-hud');
+        if (elCdBarHud) elCdBarHud.style.width = `${countdownPct}%`;
         const elOvlTimer = document.getElementById('overlay-timer');
         if (elOvlTimer) elOvlTimer.innerText = `${remainingSec.toFixed(1)}s`;
         const lblT = document.getElementById('hud-timer-label');
