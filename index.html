@@ -1801,13 +1801,13 @@
           <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
             <span class="param-name" data-i18n="lbl_total_part">👥 Total Participanți în sală:</span>
             <div style="display:flex; align-items:center; gap:6px;">
-              <input type="number" id="inp-part-num" min="0" max="1500" step="2" value="800" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPartNumInput(this.value)">
+              <input type="number" id="inp-part-num" min="2" max="1500" step="2" value="800" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(56,189,248,0.4); background:#0f172a; color:#fff;" oninput="onPartNumInput(this.value)" onchange="onPartNumChange(this.value)">
               <span class="param-val" id="disp-part" style="min-width:54px; text-align:right;">800 pers</span>
             </div>
           </div>
-          <input type="range" class="param-slider" id="rng-part" min="0" max="1200" step="2" value="800" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-part" min="2" max="1200" step="2" value="800" oninput="onParamChange()">
           <div class="param-sub">
-            <span>0 pers</span>
+            <span>2 pers</span>
             <span id="disp-part-split" style="color:var(--accent-blue); font-weight:700;">400 Stg vs 400 Dr (Față în Față)</span>
             <span>1200 pers</span>
           </div>
@@ -1851,17 +1851,20 @@
           </div>
         </div>
 
-        <!-- Slider Asistenți -->
-        <div class="param-box">
-          <div class="param-header">
+        <!-- Slider & Input Asistenți -->
+        <div class="param-box" style="border-left:3px solid #fb923c;">
+          <div class="param-header" style="display:flex; justify-content:space-between; align-items:center;">
             <span class="param-name"><span class="dot dot-orange"></span><span data-i18n="lbl_assist_lanes">Asistenți pe Culoare (Buline):</span></span>
-            <span class="param-val" id="disp-assist">40 asistenți</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="number" id="inp-assist-num" min="0" max="300" step="1" value="40" class="num-in" style="width:74px; height:32px; padding:0 6px; font-size:14px; text-align:center; border-radius:8px; border:1px solid rgba(251,146,60,0.4); background:#0f172a; color:#fff;" oninput="onAssistNumInput(this.value)" onchange="onAssistNumInput(this.value)">
+              <span class="param-val" id="disp-assist" style="min-width:65px; text-align:right;">40 asistenți</span>
+            </div>
           </div>
-          <input type="range" class="param-slider" id="rng-assist" min="0" max="80" step="2" value="40" oninput="onParamChange()">
+          <input type="range" class="param-slider" id="rng-assist" min="0" max="150" step="1" value="40" oninput="onAssistRngInput(this.value)">
           <div class="param-sub">
             <span>0</span>
             <span id="disp-assist-dist" style="color:var(--accent-orange); font-weight:700;">A1 - A40 (conform slide)</span>
-            <span>80</span>
+            <span id="disp-max-assist">150</span>
           </div>
         </div>
 
@@ -3617,13 +3620,27 @@
       document.getElementById('disp-part').innerText = `${partCount} ${en ? 'people' : 'pers'}`;
       const numIn = document.getElementById('inp-part-num');
       if (numIn && document.activeElement !== numIn) numIn.value = partCount;
+      const rngPart = document.getElementById('rng-part');
+      if (rngPart && document.activeElement !== rngPart) {
+        if (partCount > parseInt(rngPart.max, 10)) rngPart.max = Math.max(1200, partCount + 100);
+        rngPart.value = partCount;
+      }
       document.getElementById('disp-part-split').innerText = en 
         ? `${Math.round(partCount/2)} Left vs ${Math.round(partCount/2)} Right (Face to Face)` 
         : `${Math.round(partCount/2)} Stg vs ${Math.round(partCount/2)} Dr (Față în Față)`;
       document.getElementById('disp-assist').innerText = `${assistCount} ${en ? 'assistants' : 'asistenți'}`;
+      const numAssist = document.getElementById('inp-assist-num');
+      if (numAssist && document.activeElement !== numAssist) numAssist.value = assistCount;
+      const rngAssist = document.getElementById('rng-assist');
+      if (rngAssist && document.activeElement !== rngAssist) {
+        if (assistCount > parseInt(rngAssist.max, 10)) rngAssist.max = Math.max(150, assistCount + 20);
+        rngAssist.value = assistCount;
+      }
       document.getElementById('disp-assist-dist').innerText = (assistCount === 40 && nLanes === 9) 
         ? (en ? 'A1 - A40 (per slide)' : 'A1 - A40 (conform slide)') 
-        : (assistCount > 0 ? (en ? `Every ${(totalPathLength/assistCount).toFixed(1)} m` : `La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`) : (en ? 'No assistants' : 'Fără asistenți'));
+        : (assistCount > 0 ? (en ? `A1 - A${assistCount} · Every ${(totalPathLength/assistCount).toFixed(1)} m` : `A1 - A${assistCount} · La fiecare ${(totalPathLength/assistCount).toFixed(1)} m`) : (en ? 'No assistants' : 'Fără asistenți'));
+      const elMaxAssist = document.getElementById('disp-max-assist');
+      if (elMaxAssist && rngAssist) elMaxAssist.innerText = rngAssist.max;
       const elVisAssist = document.getElementById('vis-assist-label');
       if (elVisAssist) {
         elVisAssist.innerHTML = `<span class="dot dot-orange"></span><span>${assistCount} ${en ? 'Assistants on Dots' : 'Asistenți pe Buline'} (A1-A${assistCount})</span>`;
@@ -3657,9 +3674,16 @@
       }
       const dispRowSub = document.getElementById('disp-part-per-row-sub');
       if (dispRowSub) {
-        dispRowSub.innerHTML = en
-          ? `<b>${nLanes} lanes (${nRows} lines) &times; ${perRow} pers/line = ${perRow * nRows} pers</b> (Max: ${maxPerRow})`
-          : `<b>${nLanes} culoare (${nRows} rânduri) &times; ${perRow} pers/șir = ${perRow * nRows} pers</b> (Max: ${maxPerRow})`;
+        if (nRows > 0 && partCount % nRows === 0) {
+          dispRowSub.innerHTML = en
+            ? `<b>${nLanes} lanes (${nRows} lines) &times; ${perRow} pers/line = ${partCount} people</b> (Max: ${maxPerRow})`
+            : `<b>${nLanes} culoare (${nRows} rânduri) &times; ${perRow} pers/șir = ${partCount} pers total</b> (Max: ${maxPerRow})`;
+        } else if (nRows > 0) {
+          const avg = (partCount / nRows).toFixed(1);
+          dispRowSub.innerHTML = en
+            ? `<b>${nLanes} lanes (${nRows} lines) &times; ~${avg} pers/line = ${partCount} people</b> (Max: ${maxPerRow})`
+            : `<b>${nLanes} culoare (${nRows} rânduri) &times; ~${avg} pers/șir = ${partCount} pers total</b> (Max: ${maxPerRow})`;
+        }
       }
       const dispMaxRow = document.getElementById('disp-max-per-row');
       if (dispMaxRow) {
@@ -3672,9 +3696,17 @@
         ? `${nLanes} lanes = ${nRows} lines (${Math.max(0, nLanes - 1)} U-loops)`
         : `${nLanes} culoare = ${nRows} rânduri (${Math.max(0, nLanes - 1)} bucle U)`;
       const elCalcPerRow = document.getElementById('calc-per-row');
-      if (elCalcPerRow) elCalcPerRow.innerText = en
-        ? `${perRow} pers/line \u00D7 ${nRows} lines = ${partCount} total`
-        : `${perRow} pers/șir \u00D7 ${nRows} rânduri = ${partCount} pers total`;
+      if (elCalcPerRow) {
+        if (nRows > 0 && partCount % nRows === 0) {
+          elCalcPerRow.innerText = en
+            ? `${perRow} pers/line \u00D7 ${nRows} lines = ${partCount} total`
+            : `${perRow} pers/șir \u00D7 ${nRows} rânduri = ${partCount} pers total`;
+        } else if (nRows > 0) {
+          elCalcPerRow.innerText = en
+            ? `~${(partCount / nRows).toFixed(1)} pers/line \u00D7 ${nRows} lines = ${partCount} total`
+            : `~${(partCount / nRows).toFixed(1)} pers/șir \u00D7 ${nRows} rânduri = ${partCount} pers total`;
+        }
+      }
       const pairs = Math.round(partCount / 2);
       document.getElementById('calc-pairs').innerText = `${pairs} ${en ? 'pairs' : 'perechi'}`;
       const stepSize = pairs > 0 ? ((totalVirtualLength / pairs) * 100).toFixed(1) : '0';
@@ -4236,12 +4268,22 @@
     }
 
     function onParamChange() {
-      partCount = parseInt(document.getElementById('rng-part').value);
-      const numIn = document.getElementById('inp-part-num');
-      if (numIn) numIn.value = partCount;
-      assistCount = parseInt(document.getElementById('rng-assist').value);
-      nLanes = parseInt(document.getElementById('rng-lanes').value);
-      corridorW = parseFloat(document.getElementById('rng-corridor-w').value);
+      const elPart = document.getElementById('rng-part');
+      if (elPart) {
+        partCount = parseInt(elPart.value, 10);
+        const numIn = document.getElementById('inp-part-num');
+        if (numIn && document.activeElement !== numIn) numIn.value = partCount;
+      }
+      const elAssist = document.getElementById('rng-assist');
+      if (elAssist) {
+        assistCount = parseInt(elAssist.value, 10);
+        const numAssist = document.getElementById('inp-assist-num');
+        if (numAssist && document.activeElement !== numAssist) numAssist.value = assistCount;
+      }
+      const elLanes = document.getElementById('rng-lanes');
+      if (elLanes) nLanes = parseInt(elLanes.value, 10);
+      const elCorrW = document.getElementById('rng-corridor-w');
+      if (elCorrW) corridorW = parseFloat(elCorrW.value);
 
       const elEnd = document.getElementById('rng-wall-end');
       if (elEnd) wallDistEnd = parseFloat(elEnd.value);
@@ -4255,10 +4297,54 @@
     function onPartNumInput(val) {
       let n = parseInt(val, 10);
       if (isNaN(n) || n < 0) return;
+      partCount = Math.max(2, n);
+      const rng = document.getElementById('rng-part');
+      if (rng) {
+        if (partCount > parseInt(rng.max, 10)) rng.max = Math.max(1200, partCount + 100);
+        rng.value = partCount;
+      }
+      recalculateAll();
+      redraw();
+      saveState();
+    }
+
+    function onPartNumChange(val) {
+      let n = parseInt(val, 10);
+      if (isNaN(n) || n < 2) n = 2;
       if (n % 2 !== 0) n += 1;
       partCount = n;
+      const numIn = document.getElementById('inp-part-num');
+      if (numIn) numIn.value = n;
       const rng = document.getElementById('rng-part');
-      if (rng) rng.value = Math.min(1200, Math.max(0, n));
+      if (rng) {
+        if (n > parseInt(rng.max, 10)) rng.max = Math.max(1200, n + 100);
+        rng.value = n;
+      }
+      recalculateAll();
+      redraw();
+      saveState();
+    }
+
+    function onAssistNumInput(val) {
+      let n = parseInt(val, 10);
+      if (isNaN(n) || n < 0) return;
+      assistCount = n;
+      const rng = document.getElementById('rng-assist');
+      if (rng) {
+        if (n > parseInt(rng.max, 10)) rng.max = Math.max(150, n + 20);
+        rng.value = n;
+      }
+      recalculateAll();
+      redraw();
+      saveState();
+    }
+
+    function onAssistRngInput(val) {
+      let n = parseInt(val, 10);
+      if (isNaN(n) || n < 0) return;
+      assistCount = n;
+      const numIn = document.getElementById('inp-assist-num');
+      if (numIn) numIn.value = n;
       recalculateAll();
       redraw();
       saveState();
@@ -4267,7 +4353,10 @@
     function setExactParticipants(n) {
       partCount = n;
       const rng = document.getElementById('rng-part');
-      if (rng) rng.value = n;
+      if (rng) {
+        if (n > parseInt(rng.max, 10)) rng.max = Math.max(1200, n + 100);
+        rng.value = n;
+      }
       const numIn = document.getElementById('inp-part-num');
       if (numIn) numIn.value = n;
       recalculateAll();
@@ -4284,7 +4373,10 @@
       partCount = perRow * nRows;
 
       const rngPart = document.getElementById('rng-part');
-      if (rngPart) rngPart.value = Math.min(1200, partCount);
+      if (rngPart) {
+        if (partCount > parseInt(rngPart.max, 10)) rngPart.max = Math.max(1200, partCount + 100);
+        rngPart.value = partCount;
+      }
       const numPart = document.getElementById('inp-part-num');
       if (numPart) numPart.value = partCount;
 
@@ -4396,6 +4488,8 @@
       if (inpLanes) inpLanes.value = nLanes;
       const inpAssist = document.getElementById('rng-assist');
       if (inpAssist) inpAssist.value = assistCount;
+      const numAssist = document.getElementById('inp-assist-num');
+      if (numAssist) numAssist.value = assistCount;
 
       if (mode === 'tapered') {
         corridorW = 1.20;
@@ -6390,7 +6484,7 @@
       if (['none', 'tapered', 'transit', 'staggered', 'max_path', 'turners', 'recommended'].includes(st.sol)) currentSolution800 = st.sol;
       viewRot = num(st.viewRot, 0);
       const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-      setVal('rng-part', partCount); setVal('inp-part-num', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
+      setVal('rng-part', partCount); setVal('inp-part-num', partCount); setVal('rng-assist', assistCount); setVal('inp-assist-num', assistCount); setVal('rng-lanes', nLanes);
       setVal('rng-corridor-w', corridorW); setVal('rng-wall-end', wallDistEnd); setVal('rng-wall-side', wallDistSide);
       setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
       setVal('rng-interval', num(st.stepIntervalSec, stepIntervalSec)); updateInterval(num(st.stepIntervalSec, stepIntervalSec));
@@ -6801,7 +6895,7 @@
     function syncAllInputs() {
       const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
       setVal('inp-room-w', ROOM_W); setVal('inp-room-l', ROOM_L);
-      setVal('rng-part', partCount); setVal('inp-part-num', partCount); setVal('rng-assist', assistCount); setVal('rng-lanes', nLanes);
+      setVal('rng-part', partCount); setVal('inp-part-num', partCount); setVal('rng-assist', assistCount); setVal('inp-assist-num', assistCount); setVal('rng-lanes', nLanes);
       setVal('rng-corridor-w', corridorW); setVal('rng-wall-end', wallDistEnd); setVal('rng-wall-side', wallDistSide);
       setVal('rng-backgap', backGap); setVal('rng-assistgap', assistGap);
       setVal('rng-interval', stepIntervalSec); updateInterval(stepIntervalSec);
