@@ -1274,50 +1274,74 @@
       outline-offset: 2px;
     }
 
-    /* Comutator limbă modern rotunjit (RO / EN toggle) */
+    /* Comutator limbă modern rotunjit în Header (RO / EN toggle) */
     .lang-switch-box {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 8px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 9999px;
+      height: 38px !important;
+      box-sizing: border-box !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      padding: 0 12px !important;
+      background: #1e293b !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 999px !important;
       user-select: none;
       -webkit-user-select: none;
-      flex-shrink: 0;
+      flex-shrink: 0 !important;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .lang-switch-box:hover {
+      border-color: rgba(56, 189, 248, 0.5) !important;
+      background: #24344d !important;
     }
     .lang-code {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #64748b;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      font-size: 12.5px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.3px;
+      color: #94a3b8;
       transition: color 0.2s ease, text-shadow 0.2s ease;
       cursor: pointer;
     }
+    .lang-code .flag-icon {
+      font-size: 15px;
+      line-height: 1;
+      display: inline-block;
+    }
     .lang-code.active {
-      color: #38bdf8;
-      font-weight: 800;
-      text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+      color: #38bdf8 !important;
+      font-weight: 800 !important;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
     .ui-switch-lang {
       padding: 0 !important;
       margin: 0 !important;
+      width: 36px !important;
+      height: 20px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      cursor: pointer;
     }
     .ui-switch-lang .ui-switch-slider {
-      width: 34px !important;
-      height: 19px !important;
-      background: #1e293b !important;
-      border: 1px solid rgba(255, 255, 255, 0.22) !important;
+      width: 36px !important;
+      height: 20px !important;
+      border-radius: 999px !important;
+      background: #0f172a !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      transition: all 0.22s ease !important;
     }
     .ui-switch-lang .ui-switch-slider::before {
-      height: 13px !important;
-      width: 13px !important;
+      height: 14px !important;
+      width: 14px !important;
       left: 2px !important;
       top: 2px !important;
+      border-radius: 50% !important;
       background: #38bdf8 !important;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     .ui-switch-lang input:checked + .ui-switch-slider {
       background: #0369a1 !important;
@@ -1325,7 +1349,7 @@
       box-shadow: 0 0 8px rgba(56, 189, 248, 0.35) !important;
     }
     .ui-switch-lang input:checked + .ui-switch-slider::before {
-      transform: translateX(15px) !important;
+      transform: translateX(16px) !important;
       background: #ffffff !important;
     }
     .hud-lang-switch {
@@ -1516,14 +1540,14 @@
       <button class="hdr-sim" style="border-color:#38bdf8; background:rgba(2,132,199,0.3); color:#fff;" onclick="openConfigModal()" title="Salvare & Încărcare configurații sală" data-i18n-title="hdr_configs_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span class="lbl" data-i18n="hdr_configs">Configurații</span></button>
       <button class="hdr-pdf" onclick="exportPlanPDF()" title="Exportă planul în PDF" data-i18n-title="hdr_pdf_title"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> <span data-i18n="hdr_pdf">Export PDF</span></button>
 
-      <!-- Comutator rotunjit Limbă (RO / EN) în header -->
+      <!-- Comutator rotunjit Limbă (RO / EN) în header cu steaguri -->
       <div class="lang-switch-box" id="hdr-lang-box" title="Schimbă limba / Switch language (RO / EN)">
-        <span class="lang-code active" id="lbl-lang-ro" onclick="setLanguage('ro')">RO</span>
+        <span class="lang-code active" id="lbl-lang-ro" onclick="setLanguage('ro')"><span class="flag-icon">🇷🇴</span><span>RO</span></span>
         <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
           <input type="checkbox" id="chk-lang" onchange="toggleLanguage(this.checked)">
           <span class="ui-switch-slider"></span>
         </label>
-        <span class="lang-code" id="lbl-lang-en" onclick="setLanguage('en')">EN</span>
+        <span class="lang-code" id="lbl-lang-en" onclick="setLanguage('en')"><span class="flag-icon">🇬🇧</span><span>EN</span></span>
       </div>
     </div>
   </header>
@@ -1540,19 +1564,6 @@
     
     <!-- Sidebar -->
     <div class="sidebar">
-
-      <!-- Mobile Language Bar in Sidebar -->
-      <div class="sidebar-mob-lang-bar">
-        <span style="font-size:12px; font-weight:700; color:#cbd5e1;">Limba / Language:</span>
-        <div class="lang-switch-box" title="Schimbă limba / Switch language (RO / EN)">
-          <span class="lang-code active" id="lbl-lang-ro-mob" onclick="setLanguage('ro')">RO</span>
-          <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
-            <input type="checkbox" id="chk-lang-mob" onchange="toggleLanguage(this.checked)">
-            <span class="ui-switch-slider"></span>
-          </label>
-          <span class="lang-code" id="lbl-lang-en-mob" onclick="setLanguage('en')">EN</span>
-        </div>
-      </div>
       
       <!-- Tab Navigation -->
       <div class="tab-nav">
@@ -2330,15 +2341,6 @@
           <span class="hud-label" id="hud-stars-label" data-i18n="hud_stars">Steluțe</span>
           <b id="hud-stars" class="hud-val">0 / 800</b>
         </div>
-        <!-- Comutator rotunjit Limbă în HUD (pentru ecran mic / mobil) -->
-        <div class="lang-switch-box hud-lang-switch" title="Schimbă limba / Switch language (RO / EN)">
-          <span class="lang-code active" id="lbl-lang-ro-hud" onclick="setLanguage('ro')">RO</span>
-          <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
-            <input type="checkbox" id="chk-lang-hud" onchange="toggleLanguage(this.checked)">
-            <span class="ui-switch-slider"></span>
-          </label>
-          <span class="lang-code" id="lbl-lang-en-hud" onclick="setLanguage('en')">EN</span>
-        </div>
         <button class="hud-toggle" title="Micșorează / extinde panoul" onclick="toggleHud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
       </div>
 
@@ -2381,15 +2383,6 @@
         <button class="tool-btn tool-ctl" id="tool-video" title="Simulare + video (.webm)" onclick="toggleFastSimVideo()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></button>
         <button class="tool-btn tool-ctl" id="tool-fast" title="Simulare rapidă (tot turul în câteva secunde)" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg></button>
         <button class="tool-btn tool-ctl" title="Pas la dreapta" onclick="triggerContrasensStep()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-        <span class="tool-sep"></span>
-        <div class="lang-switch-box" style="margin: 0 2px;" title="Schimbă limba / Switch language (RO / EN)">
-          <span class="lang-code active" id="lbl-lang-ro-tool" onclick="setLanguage('ro')">RO</span>
-          <label class="ui-switch ui-switch-lang" aria-label="Schimbă limba / Switch language (RO / EN)">
-            <input type="checkbox" id="chk-lang-tool" onchange="toggleLanguage(this.checked)">
-            <span class="ui-switch-slider"></span>
-          </label>
-          <span class="lang-code" id="lbl-lang-en-tool" onclick="setLanguage('en')">EN</span>
-        </div>
         <button class="tool-btn" id="tool-fs" title="Ecran complet (fără meniu lateral)" onclick="toggleFullscreen()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div>
     </div>
@@ -3050,15 +3043,15 @@
       currentLang = (lang === 'en' ? 'en' : 'ro');
       const isEn = (currentLang === 'en');
 
-      // Sincronizare toate comutatoarele rotunjite de limbă
-      ['chk-lang', 'chk-lang-hud', 'chk-lang-mob', 'chk-lang-tool'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.checked = isEn;
-      });
+      // Sincronizare comutator rotunjit de limbă în antet
+      const elChk = document.getElementById('chk-lang');
+      if (elChk) elChk.checked = isEn;
 
       // Actualizare clase active pe etichetele RO / EN
-      document.querySelectorAll('[id^="lbl-lang-ro"]').forEach(el => el.classList.toggle('active', !isEn));
-      document.querySelectorAll('[id^="lbl-lang-en"]').forEach(el => el.classList.toggle('active', isEn));
+      const elRo = document.getElementById('lbl-lang-ro');
+      if (elRo) elRo.classList.toggle('active', !isEn);
+      const elEn = document.getElementById('lbl-lang-en');
+      if (elEn) elEn.classList.toggle('active', isEn);
 
       document.documentElement.lang = currentLang;
       applyTranslations();
