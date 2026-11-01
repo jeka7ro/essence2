@@ -440,11 +440,41 @@
       color: #fff;
       font-weight: 700;
     }
-    #sol-btn-tapered.active, #card-sol-btn-tapered.active { background: #059669; border-color: #34d399; box-shadow: 0 0 10px rgba(52, 211, 153, 0.4); color: #fff; }
-    #sol-btn-transit.active, #card-sol-btn-transit.active { background: #0284c7; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); color: #fff; }
-    #sol-btn-staggered.active, #card-sol-btn-staggered.active { background: #d97706; border-color: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); color: #fff; }
-    #sol-btn-max.active, #card-sol-btn-max.active { background: #7c3aed; border-color: #a78bfa; box-shadow: 0 0 10px rgba(167, 139, 250, 0.4); color: #fff; }
-    #sol-btn-none.active, #card-sol-btn-none.active { background: #dc2626; border-color: #f87171; box-shadow: 0 0 10px rgba(248, 113, 113, 0.4); color: #fff; }
+    /* Soluții colorate binar: VERDE dacă este REAL / REALIZABIL, ROȘU dacă NU este real (Problemă) */
+    .sol-pill.is-real {
+      background: rgba(6, 78, 59, 0.45);
+      border-color: rgba(52, 211, 153, 0.45);
+      color: #ecfdf5;
+    }
+    .sol-pill.is-real:hover {
+      background: rgba(5, 150, 105, 0.6);
+      border-color: #34d399;
+      color: #fff;
+    }
+    .sol-pill.is-real.active, #sol-btn-tapered.active, #sol-btn-transit.active, #sol-btn-staggered.active, #sol-btn-max.active, #sol-btn-turners.active, #sol-btn-recommended.active {
+      background: #059669 !important;
+      border-color: #34d399 !important;
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.5) !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+    }
+    .sol-pill.is-not-real {
+      background: rgba(127, 29, 29, 0.45);
+      border-color: rgba(248, 113, 113, 0.45);
+      color: #fef2f2;
+    }
+    .sol-pill.is-not-real:hover {
+      background: rgba(220, 38, 38, 0.6);
+      border-color: #f87171;
+      color: #fff;
+    }
+    .sol-pill.is-not-real.active, #sol-btn-none.active {
+      background: #dc2626 !important;
+      border-color: #f87171 !important;
+      box-shadow: 0 0 12px rgba(248, 113, 113, 0.5) !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+    }
 
     /* Total Time Summary Card */
     .time-summary-card {
@@ -761,7 +791,6 @@
     @media (max-width: 900px) { .tool-zoom, .tool-sidebar { display: none; } }
 
     .dot-teal { background: #2dd4bf; box-shadow: 0 0 6px rgba(45,212,191,.7); }
-    #sol-btn-turners.active, #card-sol-btn-turners.active { background: #0d9488; border-color: #5eead4; box-shadow: 0 0 10px rgba(94, 234, 212, 0.4); color: #fff; }
 
     /* ===== buton Export PDF vizibil in antet ===== */
     .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
@@ -793,7 +822,6 @@
     .rep-list li { margin-bottom: 4px; }
 
     .dot-lime { background: #a3e635; box-shadow: 0 0 6px rgba(163,230,53,.7); }
-    #sol-btn-recommended.active, #card-sol-btn-recommended.active { background: #65a30d; border-color: #bef264; box-shadow: 0 0 10px rgba(190, 242, 100, 0.4); color: #fff; }
 
     /* ===== dimensiuni sala editabile ===== */
     .room-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -1705,7 +1733,7 @@
         <!-- Soluția 1 -->
         <div class="param-box" style="border-left:3px solid #22c55e;">
           <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
-            PROPUNEREA 1 (RECOMANDATĂ): Culoar Conic / 0.70m pe Viraj
+            PROPUNEREA 1 [REAL]: Culoar Conic / 0.70m pe Viraj
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • Pe liniile drepte păstrezi <b>1.20 m</b> lățime pentru contactul vizual față în față.<br>
@@ -1718,80 +1746,80 @@
             &nbsp;&nbsp;→ La <b>3 secunde/pas</b>: exact <b style="color:#4ade80;">20 minute</b>.<br>
             <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni încap perfect și parcurg tot turul fără nicio secundă pierdută din cauza blocajelor.</b>
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-tapered" style="background:#059669; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('tapered')">
-            <span class="dot dot-green"></span>Afișează Soluția 1 pe Plan (Culoar 0.70m Viraj)
+          <button class="ctrl-btn" id="card-sol-btn-tapered" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('tapered')">
+            <span class="dot dot-green"></span>Afișează Soluția 1 pe Plan (REAL: Culoar 0.70m Viraj)
           </button>
         </div>
 
         <!-- Soluția 2 -->
-        <div class="param-box" style="border-left:3px solid #38bdf8;">
-          <div style="font-weight:700; color:#38bdf8; font-size:12.5px; margin-bottom:4px;">
-            PROPUNEREA 2: Viraje de Tranzit Fluid (Staționare doar pe Drept)
+        <div class="param-box" style="border-left:3px solid #22c55e;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 2 [REAL]: Viraje de Tranzit Fluid (Staționare doar pe Drept)
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • În exercițiul de 10s privire față în față, oamenii nu se opresc pe o curbă la 180°.<br>
-            • Toate cele <b>400 de perechi (800 oameni)</b> stau față în față <b>exclusiv pe cele 9 culoare drepte</b>, unde au <b style="color:#38bdf8; font-weight: 700;">66.1 cm</b> per om (+20 cm liber între umeri).<br>
+            • Toate cele <b>400 de perechi (800 oameni)</b> stau față în față <b>exclusiv pe cele 9 culoare drepte</b>, unde au <b style="color:#22c55e; font-weight: 700;">66.1 cm</b> per om (+20 cm liber între umeri).<br>
             • Virajele U sunt <b>Zone de Rotație Continuă</b> (tranzit fluid fără oprire umăr la umăr).<br>
-            <b style="color:#38bdf8;">Rezultat: Nimeni nu stă blocat pe viraj; totul decurge natural și fluid.</b>
+            <b style="color:#22c55e;">Rezultat: ZERO zone roșii! Nimeni nu stă blocat pe viraj; totul decurge natural și fluid.</b>
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-transit" style="background:#0284c7; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('transit')">
-            <span class="dot dot-blue"></span>Afișează Soluția 2 pe Plan (Viraje Tranzit Fluid)
+          <button class="ctrl-btn" id="card-sol-btn-transit" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('transit')">
+            <span class="dot dot-green"></span>Afișează Soluția 2 pe Plan (REAL: Viraje Tranzit Fluid)
           </button>
         </div>
 
         <!-- Soluția 3 -->
-        <div class="param-box" style="border-left:3px solid #f59e0b;">
-          <div style="font-weight:700; color:#f59e0b; font-size:12.5px; margin-bottom:4px;">
-            PROPUNEREA 3: Dispunere în Șah (Decalaj 20 cm pe Viraj)
+        <div class="param-box" style="border-left:3px solid #22c55e;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 3 [REAL]: Dispunere în Șah (Decalaj 20 cm pe Viraj)
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • Participanții de pe rândul interior sunt decalați cu o jumătate de pas (20 cm).<br>
             • Grosimea corpului din profil este de doar <b>24 cm</b> (față de 46 cm lățimea umerilor).<br>
             • Umerii nu se mai ciocnesc lateral, ci se suprapun liber în spațiul toracic decalat.<br>
-            <b style="color:#f59e0b;">Rezultat: Se păstrează lățimea de 1.20m peste tot, fără frecare de umeri.</b>
+            <b style="color:#22c55e;">Rezultat: ZERO zone roșii! Se păstrează lățimea de 1.20m peste tot, fără frecare de umeri.</b>
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-staggered" style="background:#d97706; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('staggered')">
-            <span class="dot dot-yellow"></span>Afișează Soluția 3 pe Plan (Dispunere în Șah)
+          <button class="ctrl-btn" id="card-sol-btn-staggered" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('staggered')">
+            <span class="dot dot-green"></span>Afișează Soluția 3 pe Plan (REAL: Dispunere în Șah)
           </button>
         </div>
 
         <!-- Soluția 4 -->
-        <div class="param-box" style="border-left:3px solid #a855f7;">
-          <div style="font-weight:700; color:#a855f7; font-size:12.5px; margin-bottom:4px;">
-            PROPUNEREA 4: Maximizare Traseu la Pereți (0.60m) + Viraj 0.75m
+        <div class="param-box" style="border-left:3px solid #22c55e;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 4 [REAL]: Maximizare Traseu la Pereți (0.60m) + Viraj 0.75m
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • Traseul se apropie la <b>0.60 m</b> de pereții de capăt și 0.80 m lateral.<br>
-            • Lungimea totală a circuitului crește la <b style="color:#a855f7; font-weight: 700;">304.5 metri</b>.<br>
+            • Lungimea totală a circuitului crește la <b style="color:#22c55e; font-weight: 700;">304.5 metri</b>.<br>
             • Spațiu foarte generos: <b>76.1 cm</b> pe liniile drepte și <b>51.8 cm</b> pe viraje.<br>
-            <b style="color:#a855f7;">Rezultat: Circuit extins la maximum în sala de 35.3m × 21.6m.</b>
+            <b style="color:#22c55e;">Rezultat: ZERO zone roșii! Circuit extins la maximum în sala de 35.3m × 21.6m.</b>
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-max" style="background:#7c3aed; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('max_path')">
-            <span class="dot dot-purple"></span>Afișează Soluția 4 pe Plan (Traseu Maxim 305m)
+          <button class="ctrl-btn" id="card-sol-btn-max" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('max_path')">
+            <span class="dot dot-green"></span>Afișează Soluția 4 pe Plan (REAL: Traseu Maxim 305m)
           </button>
         </div>
 
         <!-- Soluția 5 -->
-        <div class="param-box" style="border-left:3px solid #14b8a6;">
-          <div style="font-weight:700; color:#2dd4bf; font-size:12.5px; margin-bottom:4px;">
-            PROPUNEREA 5: Întorcător în centrul fiecărei curbe
+        <div class="param-box" style="border-left:3px solid #22c55e;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 5 [REAL]: Întorcător în centrul fiecărei curbe
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             • În centrul fiecărei curbe stă <b>un singur asistent (om portocaliu)</b>: participanții trec în curbă strânsă în jurul lui, fără să se oprească, iar el îi întoarce de pe un culoar pe următorul.<br>• Pe curbă nu se stă față în față, ci doar se trece (circa 1 m din traseu pe curbă), deci nu mai există zonă de înghesuială.<br>
-            • Culoarele au <b style="color:#2dd4bf;">30.8 m</b> (capetele la 0.50 m de perete).<br>
-            • Distanța între persoane pe culoar: <b style="color:#2dd4bf;">71.3 cm</b> (umeri 46 cm, deci rămân 25 cm liberi).<br>
+            • Culoarele au <b style="color:#22c55e;">30.8 m</b> (capetele la 0.50 m de perete).<br>
+            • Distanța între persoane pe culoar: <b style="color:#22c55e;">71.3 cm</b> (umeri 46 cm, deci rămân 25 cm liberi).<br>
             • Necesar: <b>8 asistenți întorcători</b>, câte unul în centrul fiecărei curbe, în plus față de A1–A40.<br>
-            <b style="color:#2dd4bf;">Rezultat: 800 de oameni, fără înghesuială la curbe; durata turului rămâne aceeași.</b>
+            <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni, fără înghesuială la curbe; durata turului rămâne aceeași.</b>
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-turners" style="background:#0f766e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('turners')">
-            <span class="dot dot-teal"></span>Afișează Soluția 5 pe Plan (Întorcători)
+          <button class="ctrl-btn" id="card-sol-btn-turners" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('turners')">
+            <span class="dot dot-green"></span>Afișează Soluția 5 pe Plan (REAL: Întorcători)
           </button>
         </div>
 
         <!-- Soluția 6: recomandarea mea -->
-        <div class="param-box" style="border-left:3px solid #a3e635;">
-          <div style="font-weight:700; color:#bef264; font-size:12.5px; margin-bottom:4px;">
-            PROPUNEREA 6 (RECOMANDAREA MEA): întorcători în centrul curbelor + 10 culoare
+        <div class="param-box" style="border-left:3px solid #22c55e;">
+          <div style="font-weight:700; color:#22c55e; font-size:12.5px; margin-bottom:4px;">
+            PROPUNEREA 6 [REAL - RECOMANDAT]: Întorcători în curbe + 10 culoare
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
             Combină tot ce ai cerut într-o singură configurație:<br>
@@ -1799,26 +1827,26 @@
             • <b>Șirurile albastre fără asistenți fixi în spate</b>, la <b>85 cm</b> spate în spate: destul cât un asistent să treacă și să se oprească la ei (minim 60 cm liberi; cu întorcători nu poți coborî sub 50 cm).<br>
             • <b>Asistenții în zone portocalii</b>, în spatele șirurilor roz: 5 zone cu câte 8 asistenți (A1–A40), cu 66 cm liberi fiecare.<br>• <b>Steluțe pentru toți cei 800</b>: aleile din spatele ambelor șiruri au peste 60 cm liberi, deci asistenții se pot opri la fiecare participant; pentru toate steluțele în 10 min (5 s fiecare) sunt necesari 8 asistenți, iar cei 40 termină în aproximativ 1 min 50 s.<br>
             • Spațiul câștigat față de Soluția 5 se folosește pentru <b>un al 10-lea culoar</b> (rămân 0,85 m până la pereții laterali, suficient ca asistenții să ajungă și la șirurile de lângă perete).<br>
-            • <b style="color:#bef264;">79,8 cm între persoane</b> pe culoar (în loc de 71,3 cm la Soluția 5), cu 34 cm liberi față de umeri; pe fiecare culoar stau 80 de oameni în loc de 89.<br>
+            • <b style="color:#22c55e;">79,8 cm între persoane</b> pe culoar (în loc de 71,3 cm la Soluția 5), cu 34 cm liberi față de umeri; pe fiecare culoar stau 80 de oameni în loc de 89.<br>
             • Necesar: 40 de asistenți pe culoare și <b>9 întorcători</b> (câte unul în mijlocul fiecărui capăt).<br>
             • Rezerva: cu 46 cm pe persoană aceeași sală ar încăpea până la aproximativ 1.380 de participanți.<br>
-            <b style="color:#bef264;">Rezultat: 800 de oameni, zero înghesuială, cel mai mult spațiu pe persoană; durata turului rămâne aceeași (66 min 40 s la 10 s pe pas).</b>
+            <b style="color:#22c55e;">Rezultat: ZERO zone roșii! 800 de oameni, zero înghesuială, cel mai mult spațiu pe persoană; durata turului rămâne aceeași.</b>
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-recommended" style="background:#4d7c0f; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('recommended')">
-            <span class="dot dot-lime"></span>Afișează Soluția 6 pe Plan (Recomandat)
+          <button class="ctrl-btn" id="card-sol-btn-recommended" style="background:#059669; border-color:#22c55e; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('recommended')">
+            <span class="dot dot-green"></span>Afișează Soluția 6 pe Plan (REAL: Recomandat)
           </button>
         </div>
 
         <!-- Comparație cu Problema Inițială -->
         <div class="param-box" style="border-left:3px solid #ef4444;">
           <div style="font-weight:700; color:#ef4444; font-size:12px; margin-bottom:4px;">
-            COMPARAȚIE: Configurația Inițială cu Problema Roșie
+            COMPARAȚIE [NEREAL - PROBLEMĂ]: Configurația Inițială cu Blocaje Roșii
           </div>
           <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45; margin-bottom:8px;">
-            Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje.
+            Arată exact de ce la viraj de 1.20m standard apare înghesuiala de 35.1 cm pe interiorul celor 8 viraje (< 46cm umeri = coliziune garantată).
           </div>
-          <button class="ctrl-btn" id="card-sol-btn-none" style="background:#dc2626; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('none')">
-            <span class="dot dot-red"></span>Arată Problema Inițială (Zone Roșii)
+          <button class="ctrl-btn" id="card-sol-btn-none" style="background:#dc2626; border-color:#ef4444; color:#fff; width:100%; font-weight:700;" onclick="setSolution800('none')">
+            <span class="dot dot-red"></span>Arată Problema Inițială (NEREAL: Zone Roșii)
           </button>
         </div>
 
@@ -1986,13 +2014,13 @@
       </div>
 
       <div class="hud-seg" role="group" aria-label="Soluții 800 persoane">
-        <button class="sol-pill active" id="sol-btn-tapered" onclick="setSolution800('tapered')"><span class="dot dot-green"></span>1 &middot; Culoar 0.70 m</button>
-        <button class="sol-pill" id="sol-btn-transit" onclick="setSolution800('transit')"><span class="dot dot-blue"></span>2 &middot; Tranzit</button>
-        <button class="sol-pill" id="sol-btn-staggered" onclick="setSolution800('staggered')"><span class="dot dot-yellow"></span>3 &middot; Șah</button>
-        <button class="sol-pill" id="sol-btn-max" onclick="setSolution800('max_path')"><span class="dot dot-purple"></span>4 &middot; Traseu 305 m</button>
-        <button class="sol-pill" id="sol-btn-turners" onclick="setSolution800('turners')"><span class="dot dot-teal"></span>5 &middot; Întorcători</button>
-        <button class="sol-pill" id="sol-btn-recommended" onclick="setSolution800('recommended')"><span class="dot dot-lime"></span>6 &middot; Recomandat</button>
-        <button class="sol-pill" id="sol-btn-none" onclick="setSolution800('none')"><span class="dot dot-red"></span>Problema</button>
+        <button class="sol-pill active is-real" id="sol-btn-tapered" onclick="setSolution800('tapered')"><span class="dot dot-green"></span>1 &middot; Culoar 0.70 m</button>
+        <button class="sol-pill is-real" id="sol-btn-transit" onclick="setSolution800('transit')"><span class="dot dot-green"></span>2 &middot; Tranzit</button>
+        <button class="sol-pill is-real" id="sol-btn-staggered" onclick="setSolution800('staggered')"><span class="dot dot-green"></span>3 &middot; Șah</button>
+        <button class="sol-pill is-real" id="sol-btn-max" onclick="setSolution800('max_path')"><span class="dot dot-green"></span>4 &middot; Traseu 305 m</button>
+        <button class="sol-pill is-real" id="sol-btn-turners" onclick="setSolution800('turners')"><span class="dot dot-green"></span>5 &middot; Întorcători</button>
+        <button class="sol-pill is-real" id="sol-btn-recommended" onclick="setSolution800('recommended')"><span class="dot dot-green"></span>6 &middot; Recomandat</button>
+        <button class="sol-pill is-not-real" id="sol-btn-none" onclick="setSolution800('none')"><span class="dot dot-red"></span>Problema</button>
       </div>
 
       <div id="overlay-congestion-badge" class="hud-status"><span id="overlay-congestion-text">Soluția 1 activă</span></div>
@@ -2682,24 +2710,24 @@
           cBadge.style.background = 'rgba(239, 68, 68, 0.22)';
           cBadge.style.borderColor = '#ef4444';
           cBadge.style.color = '#fca5a5';
-          cText.innerHTML = `<span class="dot dot-red"></span>Problemă: ${nTurns} Bucle Roșii (${(spaceInner*100).toFixed(1)} cm &lt; 46 cm umeri)`;
+          cText.innerHTML = `<span class="dot dot-red"></span>NEREAL · Problemă înghesuială: ${nTurns} Bucle Roșii (${(spaceInner*100).toFixed(1)} cm &lt; 46 cm umeri)`;
         } else {
           cBadge.style.background = 'rgba(34, 197, 94, 0.20)';
           cBadge.style.borderColor = '#22c55e';
           cBadge.style.color = '#86efac';
-          let solMsg = `<span class="dot dot-green"></span>Soluție 800 Activă: ${nTurns} Bucle Verzi (Zero Roșu)`;
+          let solMsg = `<span class="dot dot-green"></span>REAL (Zero Roșu): ${nTurns} Bucle Verzi`;
           if (currentSolution800 === 'tapered') {
-            solMsg = `<span class="dot dot-green"></span>Soluția 1 (Culoar 0.70m): ${(spaceInner*100).toFixed(1)} cm pe viraj &gt; 46cm umeri (Zero Roșu)`;
+            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 1 (Culoar 0.70m): ${(spaceInner*100).toFixed(1)} cm pe viraj &gt; 46cm umeri (Zero Roșu)`;
           } else if (currentSolution800 === 'transit') {
-            solMsg = `<span class="dot dot-blue"></span>Soluția 2: Viraj Tranzit Fluid (66.1 cm pe linii drepte | Zero Roșu)`;
+            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 2 (Tranzit Fluid): 66.1 cm pe linii drepte (Zero Roșu)`;
           } else if (currentSolution800 === 'staggered') {
-            solMsg = `<span class="dot dot-yellow"></span>Soluția 3: Dispunere în Șah (Decalaj 20cm | Fără contact umeri)`;
+            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 3 (Dispunere în Șah): Decalaj 20cm (Fără contact umeri)`;
           } else if (currentSolution800 === 'recommended') {
-            solMsg = `<span class="dot dot-lime"></span>Soluția 6 (recomandată): ${nLanes} culoare, ${(stepDist*100).toFixed(1)} cm între persoane | ${nLanes - 1} întorcători în centrul curbelor`;
+            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 6 (Recomandată): ${nLanes} culoare, ${(stepDist*100).toFixed(1)} cm/pers | ${nLanes - 1} întorcători`;
           } else if (currentSolution800 === 'turners') {
-            solMsg = `<span class="dot dot-teal"></span>Soluția 5: Întorcător în centrul curbelor (${(stepDist*100).toFixed(1)} cm între persoane pe drept | ${nLanes - 1} întorcători în centrul curbelor)`;
+            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 5 (Întorcători): ${(stepDist*100).toFixed(1)} cm/pers pe drept (Zero Roșu)`;
           } else if (currentSolution800 === 'max_path') {
-            solMsg = `<span class="dot dot-purple"></span>Soluția 4: Traseu Maxim 305m (${(spaceInner*100).toFixed(1)}cm viraj, 76cm drept)`;
+            solMsg = `<span class="dot dot-green"></span>REAL · Soluția 4 (Traseu Maxim 305m): ${(spaceInner*100).toFixed(1)}cm viraj, 76cm drept (Zero Roșu)`;
           }
           cText.innerHTML = solMsg;
         }
@@ -2721,6 +2749,7 @@
       document.querySelectorAll('.btn-wside').forEach(b => {
         b.classList.toggle('active', Math.abs(parseFloat(b.innerText) - wallDistSide) < 0.05);
       });
+      updateSolutionPills();
     }
 
     // --- CONTRASENS STEP LOGIC ---
@@ -3295,26 +3324,97 @@
       if (window.innerWidth <= 900) setMobileView('plan');
     }
 
+    function isSolutionReal(mode) {
+      if (partCount <= 0) return true;
+      const pairs = Math.round(partCount / 2);
+      const stepDist = pairs > 0 ? (totalVirtualLength / pairs) : 0;
+      if (mode === 'turners' || mode === 'recommended' || mode === 'transit' || mode === 'staggered') {
+        return true;
+      }
+      if (mode === 'tapered') {
+        const wTurn = 0.70;
+        const rInner = Math.max(0.05, rTurn - wTurn / 2);
+        const spaceInner = (rTurn > 0 && pairs > 0) ? stepDist * (rInner / rTurn) : 0;
+        return spaceInner >= 0.46;
+      }
+      if (mode === 'max_path') {
+        const wTurn = 0.75;
+        const rInner = Math.max(0.05, rTurn - wTurn / 2);
+        const spaceInner = (rTurn > 0 && pairs > 0) ? stepDist * (rInner / rTurn) : 0;
+        return spaceInner >= 0.46;
+      }
+      if (mode === 'none') {
+        const wTurn = 1.20;
+        const rInner = Math.max(0.05, rTurn - wTurn / 2);
+        const spaceInner = (rTurn > 0 && pairs > 0) ? stepDist * (rInner / rTurn) : 0;
+        return spaceInner >= 0.46;
+      }
+      return true;
+    }
+
     function updateSolutionPills() {
       const pillMap = [
-        { id: 'sol-btn-tapered', mode: 'tapered' },
-        { id: 'sol-btn-transit', mode: 'transit' },
-        { id: 'sol-btn-staggered', mode: 'staggered' },
-        { id: 'sol-btn-max', mode: 'max_path' },
-        { id: 'sol-btn-turners', mode: 'turners' },
-        { id: 'sol-btn-recommended', mode: 'recommended' },
-        { id: 'sol-btn-none', mode: 'none' }
+        { id: 'sol-btn-tapered', mode: 'tapered', name: '1 · Culoar 0.70 m' },
+        { id: 'sol-btn-transit', mode: 'transit', name: '2 · Tranzit' },
+        { id: 'sol-btn-staggered', mode: 'staggered', name: '3 · Șah' },
+        { id: 'sol-btn-max', mode: 'max_path', name: '4 · Traseu 305 m' },
+        { id: 'sol-btn-turners', mode: 'turners', name: '5 · Întorcători' },
+        { id: 'sol-btn-recommended', mode: 'recommended', name: '6 · Recomandat' },
+        { id: 'sol-btn-none', mode: 'none', name: 'Problema' }
       ];
       pillMap.forEach(item => {
+        const isReal = isSolutionReal(item.mode);
         const btn = document.getElementById(item.id);
-        if (btn) btn.classList.toggle('active', currentSolution800 === item.mode);
+        if (btn) {
+          const isActive = (currentSolution800 === item.mode);
+          btn.classList.toggle('active', isActive);
+          btn.classList.toggle('is-real', isReal);
+          btn.classList.toggle('is-not-real', !isReal);
+          const dotColor = isReal ? 'green' : 'red';
+          const realTag = isReal ? '' : ' (Nereal)';
+          btn.innerHTML = `<span class="dot dot-${dotColor}"></span>${item.name}${realTag}`;
+          if (isActive) {
+            btn.style.background = isReal ? '#059669' : '#dc2626';
+            btn.style.borderColor = isReal ? '#34d399' : '#f87171';
+            btn.style.boxShadow = isReal ? '0 0 12px rgba(52, 211, 153, 0.45)' : '0 0 12px rgba(248, 113, 113, 0.45)';
+            btn.style.color = '#fff';
+            btn.style.fontWeight = '700';
+          } else {
+            btn.style.background = isReal ? 'rgba(6, 78, 59, 0.45)' : 'rgba(127, 29, 29, 0.45)';
+            btn.style.borderColor = isReal ? 'rgba(52, 211, 153, 0.45)' : 'rgba(248, 113, 113, 0.45)';
+            btn.style.boxShadow = '';
+            btn.style.color = isReal ? '#ecfdf5' : '#fef2f2';
+            btn.style.fontWeight = '600';
+          }
+        }
         const cardBtn = document.getElementById(`card-${item.id}`);
-        if (cardBtn) cardBtn.classList.toggle('active', currentSolution800 === item.mode);
+        if (cardBtn) {
+          const isActive = (currentSolution800 === item.mode);
+          cardBtn.classList.toggle('active', isActive);
+          cardBtn.classList.toggle('is-real', isReal);
+          cardBtn.classList.toggle('is-not-real', !isReal);
+          if (isReal) {
+            cardBtn.style.background = isActive ? '#059669' : 'rgba(5, 150, 105, 0.25)';
+            cardBtn.style.borderColor = isActive ? '#34d399' : '#22c55e';
+            cardBtn.style.boxShadow = isActive ? '0 0 12px rgba(52, 211, 153, 0.5)' : '';
+          } else {
+            cardBtn.style.background = isActive ? '#dc2626' : 'rgba(220, 38, 38, 0.25)';
+            cardBtn.style.borderColor = isActive ? '#f87171' : '#ef4444';
+            cardBtn.style.boxShadow = isActive ? '0 0 12px rgba(248, 113, 113, 0.5)' : '';
+          }
+          cardBtn.style.color = '#fff';
+          const dotColor = isReal ? 'green' : 'red';
+          const realLabel = isReal ? 'REAL' : 'NEREAL';
+          cardBtn.innerHTML = `<span class="dot dot-${dotColor}"></span>${isActive ? '✓ ACTIV: ' : ''}[${realLabel}] ${item.name}`;
+        }
       });
-      const short = { tapered: ['Sol. 1', 'green'], transit: ['Sol. 2', 'blue'], staggered: ['Sol. 3', 'yellow'], max_path: ['Sol. 4', 'purple'],
-                      turners: ['Sol. 5', 'teal'], recommended: ['Sol. 6', 'lime'], none: ['Problema', 'red'] }[currentSolution800] || ['', 'green'];
+      const isCurReal = isSolutionReal(currentSolution800);
+      const curShortName = { tapered: 'Sol. 1', transit: 'Sol. 2', staggered: 'Sol. 3', max_path: 'Sol. 4', turners: 'Sol. 5', recommended: 'Sol. 6', none: 'Problema' }[currentSolution800] || 'Soluție';
       const hs = document.getElementById('hud-sol');
-      if (hs) hs.innerHTML = `<span class="dot dot-${short[1]}"></span><span>${short[0]}</span>`;
+      if (hs) {
+        hs.innerHTML = `<span class="dot dot-${isCurReal ? 'green' : 'red'}"></span><span>${curShortName}</span>`;
+        hs.style.color = isCurReal ? '#86efac' : '#fca5a5';
+      }
     }
 
     function toggleSidebar() {
