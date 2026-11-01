@@ -827,6 +827,10 @@
       .stage > .canvas-overlay-info .hud-row { flex-wrap: wrap; gap: 2px 14px; }
       .stage > .canvas-overlay-info .hud-sub { display: none; }
     }
+
+    .fast-box { margin-bottom: 14px; }
+    .ctl-wide { width: 100%; }
+    .tool-btn.on { background: #0284c7; border-color: #38bdf8; color: #fff; }
   </style>
 </head>
 <body>
@@ -912,6 +916,17 @@
           <button class="ctl ctl-primary" onclick="triggerContrasensStep()">Pas la dreapta <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <button id="btn-flow-play" class="ctl" onclick="toggleFlowPlay()"><span id="play-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></span> Pauză</button>
           <button class="ctl" onclick="resetCircuit()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reset</button>
+        </div>
+
+        <!-- Simulare rapida: tot turul in cateva secunde -->
+        <div class="fast-box">
+          <button id="btn-fastsim" class="ctl ctl-wide" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg> <span id="fastsim-label">Simulare rapidă</span></button>
+          <div class="param-header" style="margin-top:10px;">
+            <span class="param-name">Durata simulării rapide</span>
+            <span class="param-val" id="disp-fastdur">8 s</span>
+          </div>
+          <input type="range" class="param-slider" id="rng-fastdur" min="3" max="60" step="1" value="8" oninput="updateFastDur(this.value)">
+          <div id="fastsim-out" class="star-out" style="margin-top:8px; border-top:none; padding-top:0;">Rulează toți pașii într-un timp scurt; în pauzele dintre pași asistenții dau steluțe.</div>
         </div>
 
         <!-- Progress Box -->
@@ -1026,7 +1041,7 @@
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-reach" onchange="redraw()">
-            <span style="color:#facc15;">Acces la steluțe: stea aurie dacă asistenții ajung la participant, punct roșu dacă nu</span>
+            <span style="color:#facc15;">Marchează cu punct roșu participanții la care asistenții nu ajung</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
             <input type="checkbox" id="chk-wall-dims" checked onchange="redraw()">
@@ -1117,6 +1132,10 @@
             <span class="param-val" id="disp-distrib">10 min</span>
           </div>
           <input type="range" class="param-slider" id="rng-distrib" min="2" max="90" step="1" value="10" oninput="onStarChange()">
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; margin-top:12px;">
+            <input type="checkbox" id="chk-assist-blue" onchange="onAssistBlueChange()">
+            <span>Asistenți și în aleile albastre (steluță pentru toți participanții)</span>
+          </label>
           <div id="star-out" class="star-out"></div>
         </div>
 
@@ -1453,6 +1472,12 @@
           <b id="ovl-total-time" class="hud-val">66 min 40s</b>
           <span id="ovl-total-sub" class="hud-sub">(400 pași la 10s)</span>
         </div>
+        <span class="hud-sep"></span>
+        <div class="hud-stat">
+          <svg class="ic" style="width:16px;height:16px;color:#facc15;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 6.5 7 .9-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.9z"/></svg>
+          <span class="hud-label">Steluțe</span>
+          <b id="hud-stars" class="hud-val">0 / 800</b>
+        </div>
         <button class="hud-toggle" title="Micșorează / extinde panoul" onclick="toggleHud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
       </div>
 
@@ -1482,6 +1507,7 @@
         <button class="tool-btn" title="Recentrează vederea" onclick="resetZoom()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
         <span class="tool-sep tool-ctl"></span>
         <button class="tool-btn tool-ctl" id="tool-play" title="Pauză / Pornește" onclick="toolPlayToggle()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg></button>
+        <button class="tool-btn tool-ctl" id="tool-fast" title="Simulare rapidă (tot turul în câteva secunde)" onclick="toggleFastSim()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6"/></svg></button>
         <button class="tool-btn tool-ctl" title="Pas la dreapta" onclick="triggerContrasensStep()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         <span class="tool-sep"></span>
         <button class="tool-btn" id="tool-fs" title="Ecran complet (fără meniu lateral)" onclick="toggleFullscreen()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -1546,7 +1572,13 @@
     let laneXs = [];          // pozitiile X ale axelor culoarelor
     let starSec = 5;          // secunde pe steluta (oprire la fiecare participant)
     let distribMin = 10;      // in cate minute trebuie distribuite toate steluțele
-    let starRowOk = [];       // pentru fiecare culoar: daca asistentii ajung la sirul din stanga / dreapta
+    let starRowOk = [];
+    let assistBlue = false;   // asistenti si in aleile albastre (ca sa primeasca steluta toti participantii)
+    let fastDur = 8;          // durata simularii rapide (secunde)
+    const fastSim = { active: false, t0: 0, dur: 8, done: 0 };
+    let starred = new Set();  // participantii care au primit steluta
+    let starEvents = [];      // animatii: asistent -> participant
+    const REACH_Y = 0.80;     // cat de departe pe culoar ajunge un asistent de la locul lui (m)       // pentru fiecare culoar: daca asistentii ajung la sirul din stanga / dreapta
     const WALK_W = 0.60;      // latimea libera minima ca un asistent sa poata merge si sa se opreasca
     let assistAisles = [];    // zonele de asistenti (intre doua siruri roz, plus marginea dreapta daca nr. culoare e impar)
     let backGapAuto = true;   // true = culoarele umplu sala (distanta rezulta); false = distanta setata manual
@@ -1613,6 +1645,7 @@
       buildDynamicPath(yTop, yBottom, marginX);
       buildDynamicAssistants(yTop, yBottom, marginX);
       computeStarPlan();
+      resetStars();
       updateMetrics();
       redraw();
     }
@@ -1722,6 +1755,12 @@
     // ===================== STELUTE: acces la fiecare participant + cati asistenti sunt necesari =====================
     // Dupa ce participantii au trecut, asistentii merg pe aleile din spatele sirurilor si se opresc la fiecare participant.
     // Un sir poate fi servit doar daca aleea din spatele lui are latimea libera >= 60 cm.
+    function aisleFreeK(k) {   // k = -1: perete stanga; k = nLanes-1: perete dreapta
+      const halfW = corridorW / 2;
+      if (k < 0) return laneXs[0] - halfW - TORSO_DEPTH / 2;
+      if (k >= nLanes - 1) return ROOM_W - (laneXs[nLanes - 1] + halfW) - TORSO_DEPTH / 2;
+      return laneXs[k + 1] - laneXs[k] - corridorW - TORSO_DEPTH;
+    }
     function computeStarPlan() {
       const laneSegs = pathSegments.filter(sg => sg.type === 'line');
       const pairs = Math.round(partCount / 2);
@@ -1731,11 +1770,7 @@
       const rows = [];
       const aisles = [];          // pentru fiecare alee: {name, free, ok, persons}
       starRowOk = [];
-      const aisleFree = (k) => {  // k = -1: perete stanga; k = nLanes-1: perete dreapta
-        if (k < 0) return laneXs[0] - halfW - TORSO_DEPTH / 2;
-        if (k >= nLanes - 1) return ROOM_W - (laneXs[nLanes - 1] + halfW) - TORSO_DEPTH / 2;
-        return laneXs[k + 1] - laneXs[k] - corridorW - TORSO_DEPTH;
-      };
+      const aisleFree = aisleFreeK;
       for (let i = 0; i < laneSegs.length; i++) {
         const persons = pairs * laneSegs[i].length / sumLaneLen;               // persoane pe un sir al culoarului (curbele sunt doar tranzit)
         const down = laneSegs[i].dir === 'down';
@@ -1775,6 +1810,7 @@
     // Culoarele merg alternativ (jos/sus), deci spatiile 0, 2, 4... sunt roz-roz; 1, 3, 5... sunt albastru-albastru (fara asistenti).
     function aisleBoundsK(k) {
       const halfW = corridorW / 2;
+      if (k < 0) return { left: 0.15, right: Math.max(0.25, laneXs[0] - halfW - TORSO_DEPTH / 2) };
       const left = laneXs[k] + halfW + TORSO_DEPTH / 2;
       const right = (k < nLanes - 1) ? (laneXs[k + 1] - halfW - TORSO_DEPTH / 2) : (ROOM_W - 0.15);
       return { left, right: Math.max(left + 0.1, right) };
@@ -1785,6 +1821,13 @@
       assistAisles = [];
       for (let k = 0; k < nLanes - 1; k += 2) assistAisles.push(k);
       if (nLanes % 2 === 1) assistAisles.push(nLanes - 1);      // marginea dreapta: ultimul culoar are sirul roz spre perete
+      if (assistBlue) {
+        // si in aleile albastre (doar cele pe care un asistent poate merge): steluta ajunge la toti participantii
+        for (let k = 1; k < nLanes - 1; k += 2) if (aisleFreeK(k) >= WALK_W) assistAisles.push(k);
+        if (aisleFreeK(-1) >= WALK_W) assistAisles.push(-1);
+        if (nLanes % 2 === 0 && aisleFreeK(nLanes - 1) >= WALK_W) assistAisles.push(nLanes - 1);
+        assistAisles.sort((u, v) => u - v);
+      }
       const nAis = assistAisles.length;
       if (!nAis || !assistCount) return;
       const base = Math.floor(assistCount / nAis);
@@ -1828,6 +1871,10 @@
       onRoomChange();
     }
 
+    function onAssistBlueChange() {
+      assistBlue = document.getElementById('chk-assist-blue').checked;
+      recalculateAll();
+    }
     function onStarChange() {
       starSec = parseFloat(document.getElementById('rng-starsec').value);
       distribMin = parseFloat(document.getElementById('rng-distrib').value);
@@ -1959,6 +2006,110 @@
     // --- CONTRASENS STEP LOGIC ---
     // Când omul din stânga pășește spre dreapta sa (+d), omul din dreapta pășește spre dreapta sa (-d, contrasens)
     // Deplasarea relativă este de 1 pas complet, întâlnind exact partenerul următor FAȚĂ ÎN FAȚĂ!
+
+    // ===================== STELUTE IN SIMULARE =====================
+    // In pauza dintre pasi, asistentii se opresc la participantii din dreptul lor si le dau steluta.
+    function participantsAt(shift) {
+      const pairs = Math.round(partCount / 2), step = totalVirtualLength / pairs, halfW = corridorW / 2;
+      const out = [];
+      for (let i = 0; i < pairs; i++) {
+        for (const sgn of [1, -1]) {
+          const d = ((i + 0.5) * step + sgn * shift + totalVirtualLength * 100) % totalVirtualLength;
+          const pt = getPointAtV(d);
+          if (pt.type !== 'line') continue;
+          const ux = -Math.sin(pt.angle), uy = Math.cos(pt.angle);
+          out.push({ key: i + (sgn > 0 ? 'b' : 'p'), x: pt.x + sgn * ux * halfW, y: pt.y + sgn * uy * halfW });
+        }
+      }
+      return out;
+    }
+
+    function serveStars() {
+      if (!assistants.length) return;
+      const k = Math.max(1, Math.floor(stepIntervalSec / starSec));        // cate steluțe poate da un asistent intr-o pauza
+      const P = participantsAt(targetShift);
+      const now = performance.now();
+      for (const a of assistants) {
+        const bd = aisleBoundsK(a.aisle);
+        const cand = [];
+        for (const p of P) {
+          if (starred.has(p.key)) continue;
+          if (p.x < bd.left - 0.2 || p.x > bd.right + 0.2) continue;
+          const dy = Math.abs(p.y - a.y);
+          if (dy <= REACH_Y) cand.push({ p, dy });
+        }
+        cand.sort((u, v) => u.dy - v.dy);
+        for (let j = 0; j < Math.min(k, cand.length); j++) {
+          const p = cand[j].p;
+          starred.add(p.key);
+          starEvents.push({ ax: a.x, ay: a.y, px: p.x, py: p.y, t: now });
+        }
+      }
+      updateStarHUD();
+    }
+    function resetStars() {
+      starred = new Set(); starEvents = [];
+      serveStars();
+    }
+    function updateStarHUD() {
+      const el = document.getElementById('hud-stars');
+      if (el) el.innerText = `${starred.size} / ${partCount}`;
+    }
+    function drawStarEvents() {
+      const now = performance.now();
+      starEvents = starEvents.filter(e => now - e.t < 1600);
+      for (const e of starEvents) {
+        const k = 1 - (now - e.t) / 1600;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, k);
+        ctx.strokeStyle = '#facc15'; ctx.lineWidth = 0.05;
+        ctx.setLineDash([0.12, 0.1]);
+        ctx.beginPath(); ctx.moveTo(e.ax, e.ay); ctx.lineTo(e.px, e.py); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(e.ax, e.ay, 0.55 + 0.35 * (1 - k), 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    // steluta primita: aurie, in spatele participantului
+    function drawStarredMarker(px, py, pt, key) {
+      if (!starred.has(key) || !pt) return;
+      const dx = px - pt.x, dy = py - pt.y, dl = Math.hypot(dx, dy) || 1;
+      const mx = px + (dx / dl) * 0.30, my = py + (dy / dl) * 0.30;
+      ctx.save();
+      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 0.03;
+      drawStarShape(ctx, mx, my, 0.15); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+
+    // ===================== SIMULARE RAPIDA: tot turul in cateva secunde =====================
+    function updateFastDur(v) {
+      fastDur = parseFloat(v);
+      const d = document.getElementById('disp-fastdur'); if (d) d.innerText = fastDur + ' s';
+    }
+    function toggleFastSim() {
+      if (fastSim.active) { endFastSim(true); return; }
+      resetCircuit();
+      fastSim.active = true; fastSim.t0 = performance.now(); fastSim.dur = fastDur; fastSim.done = 0;
+      syncFastUI();
+    }
+    function endFastSim(stopped) {
+      fastSim.active = false;
+      stepTimer = 0;
+      const pairs = Math.round(partCount / 2);
+      const out = document.getElementById('fastsim-out');
+      if (out) {
+        const real = fmtDur(pairs * stepIntervalSec);
+        out.innerHTML = `${stopped ? 'Oprită la' : 'Gata:'} pasul <b>${Math.min(pairs, currentStepNumber)} din ${pairs}</b>, în ${fastDur} s (în realitate ${real}).<br>Steluțe date: <b>${starred.size} din ${partCount}</b>` + (starred.size < partCount ? ' <span class="bad">(unii participanți nu au asistent în dreptul lor)</span>' : ' <span class="ok">(toți)</span>');
+      }
+      syncFastUI();
+    }
+    function syncFastUI() {
+      const b = document.getElementById('btn-fastsim');
+      if (b) b.classList.toggle('ctl-primary', fastSim.active);
+      const lbl = document.getElementById('fastsim-label'); if (lbl) lbl.innerText = fastSim.active ? 'Oprește simularea' : 'Simulare rapidă';
+      const t = document.getElementById('tool-fast'); if (t) t.classList.toggle('on', fastSim.active);
+    }
+
     function triggerContrasensStep() {
       const pairs = Math.round(partCount / 2);
       const stepDist = totalVirtualLength / pairs;
@@ -1967,6 +2118,7 @@
       currentStepNumber++;
 
       updateStepProgressUI();
+      serveStars();
     }
 
     function triggerContrasensStepBack() {
@@ -1993,6 +2145,7 @@
       currentStepNumber = 1;
       stepTimer = 0;
       updateStepProgressUI();
+      resetStars();
       redraw();
     }
 
@@ -2362,14 +2515,24 @@
       lastTime = currentTime;
 
       if (dt > 0 && dt < 0.1) {
-        // Smoothly glide to the target shift
-        animShift += (targetShift - animShift) * (1 - Math.exp(-dt * 3 / stepGlideSec));   // pasul se termină în ~stepGlideSec secunde
+        if (fastSim.active) {
+          // simulare rapida: tot turul in fastSim.dur secunde, fara pauze
+          const pairs = Math.round(partCount / 2);
+          const elapsed = (currentTime - fastSim.t0) / 1000;
+          const want = Math.min(pairs - 1, Math.floor(elapsed / fastSim.dur * (pairs - 1)));
+          while (fastSim.done < want) { triggerContrasensStep(); fastSim.done++; }
+          animShift = targetShift;
+          if (elapsed >= fastSim.dur) endFastSim(false);
+        } else {
+          // Smoothly glide to the target shift
+          animShift += (targetShift - animShift) * (1 - Math.exp(-dt * 3 / stepGlideSec));   // pasul se termină în ~stepGlideSec secunde
 
-        if (isFlowPlaying) {
-          stepTimer += dt;
-          if (stepTimer >= stepIntervalSec) {
-            stepTimer = 0;
-            triggerContrasensStep();
+          if (isFlowPlaying) {
+            stepTimer += dt;
+            if (stepTimer >= stepIntervalSec) {
+              stepTimer = 0;
+              triggerContrasensStep();
+            }
           }
         }
 
@@ -2429,6 +2592,7 @@
 
       // DRAW THE CONTRASENS FACE-TO-FACE PARTICIPANTS
       drawContrasensParticipants();
+      drawStarEvents();
 
       drawDimensions();
     }
@@ -2738,14 +2902,10 @@
       const ok = info[side];
       const dx = px - pt.x, dy = py - pt.y, dl = Math.hypot(dx, dy) || 1;
       const mx = px + (dx / dl) * 0.26, my = py + (dy / dl) * 0.26;
+      if (ok) return;      // doar participantii la care asistentii nu ajung sunt marcati (punct rosu)
       ctx.save();
-      if (ok) {
-        ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#854d0e'; ctx.lineWidth = 0.025;
-        drawStarShape(ctx, mx, my, 0.13); ctx.fill(); ctx.stroke();
-      } else {
-        ctx.fillStyle = '#ef4444'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.025;
-        ctx.beginPath(); ctx.arc(mx, my, 0.07, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      }
+      ctx.fillStyle = '#ef4444'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.025;
+      ctx.beginPath(); ctx.arc(mx, my, 0.09, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
       ctx.restore();
     }
 
@@ -2827,6 +2987,7 @@
           isCongested1, space1
         );
         if (showReach) drawReachMarker(p1x, p1y, pt1);
+        drawStarredMarker(p1x, p1y, pt1, i + 'b');
 
         // Draw Person 2 (Rose or RED if congested)
         const isLead2 = (i === 0 && showLead);
@@ -2841,6 +3002,7 @@
           isCongested2, space2
         );
         if (showReach) drawReachMarker(p2x, p2y, pt2);
+        drawStarredMarker(p2x, p2y, pt2, i + 'p');
       }
 
       // SIGHTLINES (Linii de privire discrete FAȚĂ ÎN FAȚĂ):
@@ -3666,7 +3828,7 @@
       CHK_IDS.forEach(id => { const el = document.getElementById(id); if (el) chk[id] = el.checked; });
       return {
         v: 1, roomW: ROOM_W, roomL: ROOM_L, partCount, assistCount, nLanes, corridorW, corridorWTurn, wallDistEnd, wallDistSide,
-        backGap, backGapAuto, assistGap, starSec, distribMin, sol: currentSolution800, stepIntervalSec, stepGlideSec,
+        backGap, backGapAuto, assistGap, starSec, distribMin, fastDur, assistBlue, sol: currentSolution800, stepIntervalSec, stepGlideSec,
         viewRot, cam: camMode, tab: TAB_IDS[Math.max(0, activeTabIdx)], chk,
         sidebarCollapsed: !!(sb && sb.classList.contains('collapsed')), hudMin: !!(hud && hud.classList.contains('hud-min'))
       };
@@ -3700,6 +3862,9 @@
       assistGap = num(st.assistGap, assistGap);
       starSec = num(st.starSec, starSec);
       distribMin = num(st.distribMin, distribMin);
+      fastDur = num(st.fastDur, fastDur);
+      assistBlue = !!st.assistBlue;
+      { const ab = document.getElementById('chk-assist-blue'); if (ab) ab.checked = assistBlue; const fd = document.getElementById('rng-fastdur'); if (fd) fd.value = fastDur; updateFastDur(fastDur); }
       if (['none', 'tapered', 'transit', 'staggered', 'max_path', 'turners', 'recommended'].includes(st.sol)) currentSolution800 = st.sol;
       viewRot = num(st.viewRot, 0);
       const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
