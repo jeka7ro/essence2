@@ -4166,9 +4166,7 @@
     function setSolution800(mode) {
       const prevMode = currentSolution800;
       currentSolution800 = mode;
-      partCount = 800;
-      nLanes = (mode === 'recommended') ? 10 : 9;
-      assistCount = 40;
+
       if (mode === 'recommended') {
         assistGap = 0.90;      // aleea asistentilor: 66 cm liberi (asistentul merge si se opreste la fiecare participant)
         backGap = 0.85;        // aleea albastra: 61 cm liberi, deci asistentii ajung si la participantii albastri
@@ -4178,12 +4176,15 @@
         backGapAuto = true;
       }
 
+      // Nu resetăm partCount, nLanes sau assistCount - păstrăm numerele alese de utilizator!
       const inpPart = document.getElementById('rng-part');
-      if (inpPart) inpPart.value = 800;
+      if (inpPart) inpPart.value = partCount;
+      const numPart = document.getElementById('inp-part-num');
+      if (numPart) numPart.value = partCount;
       const inpLanes = document.getElementById('rng-lanes');
       if (inpLanes) inpLanes.value = nLanes;
       const inpAssist = document.getElementById('rng-assist');
-      if (inpAssist) inpAssist.value = 40;
+      if (inpAssist) inpAssist.value = assistCount;
 
       if (mode === 'tapered') {
         corridorW = 1.20;
@@ -4223,6 +4224,10 @@
       if (elEnd) elEnd.value = wallDistEnd;
       const elSide = document.getElementById('rng-wall-side');
       if (elSide) elSide.value = wallDistSide;
+      const elBack = document.getElementById('rng-backgap');
+      if (elBack) elBack.value = backGap;
+      const elAGap = document.getElementById('rng-assistgap');
+      if (elAGap) elAGap.value = assistGap;
 
       updateSolutionPills();
       recalculateAll();
